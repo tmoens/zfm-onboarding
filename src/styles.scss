@@ -23,3 +23,10 @@
     background-color: mat.get-color-from-palette(map-get($zf-app-theme, primary), lighter, 0.5);
   }
 }
+
+.zf-field-header {
+  font-weight: 500 !important;
+}
+.zf-field-boo-boo {
+  color: mat.get-color-from-palette(map-get($zf-app-theme, warn));
+}

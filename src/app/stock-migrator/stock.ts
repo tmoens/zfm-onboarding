@@ -3,7 +3,7 @@
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
 
-import {StockProblem, StockProblemType} from './StockProblem';
+import {StockProblem, StockProblemFields, StockProblemType} from './stock-problem';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -11,6 +11,7 @@ import {StockProblem, StockProblemType} from './StockProblem';
 // The following regular expression is used to validate a
 // stock name and extract the stock number and substock number.
 const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
+
 
 export class Stock {
   get row(): number {
@@ -56,7 +57,8 @@ export class Stock {
   mutations?: string[] = [];
   transgenes?: string[] = [];
   comment?: string; // some comment specific to the stock
-  problems: StockProblem[] = [];
+  problems: { [index: string]: StockProblem[] } = {};
+  private _duplicates: number[] = [];
 
   constructor(
     private _row: number, // the row on the input spreadsheet that this stock was found on
@@ -66,28 +68,31 @@ export class Stock {
       return;
     }
     if (!rawStock.stockName) {
-      this.addProblem(new StockProblem(StockProblemType.BAD_NAME, 'no stock name'));
+      this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID, 'no stock name'));
     } else {
-      this._stockName = String(rawStock.stockName).trim();
-      this.convertStockNameToNumber();
+      this.stockName = String(rawStock.stockName).trim();
+      if (Stock.validateStockName(this.stockName)) {
+        this.computeStockNumber(this.stockName);
+      } else {
+        this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID));
+      }
     }
 
     // The DOB is expected to be an excel date serial number.
     // if it is not a number, we give it a try anyway, but flag a problem
     if (!this.rawStock.dob) {
-      this.addProblem((new StockProblem(StockProblemType.MISSING_DOB)));
+      this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.INVALID)));
     } else if (typeof rawStock.dob === 'number') {
       this.dob = new Date(Date.UTC(0,0, rawStock.dob -1)).toISOString().substring(0, 10);
     } else {
-      // if it's something else, give it a try anyway. But leave a breadcrumb
-
+      // if the dob is not a number, give it a try anyway. But leave a breadcrumb
       const t = Date.parse(String(rawStock.dob));
       if (isNaN(t)) {
         this.dob = String(rawStock.dob);
-        this.addProblem((new StockProblem(StockProblemType.DOB_UNDECIPHERABLE, `"${rawStock.dob}"`)));
+        this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.INVALID, `"${rawStock.dob}"`)));
       } else {
         this.dob = new Date(t).toISOString().substring(0,10);
-        this.addProblem((new StockProblem(StockProblemType.DOB_NOT_A_DATE, `"${rawStock.dob}"`)));
+        this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.NOT_A_DATE, `"${rawStock.dob}"`)));
       }
     }
 
@@ -95,35 +100,35 @@ export class Stock {
     if (rawStock.mom) {
       this.internalMom = String(rawStock.mom);
     }
-    if (this.internalMom && !Stock.isStockNameValid(this.internalMom)) {
-      this.addProblem(new StockProblem(StockProblemType.INVALID_MOM));
+    if (this.internalMom && !Stock.validateStockName(this.internalMom)) {
+      this.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.INVALID));
     }
     if (rawStock.dad) {
       this.internalDad = String(rawStock.dad);
     }
-    if (this.internalDad && !Stock.isStockNameValid(this.internalDad)) {
-      this.addProblem(new StockProblem(StockProblemType.INVALID_DAD));
+    if (this.internalDad && !Stock.validateStockName(this.internalDad)) {
+      this.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.INVALID));
     }
 
     // Nursery counts have to be numbers
     if (rawStock.countEnteringNursery) {
       const count = Number(rawStock.countEnteringNursery);
       if (isNaN(count)) {
-        this.addProblem(new StockProblem(StockProblemType.INVALID_NURSERY_COUNT, rawStock.countEnteringNursery));
+        this.addProblem(StockProblemFields.COUNT_ENTERING_NURSERY, new StockProblem(StockProblemType.INVALID, rawStock.countEnteringNursery));
       } else
         this.countEnteringNursery = count;
     }
     if (rawStock.countLeavingNursery) {
       const count = Number(rawStock.countLeavingNursery);
       if (isNaN(count)) {
-        this.addProblem(new StockProblem(StockProblemType.INVALID_NURSERY_COUNT, rawStock.countLeavingNursery));
+        this.addProblem(StockProblemFields.COUNT_LEAVING_NURSERY, new StockProblem(StockProblemType.INVALID, rawStock.countLeavingNursery));
       } else
         this.countLeavingNursery = count;
     }
 
     // No context-free validation can be done on these.
-    if (rawStock.description) {
-      this.rawGenetics = rawStock.description;
+    if (rawStock.genetics) {
+      this.rawGenetics = rawStock.genetics;
     }
     if (rawStock.comment) {
       this.comment = rawStock.comment;
@@ -139,29 +144,19 @@ export class Stock {
     }
   }
 
-  static isStockNameValid(putativeName: string): boolean {
-    return stockNameRE.test(putativeName);
-  }
-
-  convertStockNameToNumber() {
-    if (!this._stockName) {
-      return;
-    } else {
-      const snTest = stockNameRE.exec(this._stockName);
-      if (snTest) {
-        this._stockNumber = Number(snTest[1]);
-        if (snTest[2]) {
-          this._subStockNumber = Number(snTest[2]);
-          // Please look the other way for a moment, while I get out my klugdel.
-          // A stock number like 1660.10, as unusual as it would be, looks
-          // like a number and sure enough it gets converted to 1660.1 somewhere
-          // along the line. So, we tack on a 0 for such cases;
-          if (snTest[2].length === 1) {
-            this._stockName = this.stockName + '0';
-          }
+  computeStockNumber(stockName: string) {
+    const snTest = stockNameRE.exec(stockName);
+    if (snTest) {
+      this._stockNumber = Number(snTest[1]);
+      if (snTest[2]) {
+        this._subStockNumber = Number(snTest[2]);
+        // Please look the other way for a moment while I get out my klugdel.
+        // A stock number like 1660.10 (as unusual as it would be) looks
+        // like a number and sure enough it gets converted to 1660.1 somewhere
+        // along the line. So, we tack on a 0 for such cases;
+        if (snTest[2].length === 1) {
+          this._stockName = this.stockName + '0';
         }
-      } else {
-        this.addProblem(new StockProblem(StockProblemType.BAD_NAME))
       }
     }
   }
@@ -174,50 +169,30 @@ export class Stock {
     return !!(this._stockName && this._stockName === name);
   }
 
-  addProblem(problem: StockProblem) {
-    this.problems.push(problem);
+  addProblem(field: string, problem: StockProblem) {
+    if (!this.problems[field]) {
+      this.problems[field] = [problem];
+    } else {
+      this.problems[field].push(problem);
+    }
   }
 
-  // If a stock has duplicates, we cannot patch it because patches are identified by stock name
-  // and if there are duplicates, we do not know how to associate a different patch with each duplicate.
-  // Bottom line here is that duplicates must be patched in the raw-stock spreadsheet.
-  getDuplicates(): StockProblem | undefined {
-    return this.problems.find((problem: StockProblem) => problem.issue === StockProblemType.DUPLICATE_STOCK_NAME);
+  get duplicates(): number[] {
+    return this._duplicates;
   }
 
-  hasBadName(): boolean {
-    return !!(this.problems.find((problem: StockProblem) => problem.issue === StockProblemType.BAD_NAME));
+  set duplicates(rowNumbers: number[]) {
+    this._duplicates = rowNumbers;
+    this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.DUPLICATE, rowNumbers.join(", ")));
   }
 
-  hasBadDOB(): boolean {
-    return !!(this.problems.find((problem: StockProblem) =>
-      problem.issue === StockProblemType.DOB_NOT_A_DATE ||
-      problem.issue === StockProblemType.DOB_UNDECIPHERABLE ||
-      problem.issue === StockProblemType.MISSING_DOB ||
-      problem.issue === StockProblemType.TIME_TRAVELER
-    ));
+  hasDuplicates(): boolean {
+    return (this.duplicates.length > 0);
   }
 
-  hasBadMom(): boolean {
-    return !!(this.problems.find((problem: StockProblem) =>
-      problem.issue === StockProblemType.INVALID_MOM ||
-      problem.issue === StockProblemType.NO_SUCH_MOM ||
-      problem.issue === StockProblemType.SUBSTOCK_MOM_DIFFERENT_FROM_BASE_STOCK
-    ));
+  static validateStockName(putativeName: string): boolean {
+    return stockNameRE.test(putativeName);
   }
 
-  hasBadDad(): boolean {
-    return !!(this.problems.find((problem: StockProblem) =>
-      problem.issue === StockProblemType.INVALID_DAD ||
-      problem.issue === StockProblemType.NO_SUCH_DAD ||
-      problem.issue === StockProblemType.SUBSTOCK_DAD_DIFFERENT_FROM_BASE_STOCK
-    ));
-  }
-
-  hasNurseryCountError(): boolean {
-    return !!(this.problems.find((problem: StockProblem) =>
-      problem.issue === StockProblemType.INVALID_NURSERY_COUNT
-    ));
-  }
 
 }

@@ -14,6 +14,7 @@ import {MatListModule} from '@angular/material/list';
 import {FlexModule} from '@angular/flex-layout';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {StockMigratorModule} from './stock-migrator/stock-migrator.module';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
+    StockMigratorModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

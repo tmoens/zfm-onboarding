@@ -1,0 +1,66 @@
+<div fxLayout="column" *ngIf="stock">
+  <mat-list dense>
+    <mat-list-item *ngIf="stock.row">
+      <div mat-line><span class="zf-field-header">Worksheet row: </span>{{stock.row}}</div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.stockName || stock.problems[StockProblemFields.STOCK_NAME]">
+      <div mat-line><span class="zf-field-header">Stock Number: </span>{{stock.stockName}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.STOCK_NAME]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.STOCK_NAME]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.dob || stock.problems[StockProblemFields.DOB]">
+      <div mat-line><span class="zf-field-header">Fertilization Date: </span>{{stock.dob}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.DOB]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.DOB]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.internalMom">
+      <div mat-line><span class="zf-field-header">Internal Mom: </span>{{stock.internalMom}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.INTERNAL_MOM]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.INTERNAL_MOM]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.internalDad">
+      <div mat-line><span class="zf-field-header">Internal Dad: </span>{{stock.internalDad}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.INTERNAL_DAD]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.INTERNAL_DAD]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.countEnteringNursery">
+      <div mat-line><span class="zf-field-header">Count entering nursery: </span>{{stock.countEnteringNursery}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.COUNT_ENTERING_NURSERY]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.COUNT_ENTERING_NURSERY]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.countLeavingNursery">
+      <div mat-line><span class="zf-field-header">Count entering nursery: </span>{{stock.countLeavingNursery}}</div>
+      <div mat-line *ngIf="stock.problems[StockProblemFields.COUNT_LEAVING_NURSERY]">
+        <div *ngFor="let p of stock.problems[StockProblemFields.COUNT_LEAVING_NURSERY]" class="zf-field-boo-boo">
+          {{p.toString()}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.researcher">
+      <div mat-line><span class="zf-field-header">Researcher: </span>{{stock.researcher}}</div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.rawGenetics">
+      <div mat-line><span class="zf-field-header">Genetics: </span></div>
+      <div mat-line>{{stock.rawGenetics}}</div>
+    </mat-list-item>
+    <mat-list-item *ngIf="stock.comment">
+      <div mat-line><span class="zf-field-header">Comment: </span></div>
+      <div mat-line>{{stock.comment}}</div>
+    </mat-list-item>
+  </mat-list>
+</div>
