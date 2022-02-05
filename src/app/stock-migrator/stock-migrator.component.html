@@ -1,0 +1,170 @@
+<div fxLayout="row">
+  <!-- list of problems -->
+  <div fxLayout="column">
+    <!-- filter area -->
+    <mat-form-field>
+      <mat-label>Problem Focus:</mat-label>
+      <mat-select [(value)]="stockProblemFocus" (selectionChange)="focusOnProblemType()">
+        <mat-option *ngFor="let sp of stockProblemTypes" value="{{sp}}">{{sp}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- filtered problems -->
+    <mat-selection-list #problems dense [multiple]="false"
+                        (selectionChange)="problemSelected(problems.selectedOptions.selected[0]?.value)">
+      <ng-container *ngFor="let s of stocks">
+        <ng-container *ngFor="let p of s.problems">
+          <mat-list-option *ngIf="stockProblemFocus === StockProblemTypes.ALL || p.issue === stockProblemFocus "
+                           [value]='{"stock": s, "problem": p}'
+                           [selected]="selectedProblem === p"
+                           class="zf-selection-item"
+                           [class.selected]="selectedProblem === p">
+            row: {{s.row}} {{s.stockName}}: {{p.toString()}}</mat-list-option>
+        </ng-container>
+      </ng-container>
+    </mat-selection-list>
+
+    <mat-divider></mat-divider>
+  </div>
+
+  <!-- "Patching" area -->
+  <div fxLayout="column">
+    <h2>Patching Area</h2>
+
+    <ng-container *ngIf="selectedStock && selectedProblem">
+      <div fxLayout="column" *ngIf="selectedStockDuplicates">
+        <h3>Duplicates</h3>
+        <p>Please fix the duplicate stock numbers in the raw-stocks worksheet.</p>
+        <p>Stock number: {{selectedStock.stockName}}</p>
+        <p>{{selectedStockDuplicates.toString()}}</p>
+      </div>
+      <form *ngIf="selectedPatch">
+        <div fxLayout="row">
+          <mat-form-field>
+            <mat-label>Worksheet Row</mat-label>
+            <input type="number" matInput value="{{selectedStock.row}}" disabled>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row">
+          <mat-form-field>
+            <mat-label>Stock Name</mat-label>
+            <input matInput [value]="selectedStock.stockName" disabled >
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch && selectedStock.hasBadName()">
+            <mat-label>Patched Name</mat-label>
+            <input matInput [(ngModel)]="selectedPatch.after.stockName" name="stockName">
+            <mat-hint>Like 2347 or 2347.03: a number optionally with a dot plus two digit sub-stock number.</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row">
+          <mat-form-field>
+            <mat-label>Fertilization Date</mat-label>
+            <input matInput value="{{selectedStock.dob}}" disabled>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch && selectedStock.hasBadDOB()">
+            <mat-label>Patched Fertilization Date</mat-label>
+            <input [(ngModel)]="selectedPatch.after.dob"
+                   matInput type="text" name="dob" >
+            <mat-hint>YYYY-MM-DD</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row" *ngIf="selectedStock.internalMom">
+          <mat-form-field>
+            <mat-label>Internal Mom</mat-label>
+            <input matInput value="{{selectedStock.internalMom}}" disabled>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch && selectedStock.hasBadMom()">
+            <mat-label>Patched Mom</mat-label>
+            <input matInput [(ngModel)]="selectedPatch.after.internalMom" name="internalMom" type="text">
+            <mat-hint>Should be an existing stock number</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row" *ngIf="selectedStock.internalDad">
+          <mat-form-field>
+            <mat-label>Internal Dad</mat-label>
+            <input matInput value="{{selectedStock.internalDad}}" disabled>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch && selectedStock.hasBadDad()">
+            <mat-label>Patched Dad</mat-label>
+            <input matInput [(ngModel)]="selectedPatch.after.internalDad" name="internalDad" type="text">
+            <mat-hint>Should be an existing stock number</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row" *ngIf="selectedStock.hasNurseryCountError()">
+          <mat-form-field>
+            <mat-label>Count Entering Nurser</mat-label>
+            <input type="number "matInput value="{{selectedStock.countEnteringNursery}}" disabled>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch">
+            <mat-label>Patched Count</mat-label>
+            <input matInput [(ngModel)]="selectedPatch.after.countEnteringNursery" name="cen" type="number" >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row" *ngIf="selectedStock.hasNurseryCountError()">
+          <mat-form-field>
+            <mat-label>Count Leaving Nursery</mat-label>
+            <input type="number "matInput value="{{selectedStock.countLeavingNursery}}" disabled>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="selectedPatch">
+            <mat-label>Patched Count</mat-label>
+            <input matInput [(ngModel)]="selectedPatch.after.countLeavingNursery" name="cln" type="number" >
+          </mat-form-field>
+        </div>
+
+
+      </form>
+    </ng-container>
+
+    <mat-divider></mat-divider>
+    <div *ngIf="selectedStock">
+      <mat-list>
+        <mat-list-item *ngFor="let p of selectedStock.problems">{{p.toString()}}</mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <div>
+    <mat-card>
+      <mat-card-header>Stock Peeker</mat-card-header>
+      <mat-form-field>
+        <input [formControl]="stockPeekFC" placeholder="stock number to peek at..." matInput type="text">
+      </mat-form-field>
+      <div fxLayout="column" *ngIf="stockPeek">
+        <mat-form-field *ngIf="stockPeek?.stockName">
+          <label>Stock Number</label>
+          <input matInput disabled value="{{stockPeek?.stockName}}">
+        </mat-form-field>
+        <mat-form-field *ngIf="stockPeek?.dob">
+          <label>Fertilization Date</label>
+          <input matInput disabled value="{{stockPeek?.dob}}">
+        </mat-form-field>
+        <mat-form-field *ngIf="stockPeek?.internalMom">
+          <label>Internal Mom</label>
+          <input matInput disabled value="{{stockPeek?.internalMom}}">
+        </mat-form-field>
+        <mat-form-field *ngIf="stockPeek?.internalDad">
+          <label>Internal Dad</label>
+          <input matInput disabled value="{{stockPeek?.internalDad}}">
+        </mat-form-field>
+        <mat-form-field *ngIf="stockPeek?.researcher">
+          <label>Internal Dad</label>
+          <input matInput disabled value="{{stockPeek?.researcher}}">
+        </mat-form-field>
+        <mat-form-field *ngIf="stockPeek?.rawGenetics">
+          <label>Internal Dad</label>
+          <input matInput disabled value="{{stockPeek?.rawGenetics}}">
+        </mat-form-field>
+      </div>
+    </mat-card>
+  </div>
+</div>

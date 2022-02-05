@@ -27,7 +27,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -71,7 +71,8 @@
               "browserTarget": "zfm-onboarding:build:production"
             },
             "development": {
-              "browserTarget": "zfm-onboarding:build:development"
+              "browserTarget": "zfm-onboarding:build:development",
+              "port": 4202
             }
           },
           "defaultConfiguration": "development"
