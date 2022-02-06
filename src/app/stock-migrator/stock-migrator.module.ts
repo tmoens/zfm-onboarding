@@ -10,17 +10,20 @@ import {MatCardModule} from '@angular/material/card';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import { StockPatcherComponent } from './stock-patcher/stock-patcher.component';
 
 
 
 @NgModule({
   declarations: [
     StockViewerComponent,
-    StockBrowserComponent
+    StockBrowserComponent,
+    StockPatcherComponent
   ],
   exports: [
     StockViewerComponent,
-    StockBrowserComponent
+    StockBrowserComponent,
+    StockPatcherComponent
   ],
   imports: [
     CommonModule,

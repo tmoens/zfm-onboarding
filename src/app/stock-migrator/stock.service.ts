@@ -60,16 +60,19 @@ export class StockService {
     })
   }
 
-  // Find the patch for a stock, creating one if one does not already exist;
-  getPatchForStock(stock: Stock): StockPatch {
-    let patch = this.patches.find((patch: StockPatch) => {
+  // Find the patch for a stock if it exists;
+  findPatchForStock(stock: Stock): StockPatch | undefined {
+     return this.patches.find((patch: StockPatch) => {
       return patch.checkName(stock.stockName);
     });
-    if (patch) {
-      patch.cleanUp(stock);
-    } else {
-        patch = new StockPatch(stock);
-        this.patches.push(patch);
+  }
+
+  // Get the patch for a stock, creating one if one does not already exist;
+  getPatchForStock(stock: Stock): StockPatch {
+    let patch = this.findPatchForStock(stock);
+    if (!patch) {
+      patch = new StockPatch(stock);
+      this.patches.push(patch);
     }
     return patch;
   }
@@ -138,9 +141,8 @@ export class StockService {
     })
   }
 
-  // mom and dad should exist
+  // if present, mom and dad should exist
   // mom and dad should be older than the stock
-  // if the stock is a sub-stock, it should have the same parents and dob as the base stock
   checkLineage() {
     this.stocks.forEach((stock: Stock) => {
       if (stock.internalMom) {
@@ -148,6 +150,7 @@ export class StockService {
         if (mom) {
           if (stock.dob && mom.dob && stock.dob <= mom.dob) {
             stock.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.TIME_TRAVELER))
+            stock.addProblem(StockProblemFields.DOB, new StockProblem(StockProblemType.TIME_TRAVELER))
           }
         } else {
           stock.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.DOES_NOT_EXIST));
@@ -158,6 +161,7 @@ export class StockService {
         if (dad) {
           if (stock.dob && dad.dob && stock.dob <= dad.dob) {
             stock.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.TIME_TRAVELER, 'older than dad'))
+            stock.addProblem(StockProblemFields.DOB, new StockProblem(StockProblemType.TIME_TRAVELER))
           }
         } else {
           stock.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.DOES_NOT_EXIST));
@@ -165,6 +169,7 @@ export class StockService {
       }
     });
   }
+
 
   // if the stock is a sub-stock, it should have the same parents and dob as the base stock
   checkSubstocks() {

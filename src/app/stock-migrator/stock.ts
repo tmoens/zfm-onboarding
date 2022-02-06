@@ -22,7 +22,7 @@ export class Stock {
   get index(): number {
     return this._row - 2;
   }
-  // we use the array index as the stock id.
+  // because there can be duplicate names, the stock service uses the array index as the de facto stock id.
   get id(): number {
     return this.index;
   }
@@ -194,5 +194,12 @@ export class Stock {
     return stockNameRE.test(putativeName);
   }
 
+  static validateDobString(putativeName: string): boolean {
+    return RegExp(/\d{4}-\d{2}-\d{2}/).test(putativeName);
+  }
+
+  youngerThan(dobString: string): boolean {
+    return (!this.dob || (this.dob >= dobString));
+  }
 
 }

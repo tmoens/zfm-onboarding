@@ -32,7 +32,15 @@
     <h2>Patching Area</h2>
     <mat-card>
       <mat-card-header>Raw Stock Data</mat-card-header>
-      <app-stock-viewer *ngIf="selectedStock" [stock]="selectedStock"></app-stock-viewer>
+      <app-stock-viewer *ngIf="selectedStock"
+                        [stock]="selectedStock"
+                        [patch]="selectedPatch"
+      ></app-stock-viewer>
+    </mat-card>
+    <mat-card>
+      <app-stock-patcher *ngIf="selectedStock"
+                         [stock]="selectedStock" [patch]="selectedPatch"
+                        ></app-stock-patcher>
     </mat-card>
   </div>
   <div>

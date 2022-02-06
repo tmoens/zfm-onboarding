@@ -1,0 +1,39 @@
+<div fxLayout="column" *ngIf="stock && patch">
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.STOCK_NAME]">
+    <input matInput type="text" [formControl]="stockNameFC" placeholder="Stock Name">
+    <mat-error *ngIf="stockNameFC.invalid">{{stockNameFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.DOB]">
+    <input matInput type="text" [formControl]="dobFC" placeholder="Fertilization Date">
+    <mat-error *ngIf="dobFC.invalid">{{dobFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.INTERNAL_MOM]">
+    <input matInput type="text" [formControl]="momFC" placeholder="Internal Mom">
+    <mat-hint>Must be empty an existing, older stock</mat-hint>
+    <mat-error *ngIf="momFC.invalid">{{momFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.INTERNAL_MOM]">
+    <input matInput type="text" [formControl]="externalMomFC" placeholder="External Mom">
+    <mat-hint>Where did it come from?</mat-hint>
+    <mat-error *ngIf="externalMomFC.invalid">{{externalMomFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.INTERNAL_DAD]">
+    <input matInput type="text" [formControl]="dadFC" placeholder="Internal Dad">
+    <mat-hint>Must be an existing, older stock</mat-hint>
+    <mat-error *ngIf="dadFC.invalid">{{dadFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.INTERNAL_DAD]">
+    <input matInput type="text" [formControl]="externalDadFC" placeholder="External Dad">
+    <mat-hint>Where did it come from?</mat-hint>
+    <mat-error *ngIf="externalDadFC.invalid">{{externalDadFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.COUNT_ENTERING_NURSERY]">
+    <input matInput type="number" [formControl]="countEnteringNurseryFC" placeholder="Count entering nursery">
+    <mat-error *ngIf="countEnteringNurseryFC.invalid">{{countEnteringNurseryFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+  <mat-form-field *ngIf="stock.problems[StockProblemFields.COUNT_LEAVING_NURSERY]">
+    <input matInput type="number" [formControl]="countLeavingNurseryFC" placeholder="Count leaving nursery">
+    <mat-error *ngIf="countLeavingNurseryFC.invalid">{{countLeavingNurseryFC.errors?.['invalid']}}</mat-error>
+  </mat-form-field>
+</div>
+<!--TODO - no patch? duplicates.-->
