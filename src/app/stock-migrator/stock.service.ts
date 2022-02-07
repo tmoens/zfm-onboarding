@@ -51,7 +51,6 @@ export class StockService {
     private httpClient: HttpClient,
   ) {
     this.loadRawStocks();
-    // for rememory over restarts. Now, where was I?
   }
 
   findStock(stockName: string): Stock | undefined {

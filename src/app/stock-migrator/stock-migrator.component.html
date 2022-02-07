@@ -14,13 +14,13 @@
                         dense [multiple]="false"
                         (selectionChange)="stockSelected(problems.selectedOptions.selected[0]?.value)">
       <ng-container *ngFor="let s of service.stocks">
-          <mat-list-option *ngIf="stockProblemFocus === null || s.problems[stockProblemFocus]"
-                           [value]='s'
-                           [selected]="selectedStock === s"
-                           class="zf-selection-item"
-                           [class.selected]="selectedStock === s">
-            row: {{s.row}}, stock: {{s.stockName}}
-          </mat-list-option>
+        <mat-list-option *ngIf="stockProblemFocus === null || s.problems[stockProblemFocus]"
+                         [value]='s'
+                         [selected]="selectedStock === s"
+                         class="zf-selection-item"
+                         [class.selected]="selectedStock === s">
+          row: {{s.row}}, stock: {{s.stockName}}
+        </mat-list-option>
       </ng-container>
     </mat-selection-list>
 
@@ -28,22 +28,19 @@
   </div>
 
   <!-- "Patching" area -->
-  <div fxLayout="column">
-    <h2>Patching Area</h2>
-    <mat-card>
-      <mat-card-header>Raw Stock Data</mat-card-header>
-      <app-stock-viewer *ngIf="selectedStock"
-                        [stock]="selectedStock"
-                        [patch]="selectedPatch"
-      ></app-stock-viewer>
-    </mat-card>
-    <mat-card>
-      <app-stock-patcher *ngIf="selectedStock"
-                         [stock]="selectedStock" [patch]="selectedPatch"
-                        ></app-stock-patcher>
-    </mat-card>
-  </div>
-  <div>
-    <app-stock-browser></app-stock-browser>
-  </div>
+  <mat-card>
+    <mat-card-header>Original Stock Data</mat-card-header>
+    <app-stock-viewer *ngIf="selectedStock"
+                      [stock]="selectedStock"
+                      [patch]="selectedPatch">
+    </app-stock-viewer>
+  </mat-card>
+  <mat-card>
+    <mat-card-header>Patches</mat-card-header>
+    <app-stock-patcher *ngIf="selectedStock"
+                       [stock]="selectedStock" [patch]="selectedPatch">
+    </app-stock-patcher>
+  </mat-card>
+  <app-stock-browser></app-stock-browser>
+
 </div>

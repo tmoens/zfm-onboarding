@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Stock} from '../stock';
 import {StockProblemFields} from '../stock-problem';
 import {StockPatch} from '../stock-patch';
@@ -13,9 +13,7 @@ export class StockViewerComponent  {
   @Input() stock: Stock | undefined;
   @Input() patch: StockPatch | undefined
   StockProblemFields = StockProblemFields;
-  constructor(
-    private service: StockService,
-  ) { }
+  constructor() { }
 
 
 }

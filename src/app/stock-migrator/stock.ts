@@ -74,7 +74,7 @@ export class Stock {
       if (Stock.validateStockName(this.stockName)) {
         this.computeStockNumber(this.stockName);
       } else {
-        this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID));
+        this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID, `"${this._stockName}"`));
       }
     }
 
@@ -101,27 +101,31 @@ export class Stock {
       this.internalMom = String(rawStock.mom);
     }
     if (this.internalMom && !Stock.validateStockName(this.internalMom)) {
-      this.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.INVALID));
+      this.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.INVALID, `"${this.internalMom}"`));
     }
     if (rawStock.dad) {
       this.internalDad = String(rawStock.dad);
     }
     if (this.internalDad && !Stock.validateStockName(this.internalDad)) {
-      this.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.INVALID));
+      this.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.INVALID, `"${this.internalMom}"`));
     }
 
     // Nursery counts have to be numbers
     if (rawStock.countEnteringNursery) {
       const count = Number(rawStock.countEnteringNursery);
       if (isNaN(count)) {
-        this.addProblem(StockProblemFields.COUNT_ENTERING_NURSERY, new StockProblem(StockProblemType.INVALID, rawStock.countEnteringNursery));
+        this.addProblem(
+          StockProblemFields.COUNT_ENTERING_NURSERY,
+          new StockProblem(StockProblemType.INVALID, `"${rawStock.countEnteringNursery}"`));
       } else
         this.countEnteringNursery = count;
     }
     if (rawStock.countLeavingNursery) {
       const count = Number(rawStock.countLeavingNursery);
       if (isNaN(count)) {
-        this.addProblem(StockProblemFields.COUNT_LEAVING_NURSERY, new StockProblem(StockProblemType.INVALID, rawStock.countLeavingNursery));
+        this.addProblem(
+          StockProblemFields.COUNT_LEAVING_NURSERY,
+          new StockProblem(StockProblemType.INVALID, `"${rawStock.countLeavingNursery}"`));
       } else
         this.countLeavingNursery = count;
     }
