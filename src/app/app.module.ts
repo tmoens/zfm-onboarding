@@ -15,11 +15,19 @@ import {FlexModule} from '@angular/flex-layout';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StockMigratorModule} from './stock-migrator/stock-migrator.module';
+import { TopBarComponent } from './top-bar/top-bar.component';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {RouterModule} from '@angular/router';
+import { SplashComponent } from './splash/splash.component';
+import {AppRoutingModule} from './app-routing.module';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 @NgModule({
   declarations: [
     AppComponent,
     StockMigratorComponent,
+    TopBarComponent,
+    SplashComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,14 +38,21 @@ import {StockMigratorModule} from './stock-migrator/stock-migrator.module';
     MatMenuModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatSidenavModule,
     MatListModule,
     FlexModule,
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
     StockMigratorModule,
+    MatToolbarModule,
+    RouterModule,
+    AppRoutingModule,
   ],
   providers: [],
+  exports: [
+    TopBarComponent,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

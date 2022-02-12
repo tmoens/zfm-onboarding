@@ -1,0 +1,18 @@
+<!--Main Toolbar-->
+<div class="app-top-bar" fxLayout="row" fxLayoutAlign="center">
+  <div class="zf-full-width">
+
+    <mat-toolbar fxLayoutGap="10px">
+      <span>Zebrafish Stock Migrator</span>
+      <span class="fill-remaining-space"></span>
+      <button mat-button [disabled]="appState.activeTool === zfTool.STOCK_MIGRATOR"
+              [routerLink]="zfTool.STOCK_MIGRATOR.route" color="primary">
+        {{zfTool.STOCK_MIGRATOR.display_name}}
+      </button>
+      <button mat-button [disabled]="appState.activeTool === zfTool.USER_MIGRATOR"
+              [routerLink]="zfTool.USER_MIGRATOR.route" color="primary">
+        {{zfTool.USER_MIGRATOR.display_name}}
+      </button>
+    </mat-toolbar>
+  </div>
+</div>

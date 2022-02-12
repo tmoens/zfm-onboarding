@@ -1,46 +1,14 @@
-<div fxLayout="row">
-  <!-- list of problems -->
-  <div fxLayout="column">
-    <!-- filter area -->
-    <mat-form-field>
-      <mat-label>Problem Focus:</mat-label>
-      <mat-select [(value)]="stockProblemFocus" (selectionChange)="focusOnProblemType()">
-        <mat-option [value]=null>All problematic stocks</mat-option>
-        <mat-option *ngFor="let spf of stockProblemFields" value="{{spf}}">{{spf}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <!-- filtered problems -->
-    <mat-selection-list #problems
-                        dense [multiple]="false"
-                        (selectionChange)="stockSelected(problems.selectedOptions.selected[0]?.value)">
-      <ng-container *ngFor="let s of service.stocks">
-        <mat-list-option *ngIf="stockProblemFocus === null || s.problems[stockProblemFocus]"
-                         [value]='s'
-                         [selected]="selectedStock === s"
-                         class="zf-selection-item"
-                         [class.selected]="selectedStock === s">
-          row: {{s.row}}, stock: {{s.stockName}}
-        </mat-list-option>
-      </ng-container>
-    </mat-selection-list>
+<div fxLayout="row" fxLayoutAlign="center" class="tool-container">
+    <mat-sidenav-container style="width: 100%">
 
-    <mat-divider></mat-divider>
-  </div>
+      <mat-sidenav #selector fixedInViewport="false" mode="side" opened>
+        <app-stock-selector></app-stock-selector>
+      </mat-sidenav>
 
-  <!-- "Patching" area -->
-  <mat-card>
-    <mat-card-header>Original Stock Data</mat-card-header>
-    <app-stock-viewer *ngIf="selectedStock"
-                      [stock]="selectedStock"
-                      [patch]="selectedPatch">
-    </app-stock-viewer>
-  </mat-card>
-  <mat-card>
-    <mat-card-header>Patches</mat-card-header>
-    <app-stock-patcher *ngIf="selectedStock"
-                       [stock]="selectedStock" [patch]="selectedPatch">
-    </app-stock-patcher>
-  </mat-card>
-  <app-stock-browser></app-stock-browser>
-
+      <mat-sidenav-content>
+        <div class="zf-tool-content">
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
 </div>

@@ -1,0 +1,38 @@
+<!--  filter area -->
+<div fxLayout="column">
+  <!-- filter area -->
+  <mat-form-field>
+    <mat-label>Problem Focus:</mat-label>
+    <mat-select [(value)]="problemFocus" (selectionChange)="focusOnProblemArea()">
+      <mat-option [value]="null">All stocks</mat-option>
+      <mat-option value="allProblems">All problematic stocks</mat-option>
+      <mat-option value="stockName">Stock Number problems</mat-option>
+      <mat-option value="dob">Fertilization Date problems</mat-option>
+      <mat-option value="internalParent">Internal Parent problems</mat-option>
+      <mat-option value="nurseryCount">Nursery Count problems</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-checkbox  [formControl]="unPatchedStocksOnlyFC" color="primary">
+    Unpatced problems only
+  </mat-checkbox>
+  <mat-divider></mat-divider>
+  <!-- filtered stocks -->
+  <mat-selection-list #problems
+                      dense [multiple]="false"
+                      (selectionChange)="stockSelected(problems.selectedOptions.selected[0]?.value)">
+
+    <!-- List the stocks that have problems that meet the focus criteria -->
+    <ng-container *ngFor="let s of filteredStocks">
+      <mat-list-option
+        [value]='s'
+        [selected]="selectedStock === s"
+        class="zf-selection-item"
+        [class.selected]="selectedStock === s">
+        row: {{s.row}}, stock: {{s.originalStock?.stockName}}
+      </mat-list-option>
+    </ng-container>
+  </mat-selection-list>
+
+  <mat-divider></mat-divider>
+</div>

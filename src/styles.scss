@@ -28,5 +28,26 @@
   font-weight: 500 !important;
 }
 .zf-field-boo-boo {
-  color: mat.get-color-from-palette(map-get($zf-app-theme, warn));
+  font-size: 75%;
+  color: red;
+}
+.zf-patched {
+  color:lightgreen;
+  font-size: 75%;
+}
+
+.zf-note {
+  font-size: 75%;
+}
+
+.zf-tool {
+  position: absolute;
+  top: 56px;
+  bottom: 0;
+  right: 10px;
+  left: 10px;
+}
+.zf-tool-content {
+  background-color: azure;
+  padding: 25px;
 }

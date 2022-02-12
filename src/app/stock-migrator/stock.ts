@@ -2,18 +2,31 @@
 // The general idea is that this gets refined as we add more "corrections" for
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
-
-import {StockProblem, StockProblemFields, StockProblemType} from './stock-problem';
+import {StockData} from './stock-data';
+import {ProblemType} from './stock-problems';
+import {StockAttr} from './stockAttr';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
 // followed by a dot and a two digit sub-stock number
 // The following regular expression is used to validate a
 // stock name and extract the stock number and substock number.
-const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
-
+export const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
 
 export class Stock {
+  stockName: StockAttr = new StockAttr(true);
+  dob: StockAttr = new StockAttr(true);
+  internalMom: StockAttr = new StockAttr();
+  internalDad: StockAttr = new StockAttr();
+  externalMom: StockAttr = new StockAttr();
+  externalDad: StockAttr = new StockAttr();
+  countEnteringNursery: StockAttr = new StockAttr();
+  countLeavingNursery: StockAttr = new StockAttr();
+  researcher: StockAttr = new StockAttr();
+  genetics: StockAttr = new StockAttr();
+  comment: StockAttr = new StockAttr();
+  private _duplicates: number[] = [];
+
   get row(): number {
     return this._row;
   }
@@ -22,172 +35,113 @@ export class Stock {
   get index(): number {
     return this._row - 2;
   }
-  // because there can be duplicate names, the stock service uses the array index as the de facto stock id.
-  get id(): number {
-    return this.index;
-  }
-
-  get stockName(): string | undefined {
-    return this._stockName;
-  }
-  set stockName(value: string | undefined) {
-    this._stockName = value;
-  }
-  private _stockName?: string; // e.g. 2301 or 1744 - i.e. nu substock number
-
-  get stockNumber(): number | undefined {
-    return this._stockNumber;
-  }
-  private _stockNumber?: number; // e.g. 2301 or 1744 - i.e. nu substock number
-
-  get subStockNumber(): number | undefined {
-    return this._subStockNumber;
-  }
-  private _subStockNumber?: number; // eg 0, 1, 2,
-
-  dob?: string = '';  // fertilization date as a string
-  countEnteringNursery?: number;
-  countLeavingNursery?: number;
-  researcher?: string;
-  internalMom?: string;  // Best case is the id of a younger stock, but who knows
-  internalDad?: string;
-  externalMom?: string;
-  externalDad?: string;
-  rawGenetics?: string = ''; // a string that contains ad-hoc identifiers for the markers carried by the stock
-  mutations?: string[] = [];
-  transgenes?: string[] = [];
-  comment?: string; // some comment specific to the stock
-  problems: { [index: string]: StockProblem[] } = {};
-  private _duplicates: number[] = [];
 
   constructor(
     private _row: number, // the row on the input spreadsheet that this stock was found on
-    private rawStock?: any,
+    public originalStock: StockData,
   ) {
-    if (!rawStock) {
-      return;
-    }
-    if (!rawStock.stockName) {
-      this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID, 'no stock name'));
+    this.stockName.original = originalStock.stockName;
+    if (!originalStock.stockName) {
+      this.stockName.addProblem(ProblemType.MISSING);
     } else {
-      this.stockName = String(rawStock.stockName).trim();
-      if (Stock.validateStockName(this.stockName)) {
-        this.computeStockNumber(this.stockName);
-      } else {
-        this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.INVALID, `"${this._stockName}"`));
+      if (!Stock.validateStockName(this.stockName.original)) {
+        this.stockName.addProblem(ProblemType.INVALID);
       }
     }
+    this.stockName.current = this.stockName.original;
 
-    // The DOB is expected to be an excel date serial number.
-    // if it is not a number, we give it a try anyway, but flag a problem
-    if (!this.rawStock.dob) {
-      this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.INVALID)));
-    } else if (typeof rawStock.dob === 'number') {
-      this.dob = new Date(Date.UTC(0,0, rawStock.dob -1)).toISOString().substring(0, 10);
-    } else {
-      // if the dob is not a number, give it a try anyway. But leave a breadcrumb
-      const t = Date.parse(String(rawStock.dob));
+    // The DOB is expected to be present and to be an excel date serial number or a date string.
+    // Also, we are going to normalize the raw stock's dob into a date string if possible.
+    if (!this.originalStock.dob) {
+      this.dob.addProblem(ProblemType.MISSING);
+    } else if (isNaN(Number(originalStock.dob))) {
+      // if the dob is not a number, try to convert from date string
+      const t = Date.parse(String(originalStock.dob));
       if (isNaN(t)) {
-        this.dob = String(rawStock.dob);
-        this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.INVALID, `"${rawStock.dob}"`)));
+        // Date.parse can't parse the string into a date. So, the given date is invalid.
+        this.dob.original = this.originalStock.dob;
+        this.dob.addProblem(ProblemType.INVALID);
       } else {
-        this.dob = new Date(t).toISOString().substring(0,10);
-        this.addProblem(StockProblemFields.DOB, (new StockProblem(StockProblemType.NOT_A_DATE, `"${rawStock.dob}"`)));
+        this.dob.original = new Date(t).toISOString().substring(0,10);
       }
+    } else {
+      this.dob.original = new Date(Date.UTC(0,0, Number(originalStock.dob) -1)).toISOString().substring(0, 10);
     }
+    this.dob.current = this.dob.original;
 
     // if they have values, mom and dad should be valid stock numbers (if they are internal stocks)
-    if (rawStock.mom) {
-      this.internalMom = String(rawStock.mom);
+    this.internalMom.original = (originalStock.internalMom) ? String(originalStock.internalMom).trim() : '';
+    if (this.internalMom.original && !Stock.validateStockName(this.internalMom.original)) {
+        this.internalMom.addProblem(ProblemType.INVALID);
     }
-    if (this.internalMom && !Stock.validateStockName(this.internalMom)) {
-      this.addProblem(StockProblemFields.INTERNAL_MOM, new StockProblem(StockProblemType.INVALID, `"${this.internalMom}"`));
+    this.internalMom.current = this.internalMom.original;
+
+    this.internalDad.original = (originalStock.internalDad) ? String(originalStock.internalDad).trim() : '';
+    if (this.internalDad.original && !Stock.validateStockName(this.internalDad.original)) {
+        this.internalDad.addProblem(ProblemType.INVALID);
     }
-    if (rawStock.dad) {
-      this.internalDad = String(rawStock.dad);
-    }
-    if (this.internalDad && !Stock.validateStockName(this.internalDad)) {
-      this.addProblem(StockProblemFields.INTERNAL_DAD, new StockProblem(StockProblemType.INVALID, `"${this.internalMom}"`));
-    }
+    this.internalDad.current = this.internalDad.original;
 
     // Nursery counts have to be numbers
-    if (rawStock.countEnteringNursery) {
-      const count = Number(rawStock.countEnteringNursery);
-      if (isNaN(count)) {
-        this.addProblem(
-          StockProblemFields.COUNT_ENTERING_NURSERY,
-          new StockProblem(StockProblemType.INVALID, `"${rawStock.countEnteringNursery}"`));
-      } else
-        this.countEnteringNursery = count;
-    }
-    if (rawStock.countLeavingNursery) {
-      const count = Number(rawStock.countLeavingNursery);
-      if (isNaN(count)) {
-        this.addProblem(
-          StockProblemFields.COUNT_LEAVING_NURSERY,
-          new StockProblem(StockProblemType.INVALID, `"${rawStock.countLeavingNursery}"`));
-      } else
-        this.countLeavingNursery = count;
-    }
+    this.countEnteringNursery.original = (originalStock.countEnteringNursery) ? String(originalStock.countEnteringNursery).trim() : '';
+    if (isNaN(Number(this.countEnteringNursery.original))) this.countEnteringNursery.addProblem(ProblemType.INVALID);
+    this.countEnteringNursery.current = this.countEnteringNursery.original;
+
+    this.countLeavingNursery.original = (originalStock.countLeavingNursery) ? String(originalStock.countLeavingNursery).trim() : '';
+    if (isNaN(Number(this.countLeavingNursery.original))) this.countLeavingNursery.addProblem(ProblemType.INVALID);
+    this.countLeavingNursery.current = this.countLeavingNursery.original;
 
     // No context-free validation can be done on these.
-    if (rawStock.genetics) {
-      this.rawGenetics = rawStock.genetics;
-    }
-    if (rawStock.comment) {
-      this.comment = rawStock.comment;
-    }
-    if (rawStock.researcher) {
-      this.researcher = rawStock.researcher;
-    }
-    if (rawStock.externalMom) {
-      this.externalMom = rawStock.externalMom;
-    }
-    if (rawStock.externalDad) {
-      this.externalDad = rawStock.externalDad;
-    }
+    this.genetics.original = (originalStock.genetics) ? String(originalStock.genetics).trim() : '';
+    this.genetics.current = this.genetics.original;
+    this.comment.original = (originalStock.comment) ? String(originalStock.comment).trim() : '';
+    this.comment.current = this.comment.original;
+    this.researcher.original = (originalStock.researcher) ? String(originalStock.researcher).trim() : '';
+    this.researcher.current = this.researcher.original;
+    this.externalMom.original = (originalStock.externalMom) ? String(originalStock.externalMom).trim() : '';
+    this.externalMom.current = this.externalMom.original;
+    this.externalDad.original = (originalStock.externalDad) ? String(originalStock.externalDad).trim() : '';
+    this.externalDad.current = this.externalDad.original;
   }
 
-  computeStockNumber(stockName: string) {
-    const snTest = stockNameRE.exec(stockName);
+  get stockNumber(): number | undefined {
+    if (!this.stockName.current) return undefined;
+    const snTest = stockNameRE.exec(this.stockName.current);
     if (snTest) {
-      this._stockNumber = Number(snTest[1]);
-      if (snTest[2]) {
-        this._subStockNumber = Number(snTest[2]);
-        // Please look the other way for a moment while I get out my klugdel.
-        // A stock number like 1660.10 (as unusual as it would be) looks
-        // like a number and sure enough it gets converted to 1660.1 somewhere
-        // along the line. So, we tack on a 0 for such cases;
-        if (snTest[2].length === 1) {
-          this._stockName = this.stockName + '0';
-        }
-      }
+      return Number(snTest[1]);
     }
+    return undefined;
+  }
+
+  get subStockNumber(): number | undefined {
+    if (!this.stockName.current) return undefined;
+    const snTest = stockNameRE.exec(this.stockName.current);
+    if (snTest && snTest[2]) {
+      return Number(snTest[2]);
+    }
+    return undefined;
   }
 
   isSubstock(): boolean{
     return (!!this.subStockNumber);
   }
 
-  checkName(name: string): boolean{
-    return !!(this._stockName && this._stockName === name);
-  }
-
-  addProblem(field: string, problem: StockProblem) {
-    if (!this.problems[field]) {
-      this.problems[field] = [problem];
-    } else {
-      this.problems[field].push(problem);
-    }
+  // when someone comes asking "are you stock 15.06?" answer yes or no.
+  checkName(name: string): boolean {
+    return !!(this.originalStock.stockName && this.originalStock.stockName === name);
   }
 
   get duplicates(): number[] {
     return this._duplicates;
   }
 
+  get duplicatesAsString(): string {
+    return this._duplicates.join(', ');
+  }
+
   set duplicates(rowNumbers: number[]) {
     this._duplicates = rowNumbers;
-    this.addProblem(StockProblemFields.STOCK_NAME, new StockProblem(StockProblemType.DUPLICATE, rowNumbers.join(", ")));
+    this.stockName.addProblem(ProblemType.DUPLICATE);
   }
 
   hasDuplicates(): boolean {
@@ -199,11 +153,21 @@ export class Stock {
   }
 
   static validateDobString(putativeName: string): boolean {
-    return RegExp(/\d{4}-\d{2}-\d{2}/).test(putativeName);
+    return RegExp(/^\d{4}-\d{2}-\d{2}$/).test(putativeName);
   }
 
   youngerThan(dobString: string): boolean {
-    return (!this.dob || (this.dob >= dobString));
+    return (!this.dob.current || (this.dob.current >= dobString));
   }
 
+  hasProblems(unPatchedProblemsOnly: boolean = true): boolean {
+    return (
+      this.stockName.hasProblems(unPatchedProblemsOnly) ||
+      this.dob.hasProblems(unPatchedProblemsOnly) ||
+      this.internalMom.hasProblems(unPatchedProblemsOnly) ||
+      this.internalDad.hasProblems(unPatchedProblemsOnly) ||
+      this.countEnteringNursery.hasProblems(unPatchedProblemsOnly) ||
+      this.countLeavingNursery.hasProblems(unPatchedProblemsOnly)
+    )
+  }
 }
