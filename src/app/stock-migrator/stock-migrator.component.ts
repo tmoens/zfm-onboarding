@@ -23,4 +23,5 @@ export class StockMigratorComponent {
   ) {
     this.appState.setActiveTool(ZFTool.STOCK_MIGRATOR);
   }
+
 }

@@ -13,6 +13,8 @@ import {StockMigratorRoutingModule} from './stock-migrator-routing.module';
 import { StockSelectorComponent } from './stock-selector/stock-selector.component';
 import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { StockViewerComponent } from './stock-viewer/stock-viewer.component';
+import { StockAttrViewerComponent } from './stock-attr-viewer/stock-attr-viewer.component';
 
 
 
@@ -20,6 +22,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
   declarations: [
     StockPatcherComponent,
     StockSelectorComponent,
+    StockViewerComponent,
+    StockAttrViewerComponent,
   ],
   exports: [
     StockPatcherComponent,

@@ -1,6 +1,5 @@
-import {ProblemType} from './stock-problems';
-
 export class StockAttr {
+  // the original value of the attribute as read from a worksheet
   get original() {
     return this._original;
   }
@@ -9,70 +8,43 @@ export class StockAttr {
   }
   private _original: string = '';
 
+  // The current value of the attribute as entered by the user in the GUI
   get current(): string {
     return this._current;
   }
-
   set current(value: string) {
     this._current = value;
   }
   private _current: string = '';
 
-  get patched(): string {
-    return this._patched;
-  }
-  set patched(value: string) {
-    this._patched = value;
-  }
-  private _patched: string = '';
+  // whether the current value is valid.
+  private _valid: boolean = true;
 
   get required(): boolean {
     return this._required;
   }
 
-  problems: ProblemType[] = [];
-
   constructor(
     private _required: boolean = false,
   ) {
-  }
-
-  get best(): string {
-    if (this.patched) return this.patched;
-    if (this.current) return this.current;
-    return this.original;
-  }
-  patch (value: string) {
-    if (this.original === value) {
-      this.patched = '';
-    } else {
-      this.patched = value;
-    }
-  }
-  unPatch () {
-    this.patched = '';
   }
   update (value: string) {
     this.current = value;
   }
 
-  hasProblems(unPatchedProblemsOnly: boolean = true): boolean {
-    if (this.problems.length === 0) return false;
-    return !(unPatchedProblemsOnly && this.isPatched());
-  }
-  addProblem(problem: ProblemType): void {
-    this.problems.push(problem);
-  }
-  getProblems(): ProblemType[] {
-    return this.problems;
+  setValidity(value: boolean) {
+    this._valid = value;
   }
 
+  isValid(): boolean {
+    return this._valid;
+  }
 
-  hasChanged(value: string): boolean {
-    return (this.original !== value);
+  hasChanged(): boolean {
+    return (this.original !== this.current);
   }
   isPatched(): boolean {
-    return !!(this._patched);
+    return (this.hasChanged() && this.isValid());
   }
 }
 

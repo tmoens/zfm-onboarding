@@ -13,9 +13,6 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-checkbox  [formControl]="unPatchedStocksOnlyFC" color="primary">
-    Unpatced problems only
-  </mat-checkbox>
   <mat-divider></mat-divider>
   <!-- filtered stocks -->
   <mat-selection-list #problems
@@ -26,9 +23,9 @@
     <ng-container *ngFor="let s of filteredStocks">
       <mat-list-option
         [value]='s'
-        [selected]="selectedStock === s"
+        [selected]="service.stockBeingPatched === s"
         class="zf-selection-item"
-        [class.selected]="selectedStock === s">
+        [class.selected]="service.stockBeingPatched === s">
         row: {{s.row}}, stock: {{s.originalStock?.stockName}}
       </mat-list-option>
     </ng-container>

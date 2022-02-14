@@ -1,164 +1,188 @@
-<div fxLayout="column" fxLayoutGap="10px" *ngIf="stock">
-  <h3>Patcher</h3>
-  <!----------------------------- Stock name ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.stockName.hasProblems()">
-      <mat-icon *ngIf="!stock.stockName.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-      <mat-icon *ngIf="stock.stockName.isPatched()" class="zf-patched">check</mat-icon></ng-container>
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="stockNameFC" placeholder="Stock name" required>
-        <mat-error *ngIf="stockNameFC.invalid">{{stockNameFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.stockName.hasChanged(stockNameFC.value)" class="zf-note">
-        originally:{{stock.stockName.original}}
-      </div>
-    </div>
-  </div>
-  <!----------------------------- DOB ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.dob.hasProblems()">
-        <mat-icon *ngIf="!stock.dob.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.dob.isPatched()" class="zf-patched">check</mat-icon></ng-container>
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="dobFC" placeholder="Fertilization Date" >
-        <mat-error *ngIf="dobFC.invalid">{{dobFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.dob.hasChanged(dobFC.value)" class="zf-note">
-        originally:{{stock.dob.original}}
-      </div>
-    </div>
-  </div>
-  <!----------------------------- Internal Mom ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.internalMom.hasProblems()">
-        <mat-icon *ngIf="!stock.internalMom.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.internalMom.isPatched()" class="zf-patched">check</mat-icon></ng-container>
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="internalMomFC" placeholder="Internal Mom" >
-        <mat-error *ngIf="internalMomFC.invalid">{{internalMomFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.internalMom.hasChanged(internalMomFC.value)" class="zf-note">
-        originally:{{stock.internalMom.original}}
-      </div>
-    </div>
-  </div>
-  <!----------------------------- ExternalMom ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="externalMomFC" placeholder="ExternalMom" >
-        <mat-error *ngIf="externalMomFC.invalid">{{externalMomFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.externalMom.hasChanged(externalMomFC.value)" class="zf-note">
-        originally:{{stock.externalMom.original}}
-      </div>
-    </div>
-  </div>
+<div fxLayout="row" fxLayoutGap="10px">
 
-  <!----------------------------- Internal Dad ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.internalDad.hasProblems()">
-        <mat-icon *ngIf="!stock.internalDad.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.internalDad.isPatched()" class="zf-patched">check</mat-icon></ng-container>
+  <div fxLayout="column" fxLayoutGap="10px" *ngIf="stock">
+    <h3>Patcher</h3>
+    <div fxLayout="row">
+      <button mat-button (click)="goToPrev()" color="primary">
+        <mat-icon>navigate_before</mat-icon>
+        {{prevStock?.stockName?.current}}
+      </button>
+      <div class="fill-remaining-space"></div>
+      <button mat-button (click)="goToNext()" color="primary">
+        {{nextStock?.stockName?.current}}
+        <mat-icon>navigate_next</mat-icon>
+      </button>
     </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="internalDadFC" placeholder="Internal Dad" >
-        <mat-error *ngIf="internalDadFC.invalid">{{internalDadFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.internalDad.hasChanged(internalDadFC.value)" class="zf-note">
-        originally:{{stock.internalDad.original}}
+    <!----------------------------- Stock name ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.stockName.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.stockName.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="stockNameFC" placeholder="Stock name" required>
+          <mat-error *ngIf="stockNameFC.invalid">{{stockNameFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.stockName.hasChanged()" class="zf-note">
+          originally:{{stock.stockName.original}}
+        </div>
       </div>
     </div>
-  </div>
-  <!----------------------------- External Dad ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="externalDadFC" placeholder="ExternalDad" >
-        <mat-error *ngIf="externalDadFC.invalid">{{externalDadFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.externalDad.hasChanged(externalDadFC.value)" class="zf-note">
-        originally:{{stock.externalDad.original}}
+    <!----------------------------- DOB ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.dob.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.dob.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="dobFC" placeholder="Fertilization Date" >
+          <mat-error *ngIf="dobFC.invalid">{{dobFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.dob.hasChanged()" class="zf-note">
+          originally:{{stock.dob.original}}
+        </div>
       </div>
     </div>
-  </div>
+    <!----------------------------- Internal Mom ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.internalMom.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.internalMom.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="internalMomFC" placeholder="Internal Mom" >
+          <mat-error *ngIf="internalMomFC.invalid">{{internalMomFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.internalMom.hasChanged()" class="zf-note">
+          originally:{{stock.internalMom.original}}
+        </div>
+      </div>
+    </div>
+    <!----------------------------- ExternalMom ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="externalMomFC" placeholder="ExternalMom" >
+          <mat-error *ngIf="externalMomFC.invalid">{{externalMomFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.externalMom.hasChanged()" class="zf-note">
+          originally:{{stock.externalMom.original}}
+        </div>
+      </div>
+    </div>
 
-  <!----------------------------- Entering Nursery Count ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.countEnteringNursery.hasProblems()">
-        <mat-icon *ngIf="!stock.countEnteringNursery.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.countEnteringNursery.isPatched()" class="zf-patched">check</mat-icon></ng-container>
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="number" [formControl]="countEnteringNurseryFC" placeholder="Count entering nursery" >
-        <mat-error *ngIf="countEnteringNurseryFC.invalid">{{countEnteringNurseryFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.countEnteringNursery.hasChanged(countEnteringNurseryFC.value.toString())" class="zf-note">
-        originally:{{stock.countEnteringNursery.original}}
+    <!----------------------------- Internal Dad ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.internalDad.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.internalDad.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="internalDadFC" placeholder="Internal Dad" >
+          <mat-error *ngIf="internalDadFC.invalid">{{internalDadFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.internalDad.hasChanged()" class="zf-note">
+          originally:{{stock.internalDad.original}}
+        </div>
       </div>
     </div>
-  </div>
-  <!----------------------------- Leaving Nursery Count ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-      <ng-container *ngIf="stock.countLeavingNursery.hasProblems()">
-        <mat-icon *ngIf="!stock.countLeavingNursery.isPatched()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.countLeavingNursery.isPatched()" class="zf-patched">check</mat-icon></ng-container>
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="number" [formControl]="countLeavingNurseryFC" placeholder="Count leaving nursery" >
-        <mat-error *ngIf="countLeavingNurseryFC.invalid">{{countLeavingNurseryFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.countLeavingNursery.hasChanged(countLeavingNurseryFC.value.toString())" class="zf-note">
-        originally:{{stock.countLeavingNursery.original}}
+    <!----------------------------- External Dad ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="externalDadFC" placeholder="ExternalDad" >
+          <mat-error *ngIf="externalDadFC.invalid">{{externalDadFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.externalDad.hasChanged()" class="zf-note">
+          originally:{{stock.externalDad.original}}
+        </div>
       </div>
     </div>
-  </div>
-  <!----------------------------- Genetics ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="geneticsFC" placeholder="Genetics" >
-        <mat-error *ngIf="geneticsFC.invalid">{{geneticsFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.genetics.hasChanged(geneticsFC.value)" class="zf-note">
-        originally:{{stock.genetics.original}}
-      </div>
-    </div>
-  </div>
-  <!----------------------------- Comments ----------------------------------------->
-  <div fxLayout="row">
-    <div fxFlex="30px">
-    </div>
-    <div fxLayout="column">
-      <mat-form-field>
-        <input matInput type="text" [formControl]="commentFC" placeholder="Comment" >
-        <mat-error *ngIf="commentFC.invalid">{{commentFC.errors?.['invalid']}}</mat-error>
-      </mat-form-field>
-      <div *ngIf="stock.comment.hasChanged(commentFC.value)" class="zf-note">
-        originally:{{stock.comment.original}}
-      </div>
-    </div>
-  </div>
 
+    <!----------------------------- Entering Nursery Count ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.countEnteringNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.countEnteringNursery.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="number" [formControl]="countEnteringNurseryFC" placeholder="Count entering nursery" >
+          <mat-error *ngIf="countEnteringNurseryFC.invalid">{{countEnteringNurseryFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.countEnteringNursery.hasChanged()" class="zf-note">
+          originally:{{stock.countEnteringNursery.original}}
+        </div>
+      </div>
+    </div>
+    <!----------------------------- Leaving Nursery Count ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+        <mat-icon *ngIf="!stock.countLeavingNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="stock.countLeavingNursery.isPatched()" class="zf-patched">check</mat-icon>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="number" [formControl]="countLeavingNurseryFC" placeholder="Count leaving nursery" >
+          <mat-error *ngIf="countLeavingNurseryFC.invalid">{{countLeavingNurseryFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.countLeavingNursery.hasChanged()" class="zf-note">
+          originally:{{stock.countLeavingNursery.original}}
+        </div>
+      </div>
+    </div>
+    <!----------------------------- Genetics ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="geneticsFC" placeholder="Genetics" >
+          <mat-error *ngIf="geneticsFC.invalid">{{geneticsFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.genetics.hasChanged()" class="zf-note">
+          originally:{{stock.genetics.original}}
+        </div>
+      </div>
+    </div>
+    <!----------------------------- Comments ----------------------------------------->
+    <div fxLayout="row">
+      <div fxFlex="30px">
+      </div>
+      <div fxLayout="column">
+        <mat-form-field>
+          <input matInput type="text" [formControl]="commentFC" placeholder="Comment" >
+          <mat-error *ngIf="commentFC.invalid">{{commentFC.errors?.['invalid']}}</mat-error>
+        </mat-form-field>
+        <div *ngIf="stock.comment.hasChanged()" class="zf-note">
+          originally:{{stock.comment.original}}
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div fxLayout="column" fxLayoutGap="10px">
+    <mat-card *ngIf="mom">
+      <h3>Mom</h3>
+      <app-stock-viewer [stock]="mom"></app-stock-viewer>
+    </mat-card>
+    <mat-card *ngIf="dad">
+      <h3>Dad</h3>
+      <app-stock-viewer [stock]="dad"></app-stock-viewer>
+    </mat-card>
+    <mat-card *ngIf="kids.length > 0">
+      <h3>Kids</h3>
+      <mat-card-content fxLayoutGap="10px">
+        <app-stock-viewer *ngFor="let kid of kids" [stock]="kid" [mini]=true></app-stock-viewer>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

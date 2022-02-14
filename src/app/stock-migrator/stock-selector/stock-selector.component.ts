@@ -47,7 +47,7 @@ export class StockSelectorComponent implements OnInit {
   }
 
   getFilteredStocks() {
-    this.filteredStocks = this.service.filterByProblemArea(this.problemFocus, this.unPatchedStocksOnlyFC.value);
+    this.filteredStocks = this.service.filterByProblemArea(this.problemFocus);
   }
 
 

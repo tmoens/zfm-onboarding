@@ -1,0 +1,12 @@
+<div *ngIf="attr" fxLayout="column" fxLayoutAlign="start start">
+  <div class="zf-note">{{label}}</div>
+  <div fxLayout="row">
+    <div fxFlex="15px">
+      <mat-icon *ngIf="!attr.isValid()" class="zf-field-boo-boo">close</mat-icon>
+      <mat-icon *ngIf="attr.isPatched()" class="zf-patched">check</mat-icon>
+    </div>
+    <div>
+      {{attr.current}}
+    </div>
+  </div>
+</div>
