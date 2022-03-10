@@ -9,9 +9,8 @@
               [routerLink]="zfTool.STOCK_MIGRATOR.route" color="primary">
         {{zfTool.STOCK_MIGRATOR.display_name}}
       </button>
-      <button mat-button [disabled]="appState.activeTool === zfTool.USER_MIGRATOR"
-              [routerLink]="zfTool.USER_MIGRATOR.route" color="primary">
-        {{zfTool.USER_MIGRATOR.display_name}}
+      <button mat-button (click)="exportToExcel()">
+        Export
       </button>
     </mat-toolbar>
   </div>

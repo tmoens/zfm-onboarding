@@ -7,6 +7,7 @@ export enum WellKnownStates {
   ERROR_MESSAGE_DURATION = 'emd',
   CONFIRM_MESSAGE_DURATION = 'cmd',
   FACILITY = 'facility',
+  STORED_STOCK_PATCHES = 'storedStockPatches',
 }
 
 export enum ZFToolStates {
@@ -15,12 +16,15 @@ export enum ZFToolStates {
   ACTIVE_TOOL= 'active_tool'
 }
 
+const PERSISTED_STATES = 'persistedStates'
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class AppStateService {
   state: Map<string, any> = new Map<string, any>();
+  persistedStates: string[] = [];
   defaults: Map<string, any> = new Map<string, any>();
 
   private _activeTool$: BehaviorSubject<ZFTool> = new BehaviorSubject<ZFTool>(ZFTool.SPLASH_LOGIN);
@@ -38,18 +42,35 @@ export class AppStateService {
     this.defaults.set(WellKnownStates.ERROR_MESSAGE_DURATION, 4000);
     this.defaults.set(WellKnownStates.CONFIRM_MESSAGE_DURATION, 2000);
     this.defaults.set(WellKnownStates.FACILITY, 'test');
+    this.defaults.set(WellKnownStates.STORED_STOCK_PATCHES, {});
+  }
+
+  initialize() {
+    // load up the persistentState
+    if (this.localStorage.has(PERSISTED_STATES)) {
+      this.persistedStates = this.localStorage.get(PERSISTED_STATES);
+      for (const ps of this.persistedStates) {
+        this.state.set(ps, this.localStorage.get(ps));
+      }
+    }
   }
 
   setState(name: string, value: any, persist: boolean = false): void {
     if (persist) {
+      if (this.persistedStates.indexOf(name) === -1) {
+        this.persistedStates.push(name);
+        this.localStorage.set(PERSISTED_STATES, this.persistedStates)
+      }
       this.localStorage.set(name, value);
-    } else {
-      this.state.set(name, value);
     }
+    this.state.set(name, value);
   }
 
   deleteState(name:string): void {
-    if (this.localStorage.has(name)) {
+    const index: number = this.persistedStates.indexOf(name);
+    if (index > -1) {
+      this.persistedStates.splice(index, 1)
+      this.localStorage.set(PERSISTED_STATES, this.persistedStates)
       this.localStorage.remove(name);
     }
     if (this.state.has(name)) {
@@ -58,9 +79,6 @@ export class AppStateService {
   }
 
   getState(name: string): any | null {
-    if (this.localStorage.has(name)) {
-      return this.localStorage.get(name);
-    }
     if (this.state.has(name)) {
       return this.state.get(name);
     }

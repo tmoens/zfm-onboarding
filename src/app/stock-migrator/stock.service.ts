@@ -3,7 +3,10 @@ import {Stock, stockNameRE} from './stock';
 import {AppStateService, WellKnownStates} from '../app-state.service';
 import {HttpClient} from '@angular/common/http';
 import * as XLSX from 'xlsx';
-import {StockData} from './stock-data';
+import {StockJson} from './stock-json';
+import {instanceToPlain, plainToInstance} from 'class-transformer';
+import {interval} from 'rxjs';
+import {StockPatch} from './stock-patch';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -53,7 +56,6 @@ export class StockService {
     private appState: AppStateService,
     private httpClient: HttpClient,
   ) {
-    this.loadRawStocks();
   }
 
   findStock(stockName: string): Stock | undefined {
@@ -91,14 +93,15 @@ export class StockService {
   getKids(stockName: string | undefined): Stock[] {
     if (!stockName) return [];
     return this.stocks.filter((stock: Stock) => (
-      stock.internalMom.current === stockName || stock.internalDad.current === stockName
+      stock.mom.current === stockName || stock.dad.current === stockName
     ))
   }
   getStockByIndex(index: number): Stock | undefined {
     return this.stocks[index];
   }
 
-  loadRawStocks() {
+
+  async loadRawStocks() {
     this.stocks = [];
     this.httpClient.get(
       `assets/${this.appState.getState(WellKnownStates.FACILITY)}/${RAW_STOCKS_WORKBOOK}`,
@@ -128,8 +131,8 @@ export class StockService {
   // When a stock is loaded from a raw stock, validation all the "per attribute"
   // validation is performed, but not the validation of relationships between stocks.
   // For example, it will note that "123.xyz" is not a valid stock number, but will not
-  // know that the internalMom "23.46" does not exist.
-  loadStocks(rawStocks: StockData[]) {
+  // know that the mom "23.46" does not exist.
+  loadStocks(rawStocks: StockJson[]) {
     let index = -1;
     for (let rawStock of rawStocks) {
       index++;
@@ -159,18 +162,38 @@ export class StockService {
       // In the worksheet, the first stock is on row 2, but the index in the array is 0;
       this.stocks[index] = new Stock(index + 2, rawStock);
     }
+
+    // Reapply any changes that were in progress.
+    // Load them up from local storage. They are just serialized stocks. We call them patches.
+    const previouslyStoredPatches: {[index: string]: StockPatch} = this.loadChangesFromLocalStorage();
+    // Loop through the stocks we loaded from the worksheet.
+    for (const stock of this.stocks) {
+      // See if there is/are patches matching on the unpatched stock name.
+      // NOTE If there ar duplicates in the stock list and a matching patch,
+      // then the patch will be applied to all the duplicate stocks.
+      // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
+      stock.applyPatch(previouslyStoredPatches[stock.stockName.original]);
+    }
+
+
     // Once they are all loaded validate them.
     // (You cannot do it before that, or you won't be able to properly check things
     //  whether the stock has duplicates or like whether a parent exists or whether
     //  a child is older than a parent.)
-    for (const stock of this.stocks) stock.validate(this);
+    this.validateStocks();
+
+    // Now start a loop to save any patches to memory every few seconds
+    interval(10000).subscribe(_ => this.saveChangesToLocalStorage())
   }
 
+  validateStocks() {
+    for (const stock of this.stocks) stock.validate(this);
+  }
 
   filterByProblemArea(problemArea: string | null): Stock[] {
     let filteredList: Stock[] = [];
     switch (problemArea) {
-      case null:
+      case ('allStocks'):
         filteredList = this.stocks;
         break;
       case ('allProblems'):
@@ -182,19 +205,45 @@ export class StockService {
       case ('dob'):
         filteredList = this.stocks.filter((s: Stock) => !s.dob.isValid());
         break;
-      case ('internalParent'):
+      case ('parent'):
         filteredList = this.stocks.filter((s: Stock) =>
-          ( !s.internalMom.isValid() ||
-            !s.internalDad.isValid()));
+          ( !s.mom.isValid() ||
+            !s.dad.isValid()));
         break;
-      case ('nurseryCount'):
+      case ('duplicates'):
         filteredList = this.stocks.filter((s: Stock) =>
-          ( !s.countEnteringNursery.isValid() ||
-            !s.countLeavingNursery.isValid()));
+          ( s.hasDuplicates() ));
         break;
     }
     return filteredList;
   }
 
+  saveChangesToLocalStorage(): void {
 
+    const stockPatches: {[index: string]: StockPatch} = {};
+    // NOTE if there are stocks with duplicate names, only the patch for the
+    // last one in the list will be saved.
+    // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
+    for (const s of this.stocks) {
+      const sp: StockPatch | null = s.extractPatch();
+      if (sp) stockPatches[s.stockName.original] = sp;
+    }
+    this.appState.setState(WellKnownStates.STORED_STOCK_PATCHES, stockPatches, true);
+  }
+
+  loadChangesFromLocalStorage(): {[index: string]: StockPatch} {
+    return this.appState.getState(WellKnownStates.STORED_STOCK_PATCHES);
+  }
+
+  exportToExcel() {
+    const data: StockJson[] = [];
+    for (const s of this.stocks) {
+      data.push(s.extractJsonForExcel());
+    }
+    var wb = XLSX.utils.book_new();
+    wb.SheetNames.push('raw-stocks');
+    const ws = XLSX.utils.json_to_sheet(data);
+    wb.Sheets['raw-stocks'] = ws;
+    XLSX.writeFile(wb, 'test.xlsx');
+  }
 }

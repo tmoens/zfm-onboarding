@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {AppStateService} from "../app-state.service";
 import {ZFTool} from '../../helpers/zf-tool';
+import {StockService} from '../stock-migrator/stock.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -14,6 +15,7 @@ export class TopBarComponent implements OnInit {
 
   constructor(
     public appState: AppStateService,
+    public stockService: StockService,
     private router: Router,
   ) {
   }
@@ -21,4 +23,7 @@ export class TopBarComponent implements OnInit {
   async ngOnInit() {
   }
 
+  exportToExcel() {
+    this.stockService.exportToExcel();
+  }
 }

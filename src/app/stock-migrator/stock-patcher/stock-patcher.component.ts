@@ -15,20 +15,16 @@ export class StockPatcherComponent implements OnInit {
   // Form controls for the fields the user can patch
   stockNameFC: FormControl = new FormControl();
   dobFC: FormControl = new FormControl();
-  internalMomFC: FormControl = new FormControl();
-  internalDadFC: FormControl = new FormControl();
-  externalMomFC: FormControl = new FormControl();
-  externalDadFC: FormControl = new FormControl();
+  momFC: FormControl = new FormControl();
+  dadFC: FormControl = new FormControl();
   countEnteringNurseryFC: FormControl = new FormControl();
   countLeavingNurseryFC: FormControl = new FormControl();
   geneticsFC: FormControl = new FormControl();
   commentFC: FormControl = new FormControl();
 
   stock: Stock | undefined;
-  mom: Stock | undefined;
-  dad: Stock | undefined;
-  nextStock: Stock | undefined;
-  prevStock: Stock | undefined;
+  moms: Stock[] = [];
+  dads: Stock[] = [];
   kids: Stock[] = [];
 
   constructor(
@@ -54,10 +50,8 @@ export class StockPatcherComponent implements OnInit {
     this.service.patchingStock(stock);
     this.stockNameFC = new FormControl(null, [Validators.required, ValidateStockNameFC(this.service, stock)]);
     this.dobFC = new FormControl(null, [Validators.required, ValidateDobFC()]);
-    this.internalMomFC = new FormControl(null, [ValidateParentFC(this.service, this.stock)]);
-    this.externalMomFC = new FormControl();
-    this.internalDadFC = new FormControl(null, [ValidateParentFC(this.service, this.stock)]);
-    this.externalDadFC = new FormControl();
+    this.momFC = new FormControl(null, [ValidateParentFC(this.service, this.stock)]);
+    this.dadFC = new FormControl(null, [ValidateParentFC(this.service, this.stock)]);
     this.countEnteringNurseryFC = new FormControl(null, [Validators.min(0)]);
     this.countLeavingNurseryFC = new FormControl(null, [Validators.min(0)]);
     this.geneticsFC = new FormControl();
@@ -67,62 +61,51 @@ export class StockPatcherComponent implements OnInit {
     this.stockNameFC.valueChanges.subscribe((value: any) => {
       this.stock?.stockName.update(value);
       this.stock?.stockName.setValidity(this.stockNameFC.valid);
-      this.kids = this.service.getKids(this.stock?.stockName.current);
+      this.refreshKids();
+      // When a stock number changes it could wreak havoc.  Anyone pointing
+      // to the old stock number as parent becomes broken and anyone
+      // pointing to the new stock number as an parent needs to be checked.
+      // So, inefficiently, just revalidate all the stocks.
+      this.service.validateStocks();
     })
     this.stockNameFC.setValue(stock.stockName.current);
     if (!stock.stockName.isValid()) this.stockNameFC.updateValueAndValidity();
 
-    // DOB and internal parents are connected because a stock cannot be
+    // DOB and parents are connected because a stock cannot be
     // younger than its mom or older than its kids.  That's why when dob
-    // changes, we recheck the validity of the internal parents.
+    // changes, we recheck the validity of the parents.
     //------------------------- DOB --------------------------
     this.dobFC.valueChanges.subscribe((value: any) => {
       this.stock?.dob.update(value);
       this.stock?.dob.setValidity(this.dobFC.valid);
-      if (this.dobFC.valid && this.internalMomFC.value) {
-        this.internalMomFC.updateValueAndValidity();
+      if (this.dobFC.valid && this.momFC.value) {
+        this.momFC.updateValueAndValidity();
       }
-      if (this.dobFC.valid && this.internalDadFC.value) {
-        this.internalDadFC.updateValueAndValidity();
+      if (this.dobFC.valid && this.dadFC.value) {
+        this.dadFC.updateValueAndValidity();
+      }
+      // when a birthdate changes, it could mean the kids have become
+      // older than their parents, so we need to revalidate them
+      for (const kid of this.kids) {
+        kid.validate(this.service);
       }
     })
     this.dobFC.setValue(stock.dob.current);
 
-    //------------------------- internal Mom & Dad --------------------------
-    this.internalMomFC.valueChanges.subscribe((value: any) => {
-      this.stock?.internalMom.update(value);
-      this.stock?.internalMom.setValidity(this.internalMomFC.valid);
-      const candidates: Stock[] = this.service.getStocksByName(this.stock?.internalMom.current);
-      if (candidates.length === 1) {
-        this.mom = candidates[0];
-      } else {
-        this.mom = undefined;
-      }
+    //------------------------- Mom & Dad --------------------------
+    this.momFC.valueChanges.subscribe((value: any) => {
+      this.stock?.mom.update(value);
+      this.stock?.mom.setValidity(this.momFC.valid);
+      this.moms = this.service.getStocksByName(this.stock?.mom.current);
     })
-    this.internalMomFC.setValue(stock.internalMom.current);
+    this.momFC.setValue(stock.mom.current);
 
-    this.internalDadFC.valueChanges.subscribe((value: any) => {
-      this.stock?.internalDad.update(value);
-      this.stock?.internalDad.setValidity(this.internalDadFC.valid);
-      const candidates: Stock[] = this.service.getStocksByName(this.stock?.internalDad.current);
-      if (candidates.length === 1) {
-        this.dad = candidates[0];
-      } else {
-        this.dad = undefined;
-      }
+    this.dadFC.valueChanges.subscribe((value: any) => {
+      this.stock?.dad.update(value);
+      this.stock?.dad.setValidity(this.dadFC.valid);
+      this.dads = this.service.getStocksByName(this.stock?.dad.current);
     })
-    this.internalDadFC.setValue(stock.internalDad.current);
-
-    //------------------------- external Mom & Dad --------------------------
-    this.externalMomFC.valueChanges.subscribe((value: any) => {
-      this.stock?.externalMom.update(value);
-    })
-    this.externalMomFC.setValue(stock.externalMom.current);
-
-    this.externalDadFC.valueChanges.subscribe((value: any) => {
-      this.stock?.externalDad.update(value);
-    })
-    this.externalDadFC.setValue(stock.externalDad.current);
+    this.dadFC.setValue(stock.dad.current);
 
     //------------------------- Nursery Counts --------------------------
     this.countEnteringNurseryFC.valueChanges.subscribe((value: any) => {
@@ -147,19 +130,26 @@ export class StockPatcherComponent implements OnInit {
       this.stock?.comment.update(String(value));
     })
     this.commentFC.setValue(stock.comment.current);
+  }
 
-    this.nextStock = this.service.getStockAfter(this.stock);
-    this.prevStock = this.service.getStockBefore(this.stock)
+  refreshKids() {
+    this.kids = this.service.getKids(this.stock?.stockName.current);
   }
 
   goToPrev() {
-    if (this.prevStock) {
-      this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + this.prevStock.index]).then();
+    if (this.stock) {
+      const prevStock = this.service.getStockBefore(this.stock)
+      if (prevStock) {
+        this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + prevStock.index]).then();
+      }
     }
   }
   goToNext() {
-    if (this.nextStock) {
-      this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + this.nextStock.index]).then();
+    if (this.stock) {
+      const nextStock = this.service.getStockAfter(this.stock)
+      if (nextStock) {
+        this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + nextStock.index]).then();
+      }
     }
   }
 }

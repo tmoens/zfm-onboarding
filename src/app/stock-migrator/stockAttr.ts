@@ -1,6 +1,8 @@
+import {AttrPatch} from './attr-patch';
+
 export class StockAttr {
   // the original value of the attribute as read from a worksheet
-  get original() {
+  get original(): string {
     return this._original;
   }
   set original(value: string) {
@@ -20,14 +22,9 @@ export class StockAttr {
   // whether the current value is valid.
   private _valid: boolean = true;
 
-  get required(): boolean {
-    return this._required;
+  constructor()   {
   }
 
-  constructor(
-    private _required: boolean = false,
-  ) {
-  }
   update (value: string) {
     this.current = value;
   }
@@ -45,6 +42,19 @@ export class StockAttr {
   }
   isPatched(): boolean {
     return (this.hasChanged() && this.isValid());
+  }
+
+  // if there was an existing patch for this attr from the same baseline, reapply it
+  applyPatch(patch?: AttrPatch) {
+    if (patch && this.original === patch.o) this.update(patch.p);
+  }
+
+  extractPatch(): AttrPatch | null {
+    if (!this.isPatched()) {
+      return null;
+    } else {
+      return {o: this.original, p: this.current}
+    }
   }
 }
 

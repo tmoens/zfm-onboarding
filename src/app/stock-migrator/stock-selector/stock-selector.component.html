@@ -1,17 +1,22 @@
 <!--  filter area -->
 <div fxLayout="column">
   <!-- filter area -->
-  <mat-form-field>
-    <mat-label>Problem Focus:</mat-label>
-    <mat-select [(value)]="problemFocus" (selectionChange)="focusOnProblemArea()">
-      <mat-option [value]="null">All stocks</mat-option>
-      <mat-option value="allProblems">All problematic stocks</mat-option>
-      <mat-option value="stockName">Stock Number problems</mat-option>
-      <mat-option value="dob">Fertilization Date problems</mat-option>
-      <mat-option value="internalParent">Internal Parent problems</mat-option>
-      <mat-option value="nurseryCount">Nursery Count problems</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div fxLayout="row">
+    <button mat-icon-button (click)="getFilteredStocks()" color="primary">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <mat-form-field>
+      <mat-label>Problem Focus:</mat-label>
+      <mat-select [(value)]="problemFocus" (selectionChange)="focusOnProblemArea()">
+        <mat-option value="allStocks">All stocks</mat-option>
+        <mat-option value="allProblems">All problematic stocks</mat-option>
+        <mat-option value="stockName">Stock Number problems</mat-option>
+        <mat-option value="dob">Fertilization Date problems</mat-option>
+        <mat-option value="parent">Parent problems</mat-option>
+        <mat-option value="duplicates">Duplicate Stock Numbers</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 
   <mat-divider></mat-divider>
   <!-- filtered stocks -->
@@ -26,7 +31,15 @@
         [selected]="service.stockBeingPatched === s"
         class="zf-selection-item"
         [class.selected]="service.stockBeingPatched === s">
-        row: {{s.row}}, stock: {{s.originalStock?.stockName}}
+        <div fxLayout="row">
+          <div fxFlex="15px">
+            <mat-icon *ngIf="!s.isValid()" class="zf-field-boo-boo">close</mat-icon>
+          </div>
+          <div>
+            row: {{s.row}}, stock: {{s.originalStock?.stockName}}
+          </div>
+        </div>
+
       </mat-list-option>
     </ng-container>
   </mat-selection-list>

@@ -4,7 +4,6 @@ import {AppStateService} from '../../app-state.service';
 import {StockService} from '../stock.service';
 import {Router} from '@angular/router';
 import {ZFTool} from '../../../helpers/zf-tool';
-import {FormControl} from '@angular/forms';
 
 const STOCK_PROBLEM_FOCUS_STATE = 'stockProblemFocusState';
 
@@ -17,7 +16,6 @@ const STOCK_PROBLEM_FOCUS_STATE = 'stockProblemFocusState';
 
 
 export class StockSelectorComponent implements OnInit {
-  unPatchedStocksOnlyFC: FormControl = new FormControl();
 
   filteredStocks: Stock[] = [];
 
@@ -33,12 +31,8 @@ export class StockSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const focus = this.appState.getState(STOCK_PROBLEM_FOCUS_STATE);
-    if (focus) {
-      this.problemFocus = focus as keyof Stock;
-    }
-    this.unPatchedStocksOnlyFC.setValue(true);
-    this.unPatchedStocksOnlyFC.valueChanges.subscribe(() => this.getFilteredStocks());
+    this.problemFocus = this.appState.getState(STOCK_PROBLEM_FOCUS_STATE);
+    this.getFilteredStocks();
   }
 
   focusOnProblemArea() {

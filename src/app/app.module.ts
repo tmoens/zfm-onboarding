@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -21,6 +21,15 @@ import {RouterModule} from '@angular/router';
 import { SplashComponent } from './splash/splash.component';
 import {AppRoutingModule} from './app-routing.module';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import {StockService} from './stock-migrator/stock.service';
+import {AppStateService} from './app-state.service';
+
+export function appStateProviderFactory(provider: AppStateService) {
+  return () => provider.initialize();
+}
+export function stockServiceProviderFactory(provider: StockService) {
+  return () => provider.loadRawStocks();
+}
 
 @NgModule({
   declarations: [
@@ -49,7 +58,20 @@ import {MatSidenavModule} from '@angular/material/sidenav';
     RouterModule,
     AppRoutingModule,
   ],
-  providers: [],
+  providers: [
+    {provide: APP_INITIALIZER,
+      useFactory: appStateProviderFactory,
+      deps: [AppStateService],
+      multi: true,
+    },
+    {provide: APP_INITIALIZER,
+      useFactory: stockServiceProviderFactory,
+      deps: [StockService, AppStateService],
+      multi: true,
+    },
+
+
+  ],
   exports: [
     TopBarComponent,
   ],

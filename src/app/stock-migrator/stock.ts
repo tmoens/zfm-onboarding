@@ -2,10 +2,12 @@
 // The general idea is that this gets refined as we add more "corrections" for
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
-import {StockData} from './stock-data';
+import {StockJson} from './stock-json';
 import {StockAttr} from './stockAttr';
 import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {StockPatch} from './stock-patch';
+import {AttrPatch} from './attr-patch';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -15,12 +17,10 @@ import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 export const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
 
 export class Stock {
-  stockName: StockAttr = new StockAttr(true);
-  dob: StockAttr = new StockAttr(true);
-  internalMom: StockAttr = new StockAttr();
-  internalDad: StockAttr = new StockAttr();
-  externalMom: StockAttr = new StockAttr();
-  externalDad: StockAttr = new StockAttr();
+  stockName: StockAttr = new StockAttr();
+  dob: StockAttr = new StockAttr();
+  mom: StockAttr = new StockAttr();
+  dad: StockAttr = new StockAttr();
   countEnteringNursery: StockAttr = new StockAttr();
   countLeavingNursery: StockAttr = new StockAttr();
   researcher: StockAttr = new StockAttr();
@@ -28,23 +28,37 @@ export class Stock {
   comment: StockAttr = new StockAttr();
 
   get row(): number {
-    return this._row;
+    if (this._row) return this._row;
+    return this._row ?? -1;
   }
   // in the worksheet the first stock appears on row 2.
   // If you are putting them in an array, you want to start at index of 0;
   get index(): number {
-    return this._row - 2;
+    return this.row - 2;
   }
+
+  hasDuplicates(): boolean {
+    return (this._duplicates.length > 0);
+  }
+  setDuplicates(dups: number[]) {
+    this._duplicates = dups;
+  }
+  private _duplicates: number[] = [];
 
   constructor(
     private _row: number, // the row on the input spreadsheet that this stock was found on
-    public originalStock: StockData,
+    public originalStock: StockJson,
   ) {
+    this.constructFromJsonFromWorksheet(originalStock);
+  }
+
+  constructFromJsonFromWorksheet(originalStock: StockJson) {
+    this.originalStock = originalStock;
     this.stockName.original = (originalStock.stockName) ? String(originalStock.stockName).trim() : '';
     // Please look the other way for a moment while I get out my klugdel.
     // A stock number like 1660.10 (as unusual as it would be) looks
     // like a number and sure enough it gets converted to 1660.1 when it
-    // comes in from the spreadsheet. So, we convert it to a string and
+    // comes in from the spreadsheet. So, we convert it to a string, and
     // we tack on a 0 for such cases;
     if (this.stockName.original) {
       const snTest = stockNameRE.exec(this.stockName.original);
@@ -74,15 +88,11 @@ export class Stock {
     this.dob.current = this.dob.original;
 
     // For other fields we just take them as they are
-    this.internalMom.original = (originalStock.internalMom) ? String(originalStock.internalMom).trim() : '';
-    this.internalMom.current = this.internalMom.original;
-    this.externalMom.original = (originalStock.externalMom) ? String(originalStock.externalMom).trim() : '';
-    this.externalMom.current = this.externalMom.original;
+    this.mom.original = (originalStock.mom) ? String(originalStock.mom).trim() : '';
+    this.mom.current = this.mom.original;
 
-    this.internalDad.original = (originalStock.internalDad) ? String(originalStock.internalDad).trim() : '';
-    this.internalDad.current = this.internalDad.original;
-    this.externalDad.original = (originalStock.externalDad) ? String(originalStock.externalDad).trim() : '';
-    this.externalDad.current = this.externalDad.original;
+    this.dad.original = (originalStock.dad) ? String(originalStock.dad).trim() : '';
+    this.dad.current = this.dad.original;
 
     this.countEnteringNursery.original = (originalStock.countEnteringNursery) ? String(originalStock.countEnteringNursery).trim() : '';
     this.countEnteringNursery.current = this.countEnteringNursery.original;
@@ -98,6 +108,91 @@ export class Stock {
 
     this.researcher.original = (originalStock.researcher) ? String(originalStock.researcher).trim() : '';
     this.researcher.current = this.researcher.original;
+  }
+
+  extractPatch(): StockPatch | null {
+    const patch: StockPatch = {}
+    let p: AttrPatch | null;
+    p = this.stockName.extractPatch();
+    if (p !== null) {patch.stockName = p;}
+    p = this.dob.extractPatch();
+    if (p !== null) {patch.dob = p;}
+    p = this.mom.extractPatch();
+    if (p !== null) {patch.mom = p;}
+    p = this.dad.extractPatch();
+    if (p !== null) {patch.dad = p;}
+    p = this.countEnteringNursery.extractPatch();
+    if (p !== null) {patch.countEnteringNursery = p;}
+    p = this.countLeavingNursery.extractPatch();
+    if (p !== null) {patch.countLeavingNursery = p;}
+    p = this.comment.extractPatch();
+    if (p !== null) {patch.comment = p;}
+    p = this.genetics.extractPatch();
+    if (p !== null) {patch.genetics = p;}
+    if (Object.keys(patch).length > 0) {
+      return patch;
+    } else {
+      return null;
+    }
+  }
+
+  extractJsonForExcel(): StockJson {
+    const json: StockJson = this.originalStock;
+    const notes: string[] = [];
+    if (this.comment.current) {
+      notes.push(this.comment.current);
+    }
+    if (this.stockName.isPatched()) {
+      notes.push (`number changed from ${this.stockName.original}`)
+      json.stockName = this.stockName.current;
+    }
+    if (this.dob.isPatched()) {
+      notes.push (`dob changed from ${this.dob.original}`)
+      json.dob = this.dob.current;
+    }
+    if (this.mom.isPatched()) {
+      notes.push (`mom changed from ${this.mom.original}`)
+      json.mom = this.mom.current;
+    }
+    if (this.dad.isPatched()) {
+      notes.push (`dad changed from ${this.dad.original}`)
+      json.dad = this.dad.current;
+    }
+    if (this.countEnteringNursery.isPatched()) {
+      notes.push (`count enteringNursery changed from ${this.countEnteringNursery.original}`)
+      json.countEnteringNursery = this.countEnteringNursery.current;
+    }
+    if (this.countLeavingNursery.isPatched()) {
+      notes.push (`countLeavingNursery changed from ${this.countLeavingNursery.original}`)
+      json.countLeavingNursery = this.countLeavingNursery.current;
+    }
+    if (this.researcher.isPatched()) {
+      notes.push (`researcher changed from ${this.researcher.original}`)
+      json.researcher = this.researcher.current;
+    }
+    if (this.genetics.isPatched()) {
+      notes.push (`genetics changed from ${this.genetics.original}`)
+      json.genetics = this.genetics.current;
+    }
+    if (this.comment.isPatched()) {
+      notes.push (`comment changed from ${this.comment.original}`)
+      json.comment = this.comment.current;
+    }
+    json.comment = notes.join(`; `)
+    return json;
+  }
+
+  applyPatch(patch?: StockPatch) {
+    if (patch) {
+      this.stockName.applyPatch(patch.stockName);
+      this.dob.applyPatch(patch.dob);
+      this.mom.applyPatch(patch.mom);
+      this.dad.applyPatch(patch.dad);
+      this.countEnteringNursery.applyPatch(patch.countEnteringNursery);
+      this.countLeavingNursery.applyPatch(patch.countLeavingNursery);
+      this.genetics.applyPatch(patch.genetics);
+      this.comment.applyPatch(patch.comment);
+    }
   }
 
   get stockNumber(): number | undefined {
@@ -143,8 +238,8 @@ export class Stock {
     return (
       this.stockName.isValid() &&
       this.dob.isValid() &&
-      this.internalMom.isValid() &&
-      this.internalDad.isValid() &&
+      this.mom.isValid() &&
+      this.dad.isValid() &&
       this.countEnteringNursery.isValid() &&
       this.countLeavingNursery.isValid()
     )
@@ -154,8 +249,8 @@ export class Stock {
   validate(service: StockService): void {
     this.stockName.setValidity(!ValidateStockName(service, this, this.stockName.current));
     this.dob.setValidity(!ValidateDob(this.dob.current));
-    this.internalMom.setValidity(!ValidateParent(service, this, this.internalMom.current));
-    this.internalDad.setValidity(!ValidateParent(service, this, this.internalDad.current));
+    this.mom.setValidity(!ValidateParent(service, this, this.mom.current));
+    this.dad.setValidity(!ValidateParent(service, this, this.dad.current));
   }
 }
 
@@ -178,7 +273,10 @@ export function ValidateStockName(service: StockService, stock: Stock, proposedS
       for (const s of dups) {
         if (s.index !== stock.index) dupRows.push(s.row);
       }
-      return {invalid: `Stock name exists in row(s): ${dupRows.join(', ')}`}
+      stock.setDuplicates(dupRows);
+      return {invalid: `Duplicate in row(s): ${dupRows.join(', ')}`}
+    } else {
+      stock.setDuplicates([]);
     }
   }
   return null;
@@ -217,7 +315,7 @@ export function ValidateParent(service: StockService, stock?: Stock, putativePar
       return {invalid: 'Parent does not exist'}
     }
     if (candidates.length > 1) {
-      return {invalid: `Ambiguous, multiple stocks called ${putativeParentName}`}
+      return {invalid: `Ambiguous: multiple stocks ${putativeParentName}`}
     }
     if (candidates.length === 1 && candidates[0].index === stock?.index) {
       return {invalid: `Can't be your own parent`}
