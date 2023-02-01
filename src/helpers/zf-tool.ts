@@ -14,7 +14,7 @@ export class ZFTool {
   static readonly USER_MIGRATOR  = new ZFTool(
     'user-migrator',
     ZFTypes.USER_MIGRATOR,
-    'Stocks');
+    'Users');
 
   // private to disallow creating other instances than the static ones above.
   private constructor(

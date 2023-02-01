@@ -1,0 +1,35 @@
+<ng-form [formGroup]="userForm" (ngSubmit)="onSave()" (change)="onSave()">
+  <div fxLayout="column" fxLayoutGap="10px">
+    <mat-form-field floatLabel="always">
+      <mat-label>Name</mat-label>
+      <input formControlName="name" type="text" matInput placeholder="e.g. Joseph Robert Alias">
+      <mat-hint>How the person appears in the GUI</mat-hint>
+    </mat-form-field>
+    <mat-form-field ngDefaultControl floatLabel="always">
+      <mat-label>Email</mat-label>
+      <input formControlName="email" type="text" matInput>
+      <mat-hint>How the system contacts the user</mat-hint>
+    </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Username</mat-label>
+      <input formControlName="username" type="text" matInput placeholder="e.g. joe.alias">
+      <mat-hint>Used to log in</mat-hint>
+    </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Initials</mat-label>
+      <input formControlName="initials" type="text" matInput placeholder="e.g. JBA">
+      <mat-hint>Used on tank labels (s.b. unique)</mat-hint>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>User Role</mat-label>
+      <mat-select formControlName="role" (change)="onSave()">
+        <mat-option [value]="UserRole.RESEARCHER">{{UserRole.RESEARCHER}}</mat-option>
+        <mat-option [value]="UserRole.ADMIN">{{UserRole.ADMIN}}</mat-option>
+        <mat-option [value]="UserRole.GUEST">{{UserRole.GUEST}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+      <mat-checkbox formControlName="isActive" color="primary">Active</mat-checkbox>
+      <mat-checkbox formControlName="isResearcher" color="primary">Researcher</mat-checkbox>
+      <mat-checkbox formControlName="isPrimaryInvestigator" color="primary">Primary Investigator</mat-checkbox>
+  </div>
+</ng-form>

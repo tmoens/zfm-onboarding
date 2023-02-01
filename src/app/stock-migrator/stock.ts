@@ -40,8 +40,8 @@ export class Stock {
   hasDuplicates(): boolean {
     return (this._duplicates.length > 0);
   }
-  setDuplicates(dups: number[]) {
-    this._duplicates = dups;
+  setDuplicates(duplicates: number[]) {
+    this._duplicates = duplicates;
   }
   private _duplicates: number[] = [];
 
@@ -55,7 +55,7 @@ export class Stock {
   constructFromJsonFromWorksheet(originalStock: StockJson) {
     this.originalStock = originalStock;
     this.stockName.original = (originalStock.stockName) ? String(originalStock.stockName).trim() : '';
-    // Please look the other way for a moment while I get out my klugdel.
+    // Please look the other way for a moment while I get out my cudgel.
     // A stock number like 1660.10 (as unusual as it would be) looks
     // like a number and sure enough it gets converted to 1660.1 when it
     // comes in from the spreadsheet. So, we convert it to a string, and
@@ -68,7 +68,7 @@ export class Stock {
       this.stockName.current = this.stockName.original;
     }
 
-    // The DOB is expected to be present and to be an excel date serial number or a date string.
+    // The DOB is expected to be present and to be an Excel date serial number or a date string.
     // Also, we are going to normalize the raw stock's dob into a date string if possible.
     this.dob.original = (originalStock.dob) ? String(originalStock.dob).trim() : '';
     if (this.dob.original) {

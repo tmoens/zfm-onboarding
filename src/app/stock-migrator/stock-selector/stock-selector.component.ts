@@ -11,7 +11,6 @@ const STOCK_PROBLEM_FOCUS_STATE = 'stockProblemFocusState';
 @Component({
   selector: 'app-stock-selector',
   templateUrl: './stock-selector.component.html',
-  styleUrls: ['./stock-selector.component.scss']
 })
 
 

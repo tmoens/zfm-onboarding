@@ -7,6 +7,14 @@
 
 @include mat.all-component-themes($zf-app-theme);
 
+.tool-container {
+  position: absolute;
+  top: 10px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
  //push everything after this in flexLayout to the end of the layout
  //So, use this in a toolbar to push the login button to the right.
 .fill-remaining-space {

@@ -21,20 +21,23 @@ import {RouterModule} from '@angular/router';
 import { SplashComponent } from './splash/splash.component';
 import {AppRoutingModule} from './app-routing.module';
 import {MatSidenavModule} from '@angular/material/sidenav';
-import {StockService} from './stock-migrator/stock.service';
 import {AppStateService} from './app-state.service';
+import {UserMigratorComponent} from './user-migrator/user-migrator.component';
+import {UserMigratorRoutingModule} from './user-migrator/user-migrator-routing.module';
+import {UserMigratorModule} from './user-migrator/user-migrator.module';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
 }
-export function stockServiceProviderFactory(provider: StockService) {
-  return () => provider.loadRawStocks();
-}
+// export function stockServiceProviderFactory(provider: StockService) {
+//   return () => provider.loadRawStocks();
+// }
 
 @NgModule({
   declarations: [
     AppComponent,
     StockMigratorComponent,
+    UserMigratorComponent,
     TopBarComponent,
     SplashComponent,
   ],
@@ -54,9 +57,11 @@ export function stockServiceProviderFactory(provider: StockService) {
     FormsModule,
     ReactiveFormsModule,
     StockMigratorModule,
+    UserMigratorRoutingModule,
     MatToolbarModule,
     RouterModule,
     AppRoutingModule,
+    UserMigratorModule,
   ],
   providers: [
     {provide: APP_INITIALIZER,
@@ -64,11 +69,11 @@ export function stockServiceProviderFactory(provider: StockService) {
       deps: [AppStateService],
       multi: true,
     },
-    {provide: APP_INITIALIZER,
-      useFactory: stockServiceProviderFactory,
-      deps: [StockService, AppStateService],
-      multi: true,
-    },
+    // {provide: APP_INITIALIZER,
+    //   useFactory: stockServiceProviderFactory,
+    //   deps: [StockService, AppStateService],
+    //   multi: true,
+    // },
 
 
   ],

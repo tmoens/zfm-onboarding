@@ -1,12 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Stock, stockNameRE} from './stock';
 import {AppStateService, WellKnownStates} from '../app-state.service';
-import {HttpClient} from '@angular/common/http';
 import * as XLSX from 'xlsx';
 import {StockJson} from './stock-json';
-import {instanceToPlain, plainToInstance} from 'class-transformer';
 import {interval} from 'rxjs';
 import {StockPatch} from './stock-patch';
+import {WorkBook} from 'xlsx';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -29,15 +28,14 @@ import {StockPatch} from './stock-patch';
  * **ALL OTHER COLUMNS ARE IGNORED** but there is no harm in having them
  */
 
-const RAW_STOCKS_WORKBOOK = 'raw-stocks.xlsm';
-const RAW_STOCKS_SHEET = 'raw-stocks';
+const WORKSHEET_NAME = 'raw-stocks';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StockService {
   // The set of problems we run into loading data from the raw-stock
-  // excel file.  These are not specific to any one stock, but more
+  // Excel file.  These are not specific to any one stock, but more
   // about the problems with the book as a whole.
   loadingProblems: string[] = [];
 
@@ -54,14 +52,7 @@ export class StockService {
 
   constructor(
     private appState: AppStateService,
-    private httpClient: HttpClient,
   ) {
-  }
-
-  findStock(stockName: string): Stock | undefined {
-    return this.stocks.find((s: Stock) => {
-      return s && s.checkName(stockName);
-    })
   }
 
   // This will return more than one if there are duplicate stock names
@@ -69,9 +60,9 @@ export class StockService {
     // Note if the string is empty or undefined we return an empty list
     // *EVEN IF* there is a stock with an empty name in the stocks list.
     // There may be several stocks with no name in the stock list if the
-    // raw data from the excel sheet is bad.
+    // raw data from the Excel sheet is bad.
     if (!stockName) return [];
-     return this.stocks.filter((stock) => stock.stockName.current === stockName);
+    return this.stocks.filter((stock) => stock.stockName.current === stockName);
   }
 
   getStockBefore(stock: Stock): Stock {
@@ -101,31 +92,16 @@ export class StockService {
   }
 
 
-  async loadRawStocks() {
+  loadWorksheet(wb: XLSX.WorkBook) {
     this.stocks = [];
-    this.httpClient.get(
-      `assets/${this.appState.getState(WellKnownStates.FACILITY)}/${RAW_STOCKS_WORKBOOK}`,
-      {responseType: 'blob'}
-    ).subscribe((data: any) => {
-      const reader: FileReader = new FileReader();
-      reader.onload = (e: any) => {
-        const binaryString: string = e.target.result;
-        const rawStocksWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
-        if (!rawStocksWb) {
-          this.loadingProblems.push(`Could not read ${RAW_STOCKS_WORKBOOK} workbook.`);
-          return;
-        }
 
-        const ws = rawStocksWb.Sheets[RAW_STOCKS_SHEET];
-        if (!ws) {
-          this.loadingProblems.push(`Could not find worksheet: ${RAW_STOCKS_SHEET}.`);
-          return;
-        }
+    const ws = wb.Sheets[WORKSHEET_NAME];
+    if (!ws) {
+      this.loadingProblems.push(`Could not find worksheet: ${WORKSHEET_NAME}.`);
+      return;
+    }
 
-        this.loadStocks(XLSX.utils.sheet_to_json(ws));
-      }
-      reader.readAsBinaryString(data);
-    });
+    this.loadStocks(XLSX.utils.sheet_to_json(ws));
   }
 
   // When a stock is loaded from a raw stock, validation all the "per attribute"
@@ -235,15 +211,12 @@ export class StockService {
     return this.appState.getState(WellKnownStates.STORED_STOCK_PATCHES);
   }
 
-  exportToExcel() {
+  exportWorksheet(wb: XLSX.WorkBook) {
     const data: StockJson[] = [];
     for (const s of this.stocks) {
       data.push(s.extractJsonForExcel());
     }
-    var wb = XLSX.utils.book_new();
-    wb.SheetNames.push('raw-stocks');
-    const ws = XLSX.utils.json_to_sheet(data);
-    wb.Sheets['raw-stocks'] = ws;
-    XLSX.writeFile(wb, 'test.xlsx');
+    wb.SheetNames.push(WORKSHEET_NAME);
+    wb.Sheets[WORKSHEET_NAME] = XLSX.utils.json_to_sheet(data);
   }
 }

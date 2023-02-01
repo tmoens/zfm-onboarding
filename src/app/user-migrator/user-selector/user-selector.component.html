@@ -1,0 +1,25 @@
+<mat-selection-list #users *ngIf="service.list" dense [multiple]="false"
+                    (selectionChange)="selectUser(users.selectedOptions.selected[0]?.value)">
+  <ng-container *ngFor="let user of service.list">
+    <mat-list-option
+      [value]='user'
+      [selected]="service.selected === user"
+      class="zf-selection-item"
+      [class.selected]="service.selected === user">
+      <div fxLayout="row">
+        <div fxFlex="15px">
+          <mat-icon (click)="service.delete(user)" color="primary">delete</mat-icon>
+        </div>
+        <div fxFlex="15px">
+          <mat-icon *ngIf="!user.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        </div>
+        <div>{{user.name}}</div>
+      </div>
+    </mat-list-option>
+  </ng-container>
+</mat-selection-list>
+<button mat-button (click)="addUser()" color="primary">
+  <mat-icon>add</mat-icon>
+  Add a user
+</button>
+<app-edit-user [user]="service.selected"></app-edit-user>
