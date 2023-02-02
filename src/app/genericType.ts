@@ -6,4 +6,7 @@ export class GenericType{
     // Needs overriding
     return true;
   }
+  get uniqueName(): string {
+    return 'No idea';
+  }
 }

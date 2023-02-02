@@ -1,5 +1,5 @@
-export class PatternMapper<T> {
-  regExp: RegExp = /.*/;
+export class PatternMapper {
+  regExp: RegExp = /needsAGoodPattern/;
   comment: string = '';
-  mapsTo: T | null = null;
+  name: string = '';
 }

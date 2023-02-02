@@ -6,7 +6,10 @@
     </mat-sidenav>
 
     <mat-sidenav-content>
-      <app-string-set [strings]="stockService.getUserStrings()"></app-string-set>
+      <app-string-set [strings]="stockService.getStrings('researcher')"></app-string-set>
+      <ng-container *ngFor="let pm of patternMappers">
+        <app-pattern-mapper [patternMapper]="pm" [targetType]="targetType" [mappingTargetsSource]="userService.uniqueNames"></app-pattern-mapper>
+      </ng-container>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

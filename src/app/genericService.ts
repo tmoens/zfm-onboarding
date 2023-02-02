@@ -3,11 +3,13 @@ import {AppStateService} from './app-state.service';
 import * as XLSX from 'xlsx';
 import {instanceToPlain} from 'class-transformer';
 import {GenericType} from './genericType';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenericService<T extends GenericType, TJson> {
+  uniqueNames: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   // The set of problems we run into loading items from the worksheet.
   // These are not specific to any one item, but more about the problems with
   // the sheet as a whole.
@@ -34,6 +36,7 @@ export class GenericService<T extends GenericType, TJson> {
       return;
     }
     this.loadItems(XLSX.utils.sheet_to_json(ws));
+    this.refreshUniqueNames();
   }
 
   loadItems(itemsFromWorksheet: TJson[]) {
@@ -61,14 +64,24 @@ export class GenericService<T extends GenericType, TJson> {
   add(item: T) {
     if (item.isValid()) {
       this.list.push(item)
+      this.refreshUniqueNames();
     }
   }
 
   delete(item: T) {
     const index = this.list.indexOf(item);
-    if (index >= 0) this.list.splice(index,1);
+    if (index >= 0) {
+      this.list.splice(index,1);
+      this.refreshUniqueNames();
+    }
     if (item === this._selected) {
       this.select(null);
     }
+  }
+
+  refreshUniqueNames() {
+    const uniqueNames: string[] = [];
+    this.list.map((item: T) => uniqueNames.push(item.uniqueName));
+    this.uniqueNames.next(uniqueNames);
   }
 }

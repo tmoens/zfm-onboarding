@@ -191,11 +191,9 @@ export class StockService extends GenericService<Stock, StockJson> {
   }
 
 
-  getUserStrings(): Set<string> {
-    const set = new Set<string>();
-    this.list.map((s: Stock) => {
-      set.add(s.researcher.current);
-    });
-    return set;
+  getStrings(type: 'genetics' | 'researcher'): string[] {
+    const strings: string[] = [];
+    this.list.map((s: Stock) => strings.push(s[type].original));
+    return strings;
   }
 }

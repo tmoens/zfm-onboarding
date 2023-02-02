@@ -29,4 +29,8 @@ export class User extends GenericType{
   override isValid(): boolean {
     return true;
   }
+
+  override get uniqueName(): string {
+    return this.username;
+  }
 }
