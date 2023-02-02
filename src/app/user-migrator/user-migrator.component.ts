@@ -15,6 +15,7 @@ export class UserMigratorComponent {
   }
   constructor(
     public appState: AppStateService,
+    public stockService: StockService,
     public service: UserService,
   ) {
     this.appState.setActiveTool(ZFTool.USER_MIGRATOR);

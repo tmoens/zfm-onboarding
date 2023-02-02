@@ -6,9 +6,7 @@
     </mat-sidenav>
 
     <mat-sidenav-content>
-      <div class="zf-tool-content">
-        la la la
-      </div>
+      <app-string-set [strings]="stockService.getUserStrings()"></app-string-set>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

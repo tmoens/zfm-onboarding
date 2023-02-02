@@ -9,7 +9,6 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 })
 export class EditUserComponent implements OnInit {
   public UserRole = UserRole;
-  private _user: User | null = null;
 
   public mode: 'edit' | 'add' = 'edit';
 
@@ -42,9 +41,6 @@ export class EditUserComponent implements OnInit {
     }
   }
 
-  get user(): User | null {
-    return this._user;
-  }
   constructor(
     private fb: FormBuilder,
     protected service: UserService,

@@ -4,7 +4,6 @@ import {AppStateService} from "../app-state.service";
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
-import {User} from '../user-migrator/user';
 import {UserService} from '../user-migrator/user.service';
 
 @Component({
@@ -33,17 +32,17 @@ export class TopBarComponent implements OnInit {
     reader.onload = (e: any) => {
       const binaryString: string = e.target.result;
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
-      this.stockService.loadWorksheet(inputWb);
-      this.userService.loadWorksheet(inputWb);
+      this.stockService.loadWorksheet(inputWb, 'raw-stocks');
+      this.userService.loadWorksheet(inputWb, 'users');
     }
     reader.readAsBinaryString(file);
   }
 
 
   exportToExcel() {
-    var wb = XLSX.utils.book_new();
-    this.stockService.exportWorksheet(wb);
-    this.userService.exportWorksheet(wb);
+    const wb = XLSX.utils.book_new();
+    this.stockService.exportWorksheet(wb, 'raw-stocks');
+    this.userService.exportWorksheet(wb, 'users');
     XLSX.writeFile(wb, 'test.xlsx');
   }
 }

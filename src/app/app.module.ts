@@ -25,6 +25,7 @@ import {AppStateService} from './app-state.service';
 import {UserMigratorComponent} from './user-migrator/user-migrator.component';
 import {UserMigratorRoutingModule} from './user-migrator/user-migrator-routing.module';
 import {UserMigratorModule} from './user-migrator/user-migrator.module';
+import {StringMaulingModule} from './string-mauling/string-mauling.module';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
@@ -62,6 +63,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     RouterModule,
     AppRoutingModule,
     UserMigratorModule,
+    StringMaulingModule,
   ],
   providers: [
     {provide: APP_INITIALIZER,

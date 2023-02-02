@@ -8,6 +8,7 @@ import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {StockPatch} from './stock-patch';
 import {AttrPatch} from './attr-patch';
+import {GenericType} from '../genericType';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -16,7 +17,7 @@ import {AttrPatch} from './attr-patch';
 // stock name and extract the stock number and substock number.
 export const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
 
-export class Stock {
+export class Stock extends GenericType {
   stockName: StockAttr = new StockAttr();
   dob: StockAttr = new StockAttr();
   mom: StockAttr = new StockAttr();
@@ -27,6 +28,11 @@ export class Stock {
   genetics: StockAttr = new StockAttr();
   comment: StockAttr = new StockAttr();
 
+  originalStock: StockJson | null = null;
+  private _row: number | null = null;
+  set row(value: number | null) {
+    this._row = value;
+  }
   get row(): number {
     if (this._row) return this._row;
     return this._row ?? -1;
@@ -45,14 +51,8 @@ export class Stock {
   }
   private _duplicates: number[] = [];
 
-  constructor(
-    private _row: number, // the row on the input spreadsheet that this stock was found on
-    public originalStock: StockJson,
-  ) {
-    this.constructFromJsonFromWorksheet(originalStock);
-  }
 
-  constructFromJsonFromWorksheet(originalStock: StockJson) {
+  override datafillFromJson(originalStock: StockJson) {
     this.originalStock = originalStock;
     this.stockName.original = (originalStock.stockName) ? String(originalStock.stockName).trim() : '';
     // Please look the other way for a moment while I get out my cudgel.
@@ -136,49 +136,51 @@ export class Stock {
     }
   }
 
-  extractJsonForExcel(): StockJson {
-    const json: StockJson = this.originalStock;
-    const notes: string[] = [];
-    if (this.comment.current) {
-      notes.push(this.comment.current);
+  extractJsonForExcel(): StockJson | null {
+    const json: StockJson | null = this.originalStock;
+    if (json) {
+      const notes: string[] = [];
+      if (this.comment.current) {
+        notes.push(this.comment.current);
+      }
+      if (this.stockName.isPatched()) {
+        notes.push(`number changed from ${this.stockName.original}`)
+        json.stockName = this.stockName.current;
+      }
+      if (this.dob.isPatched()) {
+        notes.push(`dob changed from ${this.dob.original}`)
+        json.dob = this.dob.current;
+      }
+      if (this.mom.isPatched()) {
+        notes.push(`mom changed from ${this.mom.original}`)
+        json.mom = this.mom.current;
+      }
+      if (this.dad.isPatched()) {
+        notes.push(`dad changed from ${this.dad.original}`)
+        json.dad = this.dad.current;
+      }
+      if (this.countEnteringNursery.isPatched()) {
+        notes.push(`count enteringNursery changed from ${this.countEnteringNursery.original}`)
+        json.countEnteringNursery = this.countEnteringNursery.current;
+      }
+      if (this.countLeavingNursery.isPatched()) {
+        notes.push(`countLeavingNursery changed from ${this.countLeavingNursery.original}`)
+        json.countLeavingNursery = this.countLeavingNursery.current;
+      }
+      if (this.researcher.isPatched()) {
+        notes.push(`researcher changed from ${this.researcher.original}`)
+        json.researcher = this.researcher.current;
+      }
+      if (this.genetics.isPatched()) {
+        notes.push(`genetics changed from ${this.genetics.original}`)
+        json.genetics = this.genetics.current;
+      }
+      if (this.comment.isPatched()) {
+        notes.push(`comment changed from ${this.comment.original}`)
+        json.comment = this.comment.current;
+      }
+      json.comment = notes.join(`; `)
     }
-    if (this.stockName.isPatched()) {
-      notes.push (`number changed from ${this.stockName.original}`)
-      json.stockName = this.stockName.current;
-    }
-    if (this.dob.isPatched()) {
-      notes.push (`dob changed from ${this.dob.original}`)
-      json.dob = this.dob.current;
-    }
-    if (this.mom.isPatched()) {
-      notes.push (`mom changed from ${this.mom.original}`)
-      json.mom = this.mom.current;
-    }
-    if (this.dad.isPatched()) {
-      notes.push (`dad changed from ${this.dad.original}`)
-      json.dad = this.dad.current;
-    }
-    if (this.countEnteringNursery.isPatched()) {
-      notes.push (`count enteringNursery changed from ${this.countEnteringNursery.original}`)
-      json.countEnteringNursery = this.countEnteringNursery.current;
-    }
-    if (this.countLeavingNursery.isPatched()) {
-      notes.push (`countLeavingNursery changed from ${this.countLeavingNursery.original}`)
-      json.countLeavingNursery = this.countLeavingNursery.current;
-    }
-    if (this.researcher.isPatched()) {
-      notes.push (`researcher changed from ${this.researcher.original}`)
-      json.researcher = this.researcher.current;
-    }
-    if (this.genetics.isPatched()) {
-      notes.push (`genetics changed from ${this.genetics.original}`)
-      json.genetics = this.genetics.current;
-    }
-    if (this.comment.isPatched()) {
-      notes.push (`comment changed from ${this.comment.original}`)
-      json.comment = this.comment.current;
-    }
-    json.comment = notes.join(`; `)
     return json;
   }
 
@@ -234,7 +236,7 @@ export class Stock {
     return (!this.dob.current || (this.dob.current >= dobString));
   }
 
-  isValid(): boolean {
+  override isValid(): boolean {
     return (
       this.stockName.isValid() &&
       this.dob.isValid() &&
