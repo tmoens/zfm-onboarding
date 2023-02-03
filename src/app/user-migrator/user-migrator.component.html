@@ -6,10 +6,36 @@
     </mat-sidenav>
 
     <mat-sidenav-content>
-      <app-string-set [strings]="stockService.getStrings('researcher')"></app-string-set>
-      <ng-container *ngFor="let pm of patternMappers">
-        <app-pattern-mapper [patternMapper]="pm" [targetType]="targetType" [mappingTargetsSource]="userService.uniqueNames"></app-pattern-mapper>
-      </ng-container>
+      <div fxLayout="row" fxLayoutGap="10px">
+        <!-- All the strings (and tokens) in the researcher field of the raw stocks -->
+        <div fxLayout="column" fxLayoutGap="10px">
+          <h3>Original</h3>
+          <app-string-set [uniqueStringsAndTokens]="rawStrings"></app-string-set>
+        </div>
+        <div fxLayout="column" fxLayoutGap="10px">
+          <h3>Residual</h3>
+          <app-string-set [uniqueStringsAndTokens]="residualStrings" [showCount]="false"></app-string-set>
+        </div>
+        <div fxLayout="column" fxLayoutGap="10px">
+          <button mat-button (click)="addPatternMapper()" color="primary">
+            <mat-icon>add</mat-icon>
+            Add pattern mapper
+          </button>
+
+          <!-- All the patterns that map from strings to specific users -->
+          <ng-container *ngFor="let pm of patternMappers">
+            <div fxLayout="row" fxLayoutGap="10px">
+              <mat-icon (click)="deletePatternMapper(pm)" color="primary">delete</mat-icon>
+              <app-pattern-mapper
+                [patternMapper]="pm"
+                [targetType]="targetType"
+                [mappingTargetsSource]="userService.uniqueNames"
+                (onChange)="doPatternMatching($event)">
+              </app-pattern-mapper>
+            </div>
+          </ng-container>
+        </div>
+      </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

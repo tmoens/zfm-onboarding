@@ -6,6 +6,8 @@ import { PatternMapperComponent } from './pattern-mapper/pattern-mapper.componen
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatchDetailsDialogComponent } from './pattern-mapper/match-details-dialog/match-details-dialog.component';
+import {MatDialogModule} from '@angular/material/dialog';
 
 
 
@@ -13,6 +15,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
   declarations: [
     StringSetComponent,
     PatternMapperComponent,
+    MatchDetailsDialogComponent,
   ],
   exports: [
     StringSetComponent,
@@ -24,7 +27,8 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatDialogModule,
   ]
 })
 export class StringMaulingModule { }

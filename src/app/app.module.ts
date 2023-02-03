@@ -26,6 +26,7 @@ import {UserMigratorComponent} from './user-migrator/user-migrator.component';
 import {UserMigratorRoutingModule} from './user-migrator/user-migrator-routing.module';
 import {UserMigratorModule} from './user-migrator/user-migrator.module';
 import {StringMaulingModule} from './string-mauling/string-mauling.module';
+import {MatIconModule} from '@angular/material/icon';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
@@ -64,6 +65,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     AppRoutingModule,
     UserMigratorModule,
     StringMaulingModule,
+    MatIconModule,
   ],
   providers: [
     {provide: APP_INITIALIZER,

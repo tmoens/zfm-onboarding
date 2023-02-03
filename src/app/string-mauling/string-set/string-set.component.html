@@ -1,14 +1,16 @@
 <div fxLayout="row" fxLayoutGap="10px">
   <div fxLayout="column" fxLayoutGap="10px">
-    <h2>Unique Tokens</h2>
-    <div *ngFor="let s of uniqueTokens | keyvalue" >
-      {{s.key}} ({{s.value}})
+    <h3>Unique Tokens</h3>
+    <div *ngFor="let s of stringsAndTokens.tokens | keyvalue" >
+      {{s.key}}
+      <span *ngIf="showCount">({{s.value}})</span>
     </div>
   </div>
   <div fxLayout="column" fxLayoutGap="10px">
-    <h2>Unique strings</h2>
-    <div *ngFor="let s of uniqueStrings | keyvalue" >
-      {{s.key}} ({{s.value}})
+    <h3>Unique strings</h3>
+    <div *ngFor="let s of stringsAndTokens.strings | keyvalue" >
+      {{s.key}}
+      <span *ngIf="showCount">({{s.value}})</span>
     </div>
   </div>
 </div>

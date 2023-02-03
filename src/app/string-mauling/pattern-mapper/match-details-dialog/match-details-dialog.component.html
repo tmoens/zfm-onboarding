@@ -1,0 +1,6 @@
+<div fxLayout="column" fxLayoutGap="10px">
+    <div *ngFor="let match of matches | keyvalue">
+      string: {{match.key}} matched: {{match.value.join('; ')}}
+    </div>
+  </div>
+

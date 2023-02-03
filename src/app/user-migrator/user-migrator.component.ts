@@ -1,10 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AppStateService} from '../app-state.service';
 import {StockService} from '../stock-migrator/stock.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {UserService} from './user.service';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {PatternMapper} from '../string-mauling/pattern-mapper/patternMapper';
+import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
+import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings';
 
 
 @Component({
@@ -12,14 +12,14 @@ import {PatternMapper} from '../string-mauling/pattern-mapper/patternMapper';
   templateUrl: './user-migrator.component.html',
 })
 export class UserMigratorComponent implements OnInit {
-  test: string[] = [];
   patternMappers: PatternMapper[] = [];
-  targetType = "User";
+  targetType = "username";
   sidenavOptions = {
     fixed: true,
   }
+  rawStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
+  residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   constructor(
-    private fb: FormBuilder,
     public appState: AppStateService,
     public stockService: StockService,
     public userService: UserService,
@@ -28,18 +28,34 @@ export class UserMigratorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.addPattern();
-    this.userService.uniqueNames.subscribe((strings: string[]) => this.test = strings);
+    this.addPatternMapper();
+    this.stockService.userStrings.subscribe((sAndT: UniqueStringsAndTokens) => this.rawStrings = sAndT);
   }
 
-  addPattern() {
+  addPatternMapper() {
     this.patternMappers.push(new PatternMapper());
   }
 
-  deletePattern(patternMapper: PatternMapper) {
+  deletePatternMapper(patternMapper: PatternMapper) {
     const index = this.patternMappers.indexOf(patternMapper);
     if (index >= 0) {
       this.patternMappers.splice(index, 1);
+      this.doPatternMatching('regExp');
+    }
+  }
+  // This is where the work happens
+  doPatternMatching(whatChanged: string){
+    // Clear the existing results and start from scratch;
+    this.patternMappers.map((pm: PatternMapper) => {
+      pm.matches = {};
+    })
+    this.residualStrings = new UniqueStringsAndTokens();
+    for (const s of Object.keys(this.rawStrings.strings)) {
+      let residual: string = s;
+      for (const pm of this.patternMappers.reverse()) {
+        residual = pm.checkString(residual);
+      }
+      this.residualStrings.addString(residual);
     }
   }
 }

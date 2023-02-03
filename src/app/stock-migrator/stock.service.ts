@@ -2,9 +2,10 @@ import {Injectable} from '@angular/core';
 import {Stock, stockNameRE} from './stock';
 import {WellKnownStates} from '../app-state.service';
 import {StockJson} from './stock-json';
-import {interval} from 'rxjs';
+import {BehaviorSubject, interval} from 'rxjs';
 import {StockPatch} from './stock-patch';
 import {GenericService} from '../genericService';
+import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings'
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -31,6 +32,9 @@ import {GenericService} from '../genericService';
   providedIn: 'root'
 })
 export class StockService extends GenericService<Stock, StockJson> {
+
+  userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
   private _stockBeingPatched: Stock | undefined;
 
@@ -77,8 +81,6 @@ export class StockService extends GenericService<Stock, StockJson> {
   getStockByIndex(index: number): Stock | undefined {
     return this.list[index];
   }
-
-
 
   // When a stock is loaded from a raw stock, validation all the "per attribute"
   // validation is performed, but not the validation of relationships between stocks.
@@ -130,15 +132,16 @@ export class StockService extends GenericService<Stock, StockJson> {
       stock.applyPatch(previouslyStoredPatches[stock.stockName.original]);
     }
 
-
     // Once they are all loaded validate them.
     // (You cannot do it before that, or you won't be able to properly check things
     //  whether the stock has duplicates or like whether a parent exists or whether
     //  a child is older than a parent.)
     this.validateStocks();
 
-    // Now start a loop to save any patches to memory every few seconds
-    interval(10000).subscribe(_ => this.saveChangesToLocalStorage())
+    this.refreshStringsAndTokens();
+
+    // Now start a loop to save any patches to memory every minute
+    interval(60000).subscribe(_ => this.saveChangesToLocalStorage())
   }
 
   validateStocks() {
@@ -191,9 +194,14 @@ export class StockService extends GenericService<Stock, StockJson> {
   }
 
 
-  getStrings(type: 'genetics' | 'researcher'): string[] {
-    const strings: string[] = [];
-    this.list.map((s: Stock) => strings.push(s[type].original));
-    return strings;
+  refreshStringsAndTokens() {
+    const userSandT = new UniqueStringsAndTokens();
+    const geneticsSandT = new UniqueStringsAndTokens();
+    this.list.map((s: Stock) => {
+      userSandT.addString(s.researcher.current);
+      geneticsSandT.addString(s.genetics.current);
+    });
+    this.userStrings.next(userSandT);
+    this.geneticsStrings.next(geneticsSandT);
   }
 }

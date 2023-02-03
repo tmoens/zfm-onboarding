@@ -1,22 +1,24 @@
-<div fxLayout="row" fxLayoutGap="10ps">
-  <ng-form [formGroup]="patternForm" (change)="onFormChange()">
+<div fxLayout="row" fxLayoutGap="10ps" #me>
+  <form>
     <div fxLayout="row" fxLayoutGap="10px">
       <mat-form-field floatLabel="always">
         <mat-label>RegExp</mat-label>
-        <input formControlName="regExp" type="text" matInput>
+        <input [formControl]="regExpStringFC" type="text" matInput (change)="onChangeRegExp()">
+        <mat-error *ngIf="regExpStringFC.invalid">Invalid RegExp</mat-error>
       </mat-form-field>
       <mat-form-field floatLabel="always">
         <mat-label>comment</mat-label>
-        <input formControlName="comment" type="text" matInput>
+        <input [formControl]="commentFC" type="text" matInput (change)="onChangeComment()">
       </mat-form-field>
       <mat-form-field floatLabel="always">
-        <mat-label>{{targetType}} name</mat-label>
-        <input type="text" matInput formControlName="name" [matAutocomplete]="mappingOptions">
+        <mat-label>{{targetType}}</mat-label>
+        <input type="text" matInput [formControl]="targetFC" [matAutocomplete]="mappingOptions"  (change)="onChangeTarget()" >
       </mat-form-field>
+      <p (mouseover)="openMatchDetailsDialog()" #foo>matches: {{patternMapper.matchCount}}</p>
     </div>
-  </ng-form>
+  </form>
 </div>
-<mat-autocomplete #mappingOptions="matAutocomplete">
+<mat-autocomplete #mappingOptions="matAutocomplete" (optionSelected)="onChangeTarget()">
   <mat-option *ngFor="let option of mappingTargets" [value]="option">
     {{option}}
   </mat-option>
