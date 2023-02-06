@@ -3,12 +3,12 @@
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
 import {StockJson} from './stock-json';
-import {StockAttr} from './stockAttr';
+import {PatchableAttr} from '../generics/patchable-attr';
 import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {StockPatch} from './stock-patch';
-import {AttrPatch} from './attr-patch';
-import {GenericType} from '../genericType';
+import {AttrPatch} from '../generics/attr-patch';
+import {GenericType} from '../generics/generic-type';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -18,15 +18,15 @@ import {GenericType} from '../genericType';
 export const stockNameRE = RegExp(/^(\d+)\.?(\d{1,2})?$/);
 
 export class Stock extends GenericType {
-  stockName: StockAttr = new StockAttr();
-  dob: StockAttr = new StockAttr();
-  mom: StockAttr = new StockAttr();
-  dad: StockAttr = new StockAttr();
-  countEnteringNursery: StockAttr = new StockAttr();
-  countLeavingNursery: StockAttr = new StockAttr();
-  researcher: StockAttr = new StockAttr();
-  genetics: StockAttr = new StockAttr();
-  comment: StockAttr = new StockAttr();
+  stockName: PatchableAttr = new PatchableAttr();
+  dob: PatchableAttr = new PatchableAttr();
+  mom: PatchableAttr = new PatchableAttr();
+  dad: PatchableAttr = new PatchableAttr();
+  countEnteringNursery: PatchableAttr = new PatchableAttr();
+  countLeavingNursery: PatchableAttr = new PatchableAttr();
+  researcher: PatchableAttr = new PatchableAttr();
+  genetics: PatchableAttr = new PatchableAttr();
+  comment: PatchableAttr = new PatchableAttr();
 
   originalStock: StockJson | null = null;
   private _row: number | null = null;
@@ -160,7 +160,7 @@ export class Stock extends GenericType {
         json.dad = this.dad.current;
       }
       if (this.countEnteringNursery.isPatched()) {
-        notes.push(`count enteringNursery changed from ${this.countEnteringNursery.original}`)
+        notes.push(`countEnteringNursery changed from ${this.countEnteringNursery.original}`)
         json.countEnteringNursery = this.countEnteringNursery.current;
       }
       if (this.countLeavingNursery.isPatched()) {

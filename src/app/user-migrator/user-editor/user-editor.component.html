@@ -1,4 +1,4 @@
-<ng-form [formGroup]="userForm" (ngSubmit)="onSave()" (change)="onSave()">
+<ng-form [formGroup]="userForm">
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-form-field floatLabel="always">
       <mat-label>Name</mat-label>
@@ -22,14 +22,19 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>User Role</mat-label>
-      <mat-select formControlName="role" (change)="onSave()">
-        <mat-option [value]="UserRole.RESEARCHER">{{UserRole.RESEARCHER}}</mat-option>
+      <mat-select formControlName="role">
+        <mat-option [value]="UserRole.USER">{{UserRole.USER}}</mat-option>
         <mat-option [value]="UserRole.ADMIN">{{UserRole.ADMIN}}</mat-option>
         <mat-option [value]="UserRole.GUEST">{{UserRole.GUEST}}</mat-option>
       </mat-select>
     </mat-form-field>
-      <mat-checkbox formControlName="isActive" color="primary">Active</mat-checkbox>
-      <mat-checkbox formControlName="isResearcher" color="primary">Researcher</mat-checkbox>
-      <mat-checkbox formControlName="isPrimaryInvestigator" color="primary">Primary Investigator</mat-checkbox>
+    <mat-checkbox formControlName="isActive" color="primary">Active</mat-checkbox>
+    <mat-checkbox formControlName="isResearcher" color="primary">Researcher</mat-checkbox>
+    <mat-checkbox formControlName="isPrimaryInvestigator" color="primary">Primary Investigator</mat-checkbox>
+    <div fxLayout="row" fxLayoutAlign="end">
+      <button [disabled]="userForm.pristine || userForm.invalid" mat-button (click)="onSave()" color="primary">
+        Save
+      </button>
+    </div>
   </div>
 </ng-form>

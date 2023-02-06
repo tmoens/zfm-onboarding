@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {User} from './user';
 import {UserJson} from './user-json';
-import {GenericService} from '../genericService';
+import {GenericService} from '../generics/generic-service';
 
 /**
  * Load customer's user information from a spreadsheet.

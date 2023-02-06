@@ -4,8 +4,9 @@ import {WellKnownStates} from '../app-state.service';
 import {StockJson} from './stock-json';
 import {BehaviorSubject, interval} from 'rxjs';
 import {StockPatch} from './stock-patch';
-import {GenericService} from '../genericService';
+import {GenericService} from '../generics/generic-service';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings'
+import * as XLSX from 'xlsx';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -187,6 +188,16 @@ export class StockService extends GenericService<Stock, StockJson> {
       if (sp) stockPatches[s.stockName.original] = sp;
     }
     this.appState.setState(WellKnownStates.STORED_STOCK_PATCHES, stockPatches, true);
+  }
+
+  override exportWorksheet(wb: XLSX.WorkBook, worksheetName: string) {
+    const data: StockJson[] = [];
+    for (const s of this.list) {
+      const json: StockJson | null = s.extractJsonForExcel();
+      if (json) data.push(json);
+    }
+    wb.SheetNames.push(worksheetName);
+    wb.Sheets[worksheetName] = XLSX.utils.json_to_sheet(data);
   }
 
   loadChangesFromLocalStorage(): {[index: string]: StockPatch} {

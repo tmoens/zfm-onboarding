@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {StockAttr} from '../stockAttr';
+import {PatchableAttr} from '../../generics/patchable-attr';
 
 @Component({
   selector: 'app-stock-attr-viewer',
@@ -7,7 +7,7 @@ import {StockAttr} from '../stockAttr';
   styleUrls: ['./stock-attr-viewer.component.scss']
 })
 export class StockAttrViewerComponent implements OnInit {
-  @Input() attr!: StockAttr | undefined;
+  @Input() attr!: PatchableAttr | undefined;
   @Input() label: string = '';
   constructor() { }
 

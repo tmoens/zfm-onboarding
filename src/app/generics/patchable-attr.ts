@@ -1,16 +1,24 @@
 import {AttrPatch} from './attr-patch';
 
-export class StockAttr {
-  // the original value of the attribute as read from a worksheet
+
+export class PatchableAttr {
+  /**
+   * Stores an attribute that holds both an original value and current value.
+   *
+   * @remarks
+   * It supports the concept of an edit that is "in progress" but not committed.
+   * A "patch" is simply the distilled "storable" version which contains only
+   * the original and current versions of the attribute.
+   */
   get original(): string {
     return this._original;
   }
   set original(value: string) {
     this._original = value;
   }
+
   private _original: string = '';
 
-  // The current value of the attribute as entered by the user in the GUI
   get current(): string {
     return this._current;
   }
@@ -21,9 +29,6 @@ export class StockAttr {
 
   // whether the current value is valid.
   private _valid: boolean = true;
-
-  constructor()   {
-  }
 
   update (value: string) {
     this.current = value;
@@ -44,11 +49,13 @@ export class StockAttr {
     return (this.hasChanged() && this.isValid());
   }
 
-  // if there was an existing patch for this attr from the same baseline, reapply it
+  // apply a "patch" to this attribute
+  // FWIW this is done when re-loading objects and patches that are work in progress.
   applyPatch(patch?: AttrPatch) {
     if (patch && this.original === patch.o) this.update(patch.p);
   }
 
+  // get a "patch" for this attribute that can be easily stored as text.
   extractPatch(): AttrPatch | null {
     if (!this.isPatched()) {
       return null;

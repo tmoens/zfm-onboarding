@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {AppStateService} from './app-state.service';
+import {AppStateService} from '../app-state.service';
 import * as XLSX from 'xlsx';
 import {instanceToPlain} from 'class-transformer';
-import {GenericType} from './genericType';
+import {GenericType} from './generic-type';
 import {BehaviorSubject} from 'rxjs';
 
 @Injectable({

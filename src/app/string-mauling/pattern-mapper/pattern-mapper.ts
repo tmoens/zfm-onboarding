@@ -16,18 +16,23 @@ export class PatternMapper {
 
   set regExpString(regExpString: string) {
     this._regExpString = regExpString;
-    try {
-      this.regExp = new RegExp(regExpString, 'gi');
-    } catch (e) {
-      this.regExp = null;
-    }
+    this.makeRegExpFromString();
   }
   get regExpString(): string {
     return this._regExpString;
   }
 
+  makeRegExpFromString() {
+    try {
+      this.regExp = new RegExp(this.regExpString, 'gi');
+    } catch (e) {
+      this.regExp = null;
+    }
+  }
+
   clearResults() {
     this.matches = {};
+    this.matchCount = 0;
   }
 
   checkString(s: string): string {

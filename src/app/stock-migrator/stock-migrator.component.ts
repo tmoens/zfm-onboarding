@@ -11,12 +11,8 @@ import {ZFTool} from '../../helpers/zf-tool';
 @Component({
   selector: 'app-stock-migrator',
   templateUrl: './stock-migrator.component.html',
-  styleUrls: ['./stock-migrator.component.scss']
 })
 export class StockMigratorComponent {
-  sidenavOptions = {
-    fixed: true,
-  }
   constructor(
     public appState: AppStateService,
     public service: StockService,

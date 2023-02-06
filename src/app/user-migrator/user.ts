@@ -1,17 +1,17 @@
 import {UserJson} from './user-json';
-import {GenericType} from '../genericType';
+import {GenericType} from '../generics/generic-type';
 
 export enum UserRole {
   ADMIN = 'admin',
   GUEST = 'guest',
-  RESEARCHER = 'researcher',
+  USER = 'user',
 }
 export class User extends GenericType{
   name = '';
   initials = '';
   email?: string;
   username = '';
-  role = UserRole.GUEST;
+  role: string = UserRole.GUEST;
   isPrimaryInvestigator = false;
   isResearcher = false;
   isActive = false;

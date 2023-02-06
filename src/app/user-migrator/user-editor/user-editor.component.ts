@@ -4,10 +4,10 @@ import {UserService} from '../user.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
-  selector: 'app-edit-user',
-  templateUrl: './edit-user.component.html',
+  selector: 'app-user-editor',
+  templateUrl: './user-editor.component.html',
 })
-export class EditUserComponent implements OnInit {
+export class UserEditorComponent implements OnInit {
   public UserRole = UserRole;
 
   public mode: 'edit' | 'add' = 'edit';
@@ -60,7 +60,7 @@ export class EditUserComponent implements OnInit {
         this.service.select(newUser);
         this.mode = 'edit';
       }
+      this.userForm.markAsPristine();
     }
   }
-
 }
