@@ -14,7 +14,7 @@ import { StockSelectorComponent } from './stock-selector/stock-selector.componen
 import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { StockViewerComponent } from './stock-viewer/stock-viewer.component';
-import { StockAttrViewerComponent } from './stock-attr-viewer/stock-attr-viewer.component';
+import { PatchableAttrViewerComponent } from './patchable-attr-viewer/patchable-attr-viewer.component';
 
 
 
@@ -23,11 +23,12 @@ import { StockAttrViewerComponent } from './stock-attr-viewer/stock-attr-viewer.
     StockPatcherComponent,
     StockSelectorComponent,
     StockViewerComponent,
-    StockAttrViewerComponent,
+    PatchableAttrViewerComponent,
   ],
   exports: [
     StockPatcherComponent,
-    StockSelectorComponent
+    StockSelectorComponent,
+    PatchableAttrViewerComponent,
   ],
   imports: [
     StockMigratorRoutingModule,

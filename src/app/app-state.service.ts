@@ -7,12 +7,9 @@ export enum WellKnownStates {
   ERROR_MESSAGE_DURATION = 'emd',
   CONFIRM_MESSAGE_DURATION = 'cmd',
   FACILITY = 'facility',
-  STORED_STOCK_PATCHES = 'storedStockPatches',
 }
 
 export enum ZFToolStates {
-  FILTER = '_filter',
-  SELECTED_ID = '_selected_id',
   ACTIVE_TOOL= 'active_tool'
 }
 
@@ -42,7 +39,6 @@ export class AppStateService {
     this.defaults.set(WellKnownStates.ERROR_MESSAGE_DURATION, 4000);
     this.defaults.set(WellKnownStates.CONFIRM_MESSAGE_DURATION, 2000);
     this.defaults.set(WellKnownStates.FACILITY, 'test');
-    this.defaults.set(WellKnownStates.STORED_STOCK_PATCHES, {});
   }
 
   initialize() {

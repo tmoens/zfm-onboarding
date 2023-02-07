@@ -1,5 +1,8 @@
-import {UserJson} from './user-json';
 import {GenericType} from '../generics/generic-type';
+import {PatchableAttr} from '../generics/patchable-attr';
+import {UserService} from './user.service';
+import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {GenericService} from '../generics/generic-service';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -7,30 +10,38 @@ export enum UserRole {
   USER = 'user',
 }
 export class User extends GenericType{
-  name = '';
-  initials = '';
-  email?: string;
-  username = '';
-  role: string = UserRole.GUEST;
-  isPrimaryInvestigator = false;
-  isResearcher = false;
-  isActive = false;
-  override datafillFromJson(o: any) {
-    if (o.name.trim()) this.name = o.name.trim();
-    if (o.email.trim()) this.email = o.email.trim();
-    if (o.role.trim()) this.role = o.role.trim() as UserRole;
-    if (o.username.trim()) this.username = o.username.trim();
-    if (o.initials.trim()) this.initials = o.initials.trim();
-    this.isActive = (o.isActive && o.isActive === true);
-    this.isResearcher = (o.isResearcher && o.isResearcher === true);
-    this.isPrimaryInvestigator = (o.isPrimaryInvestigator && o.isPrimaryInvestigator === true);
-  }
-
-  override isValid(): boolean {
-    return true;
-  }
+  name: PatchableAttr = new PatchableAttr();
+  initials: PatchableAttr = new PatchableAttr();
+  email: PatchableAttr = new PatchableAttr();
+  username: PatchableAttr = new PatchableAttr();
+  role: PatchableAttr = new PatchableAttr();
+  isPrimaryInvestigator: PatchableAttr = new PatchableAttr();
+  isResearcher: PatchableAttr = new PatchableAttr();
+  isActive: PatchableAttr = new PatchableAttr();
 
   override get uniqueName(): string {
-    return this.username;
+    return this.username.original;
+  }
+
+  getPatchableAttrValue(attrName: string): string | null {
+    if (this[attrName as keyof User] && this[attrName as keyof User] instanceof PatchableAttr) {
+      return (this[attrName as keyof User] as PatchableAttr).current;
+    }  else {
+      return null;
+    }
   }
 }
+
+export function ValidateUserRoleFC(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    return ValidateUserRole(control.value);
+  }
+}
+export function ValidateUserRole(proposedRole: string = ''): ValidationErrors | null {
+  if ((Object.values(UserRole) as string[]).includes(proposedRole.toLowerCase())) {
+    return null;
+  } else {
+    return {'invalid': Object.values(UserRole).join(' | ')};
+  }
+}
+

@@ -1,66 +1,64 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {User, UserRole} from '../user';
+import {User, ValidateUserRoleFC} from '../user';
 import {UserService} from '../user.service';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {ValidatorFn, Validators} from '@angular/forms';
+import {ValidateYesNoFC} from '../../generics/validators/yes-no.validator';
+import {uniquenessValidatorFC} from '../../generics/validators/uniqueness.validator';
 
 @Component({
   selector: 'app-user-editor',
   templateUrl: './user-editor.component.html',
 })
 export class UserEditorComponent implements OnInit {
-  public UserRole = UserRole;
+  private _user: User | null = null;
 
   public mode: 'edit' | 'add' = 'edit';
 
-  userForm = this.fb.group({
-    name: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    username: ['', [Validators.required]],
-    initials: ['', Validators.required],
-    role: [UserRole.GUEST],
-    isActive: [false],
-    isPrimaryInvestigator: [false],
-    isResearcher: [false],
-  })
   @Input() set user(user: User | null) {
-    if (user) {
-      this.userForm.setValue(user);
-      this.mode = 'edit';
-    } else {
-      this.userForm.setValue({
-        name: '',
-        email: '',
-        username: '',
-        initials: '',
-        role: UserRole.GUEST,
-        isActive: false,
-        isResearcher: false,
-        isPrimaryInvestigator: false
-      })
+
+    if (!user) {
+      this._user = new User();
       this.mode = 'add';
+    } else {
+      this._user = user;
+      this.mode = 'edit'
     }
+    this.nameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'name')]
+    this.usernameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'username')]
+    this.initialsValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'initials')]
+
+  };
+  get user(): User | null {
+    return this._user;
   }
 
+  nameValidators: ValidatorFn[] = [];
+  usernameValidators: ValidatorFn[] = [];
+  initialsValidators: ValidatorFn[] = [];
+  emailValidators: ValidatorFn[] = [Validators.required, Validators.email];
+  requiredValidator: ValidatorFn[] = [Validators.required]
+  userRoleValidators: ValidatorFn[] = [Validators.required, ValidateUserRoleFC()];
+  yesNoValidators: ValidatorFn[] = [Validators.required, ValidateYesNoFC()];
+
+  // TODO since the username field is used as the "target" of pattern matching,
+  // changes to a username should trigger changes to any matching rules that use it as a target.
+
+
   constructor(
-    private fb: FormBuilder,
     protected service: UserService,
-    ) { }
+  ) {
+  }
 
   ngOnInit(): void {
   }
 
   onSave() {
-    if (this.userForm.valid) {
-      if (this.mode === 'edit' && this.service.selected) {
-        this.service.selected.datafillFromJson(this.userForm.getRawValue());
-      } else {
-        const newUser = new User;
-        newUser.datafillFromJson(this.userForm.getRawValue());
-        this.service.add(newUser);
-        this.service.select(newUser);
-        this.mode = 'edit';
-      }
-      this.userForm.markAsPristine();
+    if (this.user) {
+      this.service.addUser();
     }
+  }
+
+  onChange(event: string) {
+    this.user?.updateValidity();
   }
 }

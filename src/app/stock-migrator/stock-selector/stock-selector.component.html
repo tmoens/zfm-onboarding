@@ -35,7 +35,7 @@
             <mat-icon *ngIf="!s.isValid()" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>
-            row: {{s.row}}, stock: {{s.originalStock?.stockName}}
+            row: {{s.row}}, stock: {{(s.originalInstance) ? s.originalInstance['stockName'] : ''}}
           </div>
         </div>
 

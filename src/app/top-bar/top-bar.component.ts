@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {AppStateService} from "../app-state.service";
+import {AppStateService, WellKnownStates} from '../app-state.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
 import {UserService} from '../user-migrator/user.service';
+import {interval} from 'rxjs';
 
 @Component({
   selector: 'app-top-bar',
@@ -32,8 +33,15 @@ export class TopBarComponent implements OnInit {
     reader.onload = (e: any) => {
       const binaryString: string = e.target.result;
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
-      this.stockService.loadWorksheet(inputWb, 'raw-stocks');
-      this.userService.loadWorksheet(inputWb, 'users');
+      this.stockService.loadWorksheet(inputWb);
+
+      // Now start a loop to save any patches to memory every minute
+      this.userService.loadWorksheet(inputWb);
+      interval(60000).subscribe(_ => {
+        this.stockService.savePatchesToLocalStorage();
+        this.userService.savePatchesToLocalStorage();
+      })
+
     }
     reader.readAsBinaryString(file);
   }
@@ -41,8 +49,8 @@ export class TopBarComponent implements OnInit {
 
   exportToExcel() {
     const wb = XLSX.utils.book_new();
-    this.stockService.exportWorksheet(wb, 'raw-stocks');
-    this.userService.exportWorksheet(wb, 'users');
+    this.stockService.exportWorksheet(wb);
+    this.userService.exportWorksheet(wb);
     XLSX.writeFile(wb, 'test.xlsx');
   }
 }

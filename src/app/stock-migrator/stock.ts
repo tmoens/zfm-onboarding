@@ -2,13 +2,11 @@
 // The general idea is that this gets refined as we add more "corrections" for
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
-import {StockJson} from './stock-json';
 import {PatchableAttr} from '../generics/patchable-attr';
 import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {StockPatch} from './stock-patch';
-import {AttrPatch} from '../generics/attr-patch';
 import {GenericType} from '../generics/generic-type';
+import {JsonForExcel} from '../generics/json-for-excel';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -28,7 +26,6 @@ export class Stock extends GenericType {
   genetics: PatchableAttr = new PatchableAttr();
   comment: PatchableAttr = new PatchableAttr();
 
-  originalStock: StockJson | null = null;
   private _row: number | null = null;
   set row(value: number | null) {
     this._row = value;
@@ -51,10 +48,24 @@ export class Stock extends GenericType {
   }
   private _duplicates: number[] = [];
 
+  constructor(private service: StockService) {
+    super();
+  }
 
-  override datafillFromJson(originalStock: StockJson) {
-    this.originalStock = originalStock;
-    this.stockName.original = (originalStock.stockName) ? String(originalStock.stockName).trim() : '';
+
+  getPatchableAttrValue(attrName: string): string | null {
+    if (this[attrName as keyof Stock] && this[attrName as keyof Stock] instanceof PatchableAttr) {
+      return (this[attrName as keyof Stock] as PatchableAttr).current;
+    }  else {
+      return null;
+    }
+  }
+
+  override datafillFromJson(originalStock: JsonForExcel) {
+    // Do the generic datafill, then play mucky maulers with a couple of attributes
+    super.datafillFromJson(originalStock);
+
+
     // Please look the other way for a moment while I get out my cudgel.
     // A stock number like 1660.10 (as unusual as it would be) looks
     // like a number and sure enough it gets converted to 1660.1 when it
@@ -63,165 +74,23 @@ export class Stock extends GenericType {
     if (this.stockName.original) {
       const snTest = stockNameRE.exec(this.stockName.original);
       if (snTest && snTest[2] && snTest[2].length === 1) {
-        this.stockName.original = this.stockName.original + '0';
+        this.stockName.initialize(this.stockName.original + '0');
       }
-      this.stockName.current = this.stockName.original;
     }
 
     // The DOB is expected to be present and to be an Excel date serial number or a date string.
     // Also, we are going to normalize the raw stock's dob into a date string if possible.
-    this.dob.original = (originalStock.dob) ? String(originalStock.dob).trim() : '';
     if (this.dob.original) {
       if (isNaN(Number(this.dob.original))) {
         // if the dob is not a number, try to convert from date string
         const t = Date.parse(String(this.dob.original));
-        if (isNaN(t)) {
-          // Date.parse can't parse the string into a date. So, the given date is invalid.
-          this.dob.original = this.dob.original;
-        } else {
-          this.dob.original = new Date(t).toISOString().substring(0, 10);
+        if (!isNaN(t)) {
+          this.dob.initialize(new Date(t).toISOString().substring(0, 10));
         }
       } else {
-        this.dob.original = new Date(Date.UTC(0, 0, Number(this.dob.original) - 1)).toISOString().substring(0, 10);
+        this.dob.initialize(new Date(Date.UTC(0, 0, Number(this.dob.original) - 1)).toISOString().substring(0, 10));
       }
     }
-    this.dob.current = this.dob.original;
-
-    // For other fields we just take them as they are
-    this.mom.original = (originalStock.mom) ? String(originalStock.mom).trim() : '';
-    this.mom.current = this.mom.original;
-
-    this.dad.original = (originalStock.dad) ? String(originalStock.dad).trim() : '';
-    this.dad.current = this.dad.original;
-
-    this.countEnteringNursery.original = (originalStock.countEnteringNursery) ? String(originalStock.countEnteringNursery).trim() : '';
-    this.countEnteringNursery.current = this.countEnteringNursery.original;
-
-    this.countLeavingNursery.original = (originalStock.countLeavingNursery) ? String(originalStock.countLeavingNursery).trim() : '';
-    this.countLeavingNursery.current = this.countLeavingNursery.original;
-
-    this.genetics.original = (originalStock.genetics) ? String(originalStock.genetics).trim() : '';
-    this.genetics.current = this.genetics.original;
-
-    this.comment.original = (originalStock.comment) ? String(originalStock.comment).trim() : '';
-    this.comment.current = this.comment.original;
-
-    this.researcher.original = (originalStock.researcher) ? String(originalStock.researcher).trim() : '';
-    this.researcher.current = this.researcher.original;
-  }
-
-  extractPatch(): StockPatch | null {
-    const patch: StockPatch = {}
-    let p: AttrPatch | null;
-    p = this.stockName.extractPatch();
-    if (p !== null) {patch.stockName = p;}
-    p = this.dob.extractPatch();
-    if (p !== null) {patch.dob = p;}
-    p = this.mom.extractPatch();
-    if (p !== null) {patch.mom = p;}
-    p = this.dad.extractPatch();
-    if (p !== null) {patch.dad = p;}
-    p = this.countEnteringNursery.extractPatch();
-    if (p !== null) {patch.countEnteringNursery = p;}
-    p = this.countLeavingNursery.extractPatch();
-    if (p !== null) {patch.countLeavingNursery = p;}
-    p = this.comment.extractPatch();
-    if (p !== null) {patch.comment = p;}
-    p = this.genetics.extractPatch();
-    if (p !== null) {patch.genetics = p;}
-    if (Object.keys(patch).length > 0) {
-      return patch;
-    } else {
-      return null;
-    }
-  }
-
-  extractJsonForExcel(): StockJson | null {
-    const json: StockJson | null = this.originalStock;
-    if (json) {
-      const notes: string[] = [];
-      if (this.comment.current) {
-        notes.push(this.comment.current);
-      }
-      if (this.stockName.isPatched()) {
-        notes.push(`number changed from ${this.stockName.original}`)
-        json.stockName = this.stockName.current;
-      }
-      if (this.dob.isPatched()) {
-        notes.push(`dob changed from ${this.dob.original}`)
-        json.dob = this.dob.current;
-      }
-      if (this.mom.isPatched()) {
-        notes.push(`mom changed from ${this.mom.original}`)
-        json.mom = this.mom.current;
-      }
-      if (this.dad.isPatched()) {
-        notes.push(`dad changed from ${this.dad.original}`)
-        json.dad = this.dad.current;
-      }
-      if (this.countEnteringNursery.isPatched()) {
-        notes.push(`countEnteringNursery changed from ${this.countEnteringNursery.original}`)
-        json.countEnteringNursery = this.countEnteringNursery.current;
-      }
-      if (this.countLeavingNursery.isPatched()) {
-        notes.push(`countLeavingNursery changed from ${this.countLeavingNursery.original}`)
-        json.countLeavingNursery = this.countLeavingNursery.current;
-      }
-      if (this.researcher.isPatched()) {
-        notes.push(`researcher changed from ${this.researcher.original}`)
-        json.researcher = this.researcher.current;
-      }
-      if (this.genetics.isPatched()) {
-        notes.push(`genetics changed from ${this.genetics.original}`)
-        json.genetics = this.genetics.current;
-      }
-      if (this.comment.isPatched()) {
-        notes.push(`comment changed from ${this.comment.original}`)
-        json.comment = this.comment.current;
-      }
-      json.comment = notes.join(`; `)
-    }
-    return json;
-  }
-
-  applyPatch(patch?: StockPatch) {
-    if (patch) {
-      this.stockName.applyPatch(patch.stockName);
-      this.dob.applyPatch(patch.dob);
-      this.mom.applyPatch(patch.mom);
-      this.dad.applyPatch(patch.dad);
-      this.countEnteringNursery.applyPatch(patch.countEnteringNursery);
-      this.countLeavingNursery.applyPatch(patch.countLeavingNursery);
-      this.genetics.applyPatch(patch.genetics);
-      this.comment.applyPatch(patch.comment);
-    }
-  }
-
-  get stockNumber(): number | undefined {
-    if (!this.stockName.current) return undefined;
-    const snTest = stockNameRE.exec(this.stockName.current);
-    if (snTest) {
-      return Number(snTest[1]);
-    }
-    return undefined;
-  }
-
-  get subStockNumber(): number | undefined {
-    if (!this.stockName.current) return undefined;
-    const snTest = stockNameRE.exec(this.stockName.current);
-    if (snTest && snTest[2]) {
-      return Number(snTest[2]);
-    }
-    return undefined;
-  }
-
-  isSubstock(): boolean{
-    return (!!this.subStockNumber);
-  }
-
-  // when someone comes asking "are you stock 15.06?" answer yes or no.
-  checkName(name: string): boolean {
-    return (this.stockName && this.stockName.current === name);
   }
 
   static validateStockNameSyntax(putativeName: string): boolean {
@@ -236,7 +105,7 @@ export class Stock extends GenericType {
     return (!this.dob.current || (this.dob.current >= dobString));
   }
 
-  override isValid(): boolean {
+  isValid(): boolean {
     return (
       this.stockName.isValid() &&
       this.dob.isValid() &&
@@ -248,11 +117,11 @@ export class Stock extends GenericType {
   }
 
   // Checks the validity of all the fields of a stock
-  validate(service: StockService): void {
-    this.stockName.setValidity(!ValidateStockName(service, this, this.stockName.current));
+  validate(): void {
+    this.stockName.setValidity(!ValidateStockName(this.service, this, this.stockName.current));
     this.dob.setValidity(!ValidateDob(this.dob.current));
-    this.mom.setValidity(!ValidateParent(service, this, this.mom.current));
-    this.dad.setValidity(!ValidateParent(service, this, this.dad.current));
+    this.mom.setValidity(!ValidateParent(this.service, this, this.mom.current));
+    this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
 }
 

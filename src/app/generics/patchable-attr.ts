@@ -63,6 +63,11 @@ export class PatchableAttr {
       return {o: this.original, p: this.current}
     }
   }
+
+  initialize(s: string) {
+    this.original = s.trim();
+    this.current = this.original;
+  }
 }
 
 

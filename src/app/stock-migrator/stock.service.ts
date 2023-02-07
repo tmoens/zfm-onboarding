@@ -1,20 +1,15 @@
 import {Injectable} from '@angular/core';
-import {Stock, stockNameRE} from './stock';
-import {WellKnownStates} from '../app-state.service';
-import {StockJson} from './stock-json';
-import {BehaviorSubject, interval} from 'rxjs';
-import {StockPatch} from './stock-patch';
+import {Stock} from './stock';
+import {BehaviorSubject} from 'rxjs';
 import {GenericService} from '../generics/generic-service';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings'
-import * as XLSX from 'xlsx';
+import {JsonForExcel} from '../generics/json-for-excel';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
  *
- * Then acts like a database type service answering questions
- * and so on.
+ * Then acts like a database type service answering questions and so on.
  *
- * TODO let the user choose where the spreadsheet is.
  * We go looking for a sheet called "raw-stocks"
  * We make use of the following columns
  * stockName - typically a stock number like 2301 or 1472.03
@@ -32,8 +27,9 @@ import * as XLSX from 'xlsx';
 @Injectable({
   providedIn: 'root'
 })
-export class StockService extends GenericService<Stock, StockJson> {
-
+export class StockService extends GenericService<Stock> {
+  localStorageVariableName = 'storedStockPatches'
+  worksheetName = 'raw-stocks'
   userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
   geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
@@ -87,66 +83,17 @@ export class StockService extends GenericService<Stock, StockJson> {
   // validation is performed, but not the validation of relationships between stocks.
   // For example, it will note that "123.xyz" is not a valid stock number, but will not
   // know that the mom "23.46" does not exist.
-  override loadItems(rawStocks: StockJson[]) {
+  override loadItems(rawStocks: JsonForExcel[]) {
     let index = -1;
     for (let rawStock of rawStocks) {
       index++;
 
-      // Do a little tidying up of each field
-      if (rawStock.stockName) {
-        rawStock.stockName = String(rawStock.stockName).trim();
-        // Please look the other way for a moment while I get out my klugdel.
-        // A stock number like 1660.10 (as unusual as it would be) looks
-        // like a number and sure enough it gets converted to 1660.1 somewhere
-        // along the line. So, we tack on a 0 for such cases;
-        const snTest = stockNameRE.exec(rawStock.stockName);
-        if (snTest && snTest[2] && snTest[2].length === 1) {
-          rawStock.stockName = rawStock.stockName + '0';
-        }
-      } else {
-        rawStock.stockName = '';
-      }
-
-      if (rawStock.dob) {
-        rawStock.dob = String(rawStock.dob).trim();
-      } else {
-        rawStock.dob = '';
-      }
-
-
       // In the worksheet, the first stock is on row 2, but the index in the array is 0;
-      const newStock = new Stock();
+      const newStock = new Stock(this);
       newStock.row = index +2;
       newStock.datafillFromJson(rawStock);
       this.list[index] = newStock;
     }
-
-    // Reapply any changes that were in progress.
-    // Load them up from local storage. They are just serialized stocks. We call them patches.
-    const previouslyStoredPatches: {[index: string]: StockPatch} = this.loadChangesFromLocalStorage();
-    // Loop through the stocks we loaded from the worksheet.
-    for (const stock of this.list) {
-      // See if there is/are patches matching on the unpatched stock name.
-      // NOTE If there ar duplicates in the stock list and a matching patch,
-      // then the patch will be applied to all the duplicate stocks.
-      // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
-      stock.applyPatch(previouslyStoredPatches[stock.stockName.original]);
-    }
-
-    // Once they are all loaded validate them.
-    // (You cannot do it before that, or you won't be able to properly check things
-    //  whether the stock has duplicates or like whether a parent exists or whether
-    //  a child is older than a parent.)
-    this.validateStocks();
-
-    this.refreshStringsAndTokens();
-
-    // Now start a loop to save any patches to memory every minute
-    interval(60000).subscribe(_ => this.saveChangesToLocalStorage())
-  }
-
-  validateStocks() {
-    for (const stock of this.list) stock.validate(this);
   }
 
   filterByProblemArea(problemArea: string | null): Stock[] {
@@ -177,34 +124,26 @@ export class StockService extends GenericService<Stock, StockJson> {
     return filteredList;
   }
 
-  saveChangesToLocalStorage(): void {
 
-    const stockPatches: {[index: string]: StockPatch} = {};
-    // NOTE if there are stocks with duplicate names, only the patch for the
-    // last one in the list will be saved.
-    // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
-    for (const s of this.list) {
-      const sp: StockPatch | null = s.extractPatch();
-      if (sp) stockPatches[s.stockName.original] = sp;
-    }
-    this.appState.setState(WellKnownStates.STORED_STOCK_PATCHES, stockPatches, true);
+
+  override afterLoadWorksheet() {
+    this.refreshStringsAndTokens();
+
+    // Once they are all loaded and patched, validate them.
+    // (You cannot do it before that, or you won't be able to properly check things
+    // whether the stock has duplicates or like whether a parent exists or whether
+    // a child is older than a parent.)
+    this.validateAll();
   }
 
-  override exportWorksheet(wb: XLSX.WorkBook, worksheetName: string) {
-    const data: StockJson[] = [];
-    for (const s of this.list) {
-      const json: StockJson | null = s.extractJsonForExcel();
-      if (json) data.push(json);
-    }
-    wb.SheetNames.push(worksheetName);
-    wb.Sheets[worksheetName] = XLSX.utils.json_to_sheet(data);
+  validateAll() {
+    this.list.map((s: Stock) => s.validate());
   }
 
-  loadChangesFromLocalStorage(): {[index: string]: StockPatch} {
-    return this.appState.getState(WellKnownStates.STORED_STOCK_PATCHES);
-  }
-
-
+  /**
+   * Itemize and tokenize the input strings that represent the genetics for each stock
+   * and the researchers associated with each stock.
+   */
   refreshStringsAndTokens() {
     const userSandT = new UniqueStringsAndTokens();
     const geneticsSandT = new UniqueStringsAndTokens();

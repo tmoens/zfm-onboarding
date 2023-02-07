@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AppStateService} from '../../app-state.service';
 import {StockService} from '../stock.service';
 import {FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -9,7 +8,6 @@ import {ZFTool} from '../../../helpers/zf-tool';
 @Component({
   selector: 'app-stock-patcher',
   templateUrl: './stock-patcher.component.html',
-  styleUrls: ['./stock-patcher.component.scss']
 })
 export class StockPatcherComponent implements OnInit {
   // Form controls for the fields the user can patch
@@ -28,7 +26,6 @@ export class StockPatcherComponent implements OnInit {
   kids: Stock[] = [];
 
   constructor(
-    public appState: AppStateService,
     public service: StockService,
     private route: ActivatedRoute,
     private router: Router,
@@ -64,9 +61,9 @@ export class StockPatcherComponent implements OnInit {
       this.refreshKids();
       // When a stock number changes it could wreak havoc.  Anyone pointing
       // to the old stock number as parent becomes broken and anyone
-      // pointing to the new stock number as an parent needs to be checked.
+      // pointing to the new stock number as a parent needs to be checked.
       // So, inefficiently, just revalidate all the stocks.
-      this.service.validateStocks();
+      this.service.validateAll();
     })
     this.stockNameFC.setValue(stock.stockName.current);
     if (!stock.stockName.isValid()) this.stockNameFC.updateValueAndValidity();
@@ -87,7 +84,7 @@ export class StockPatcherComponent implements OnInit {
       // when a birthdate changes, it could mean the kids have become
       // older than their parents, so we need to revalidate them
       for (const kid of this.kids) {
-        kid.validate(this.service);
+        kid.validate();
       }
     })
     this.dobFC.setValue(stock.dob.current);

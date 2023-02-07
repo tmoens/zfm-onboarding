@@ -24,10 +24,8 @@ export class UserSelectorComponent implements OnInit {
     this.service.select(user);
   }
 
-  // This is a little oblique.  By setting the selected user to null, the user editor
-  // "knows" it is editing a new user.
   addUser() {
-    this.service.select(null);
+    this.service.createUser();
   }
 
   deleteUser(user: User) {

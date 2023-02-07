@@ -6,7 +6,7 @@ import {ZFTool} from '../../../helpers/zf-tool';
 @Component({
   selector: 'app-stock-viewer',
   templateUrl: './stock-viewer.component.html',
-  styleUrls: ['./stock-viewer.component.scss']
+
 })
 export class StockViewerComponent implements OnInit {
   @Input() stock!: Stock;

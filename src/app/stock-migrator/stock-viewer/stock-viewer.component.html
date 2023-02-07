@@ -2,25 +2,25 @@
 <div fxLayout="column" fxLayoutGap="5px" style="width: 200px">
   <div fxLayout="row"fxLayoutAlign="start center">
   <button mat-button (click)="patchStock()" color="primary" style="padding: 0; line-height: inherit;">
-    <app-stock-attr-viewer
+    <app-patchable-attr-viewer
       *ngIf="stock.stockName.current" [attr]="stock.stockName" label="Stock name">
-    </app-stock-attr-viewer>
+    </app-patchable-attr-viewer>
   </button>
     <mat-icon *ngIf="!stock.isValid()" class="zf-field-boo-boo">close</mat-icon>
   </div>
-  <app-stock-attr-viewer
+  <app-patchable-attr-viewer
     *ngIf="stock.dob.current" [attr]="stock.dob" label="Fertilization date">
-  </app-stock-attr-viewer>
-  <app-stock-attr-viewer
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
     *ngIf="stock.mom.current && !mini" [attr]="stock.mom" label="Mom">
-  </app-stock-attr-viewer>
-  <app-stock-attr-viewer
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
     *ngIf="stock.dad.current && !mini" [attr]="stock.dad" label="Dad">
-  </app-stock-attr-viewer>
-  <app-stock-attr-viewer
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
     *ngIf="stock.genetics.current" [attr]="stock.genetics" label="Genetics">
-  </app-stock-attr-viewer>
-  <app-stock-attr-viewer
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
     *ngIf="stock.comment.current" [attr]="stock.comment" label="Comment">
-  </app-stock-attr-viewer>
+  </app-patchable-attr-viewer>
 </div>

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {User} from './user';
-import {UserJson} from './user-json';
 import {GenericService} from '../generics/generic-service';
+import {JsonForExcel} from '../generics/json-for-excel';
+import {ObjectPatch} from '../generics/object-patch';
+import {WellKnownStates} from '../app-state.service';
 
 /**
  * Load customer's user information from a spreadsheet.
@@ -19,13 +21,29 @@ import {GenericService} from '../generics/generic-service';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends GenericService<User, UserJson>{
+export class UserService extends GenericService<User>{
+  localStorageVariableName = 'storedStockPatches';
+  worksheetName = 'users';
+  newUser: User | null = null;
 
-  override loadItems(usersFromWorksheet: UserJson[]) {
+  override loadItems(usersFromWorksheet: JsonForExcel[]) {
     for (const rawUser of usersFromWorksheet) {
       const user = new User();
       user.datafillFromJson(rawUser);
       this.list.push(user);
+    }
+    this.loadPatchesFromLocalStorage();
+  }
+
+
+  createUser(): void {
+    this.newUser = new User();
+  }
+  addUser(): void {
+    if (this.newUser) {
+      this.list.push(this.newUser);
+      this.select(this.newUser);
+      this.newUser = null;
     }
   }
 
