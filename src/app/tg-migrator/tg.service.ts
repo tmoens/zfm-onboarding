@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {User} from './user';
 import {GenericService} from '../generics/generic-service';
 import {JsonForExcel} from '../generics/json-for-excel';
+import {Transgene} from './tg';
 
 /**
  * Load customer's user information from a spreadsheet.
@@ -18,37 +18,37 @@ import {JsonForExcel} from '../generics/json-for-excel';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends GenericService<User>{
-  localPatternMapperStorageToken = 'userPatterns'
-  localPatchStorageToken = 'userPatches';
-  worksheetName = 'users';
-  newUser: User | null = null;
+export class TransgeneService extends GenericService<Transgene>{
+  localPatternMapperStorageToken = 'tgPatterns'
+  localPatchStorageToken = 'tgPatches';
+  worksheetName = 'transgenes';
+  newItem: Transgene | null = null;
 
-  override loadItems(usersFromWorksheet: JsonForExcel[]) {
-    for (const rawUser of usersFromWorksheet) {
-      const user = new User();
-      user.datafillFromJson(rawUser);
-      this.list.push(user);
+  override loadItems(itemsFromWorksheet: JsonForExcel[]) {
+    for (const jsonTg of itemsFromWorksheet) {
+      const tg = new Transgene();
+      tg.datafillFromJson(jsonTg);
+      this.list.push(tg);
     }
     this.loadPatchesFromLocalStorage();
   }
 
 
-  createUser(): void {
-    this.newUser = new User();
+  create(): void {
+    this.newItem = new Transgene();
   }
 
-  override select(item: User | null) {
+  override select(item: Transgene | null) {
     super.select(item);
     // auto wipe out a new user if it was being added. No big deal.
-    this.newUser = null;
+    this.newItem = null;
   }
 
-  addUser(): void {
-    if (this.newUser) {
-      this.list.push(this.newUser);
-      this.select(this.newUser);
-      this.newUser = null;
+  add(): void {
+    if (this.newItem) {
+      this.list.push(this.newItem);
+      this.select(this.newItem);
+      this.newItem = null;
     }
   }
 

@@ -5,9 +5,8 @@ import {JsonForExcel} from './json-for-excel';
 export abstract class GenericType{
   valid: boolean = false;
   originalInstance: JsonForExcel | null = null;
-  get uniqueName(): string {
-    return 'No idea';
-  }
+  abstract get uniqueName(): string;
+
   notes: PatchableAttr = new PatchableAttr();
   abstract getPatchableAttrValue(attrName: string): string | null;
 

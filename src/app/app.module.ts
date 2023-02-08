@@ -23,7 +23,6 @@ import {AppRoutingModule} from './app-routing.module';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {AppStateService} from './app-state.service';
 import {UserMigratorComponent} from './user-migrator/user-migrator.component';
-import {UserMigratorRoutingModule} from './user-migrator/user-migrator-routing.module';
 import {UserMigratorModule} from './user-migrator/user-migrator.module';
 import {StringMaulingModule} from './string-mauling/string-mauling.module';
 import {MatIconModule} from '@angular/material/icon';
@@ -59,7 +58,6 @@ export function appStateProviderFactory(provider: AppStateService) {
     FormsModule,
     ReactiveFormsModule,
     StockMigratorModule,
-    UserMigratorRoutingModule,
     MatToolbarModule,
     RouterModule,
     AppRoutingModule,

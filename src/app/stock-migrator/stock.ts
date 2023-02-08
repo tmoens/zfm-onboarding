@@ -7,6 +7,8 @@ import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {GenericType} from '../generics/generic-type';
 import {JsonForExcel} from '../generics/json-for-excel';
+import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
+import {UserService} from '../user-migrator/user.service';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -25,7 +27,7 @@ export class Stock extends GenericType {
   researcher: PatchableAttr = new PatchableAttr();
   genetics: PatchableAttr = new PatchableAttr();
   comment: PatchableAttr = new PatchableAttr();
-
+  researcherUserName: PatchableAttr = new PatchableAttr();
   private _row: number | null = null;
   set row(value: number | null) {
     this._row = value;
@@ -48,10 +50,11 @@ export class Stock extends GenericType {
   }
   private _duplicates: number[] = [];
 
-  constructor(private service: StockService) {
+  constructor(
+    private service: StockService,
+    ) {
     super();
   }
-
 
   getPatchableAttrValue(attrName: string): string | null {
     if (this[attrName as keyof Stock] && this[attrName as keyof Stock] instanceof PatchableAttr) {
@@ -122,6 +125,21 @@ export class Stock extends GenericType {
     this.dob.setValidity(!ValidateDob(this.dob.current));
     this.mom.setValidity(!ValidateParent(this.service, this, this.mom.current));
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
+  }
+  applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
+    this.researcherUserName.update('');
+    for (const pm of patternMappers) {
+      const target: string = pm.mapStringToTarget(this.researcher.original);
+      if (target) {
+        this.researcherUserName.update(target);
+        // take the first match and run.
+        return;
+      }
+    }
+  }
+
+  get uniqueName(): string {
+    return this.stockName.current;
   }
 }
 

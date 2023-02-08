@@ -17,6 +17,7 @@ export class StockPatcherComponent implements OnInit {
   dadFC: FormControl = new FormControl();
   countEnteringNurseryFC: FormControl = new FormControl();
   countLeavingNurseryFC: FormControl = new FormControl();
+  researcherFC: FormControl = new FormControl();
   geneticsFC: FormControl = new FormControl();
   commentFC: FormControl = new FormControl();
 
@@ -51,6 +52,7 @@ export class StockPatcherComponent implements OnInit {
     this.dadFC = new FormControl(null, [ValidateParentFC(this.service, this.stock)]);
     this.countEnteringNurseryFC = new FormControl(null, [Validators.min(0)]);
     this.countLeavingNurseryFC = new FormControl(null, [Validators.min(0)]);
+    this.researcherFC = new FormControl();
     this.geneticsFC = new FormControl();
     this.commentFC = new FormControl();
 
@@ -127,6 +129,14 @@ export class StockPatcherComponent implements OnInit {
       this.stock?.comment.update(String(value));
     })
     this.commentFC.setValue(stock.comment.current);
+
+    //------------------------- Researcher --------------------------
+    this.researcherFC.valueChanges.subscribe((value: any) => {
+      this.stock?.researcher.update(String(value));
+      this.service.refreshStringsAndTokens();
+    })
+    this.researcherFC.setValue(stock.researcher.current);
+
   }
 
   refreshKids() {

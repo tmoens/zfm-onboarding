@@ -4,6 +4,9 @@ import {BehaviorSubject} from 'rxjs';
 import {GenericService} from '../generics/generic-service';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings'
 import {JsonForExcel} from '../generics/json-for-excel';
+import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
+import {UserService} from '../user-migrator/user.service';
+import {AppStateService} from '../app-state.service';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -28,7 +31,8 @@ import {JsonForExcel} from '../generics/json-for-excel';
   providedIn: 'root'
 })
 export class StockService extends GenericService<Stock> {
-  localStorageVariableName = 'storedStockPatches'
+  localPatternMapperStorageToken = 'stockPatternMappersNotUsed' // Not used but required by GenericService
+  localPatchStorageToken = 'stockPatches'
   worksheetName = 'raw-stocks'
   userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
   geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
@@ -42,6 +46,15 @@ export class StockService extends GenericService<Stock> {
     this._stockBeingPatched = value;
   }
 
+  constructor(
+    private appService: AppStateService,
+    private userService: UserService,
+  ) {
+    super(appService);
+    userService.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
+      this.applyUserPatternMappers(patternMappers);
+    })
+  }
 
   // This will return more than one if there are duplicate stock names
   getStocksByName(stockName: string | undefined): Stock[] {
@@ -153,5 +166,11 @@ export class StockService extends GenericService<Stock> {
     });
     this.userStrings.next(userSandT);
     this.geneticsStrings.next(geneticsSandT);
+  }
+
+  applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
+    this.list.map((s:Stock) => {
+      s.applyUserPatternMappers(patternMappers);
+    })
   }
 }

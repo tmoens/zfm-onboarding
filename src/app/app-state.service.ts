@@ -7,6 +7,7 @@ export enum WellKnownStates {
   ERROR_MESSAGE_DURATION = 'emd',
   CONFIRM_MESSAGE_DURATION = 'cmd',
   FACILITY = 'facility',
+
 }
 
 export enum ZFToolStates {

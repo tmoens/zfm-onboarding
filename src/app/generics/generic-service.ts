@@ -5,12 +5,16 @@ import {GenericType} from './generic-type';
 import {BehaviorSubject} from 'rxjs';
 import {JsonForExcel} from './json-for-excel';
 import {ObjectPatch} from './object-patch';
+import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
+import {instanceToPlain, plainToInstance} from 'class-transformer';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class GenericService<T extends GenericType> {
-  abstract localStorageVariableName: string;
+
+  abstract localPatternMapperStorageToken: string;
+  abstract localPatchStorageToken: string;
   abstract worksheetName: string;
   // a list of the unique names of all the items in the list.
   // It is used in pattern mapping. A pattern mated in a text field maps to one of these unique names.
@@ -28,6 +32,10 @@ export abstract class GenericService<T extends GenericType> {
 
   // The set of items
   list: T[] = [];
+
+  // The set of patterns that map to instances of this type
+  private _patternMappers: PatternMapper[] = [];
+  patternMappers: BehaviorSubject<PatternMapper[]> = new BehaviorSubject<PatternMapper[]>([]);
 
   constructor(
     protected appState: AppStateService
@@ -50,6 +58,8 @@ export abstract class GenericService<T extends GenericType> {
 
     this.refreshUniqueNames();
 
+    this.loadPatternMappers();
+
     this.afterLoadWorksheet();
   }
 
@@ -61,15 +71,17 @@ export abstract class GenericService<T extends GenericType> {
   loadPatchesFromLocalStorage(): void {
     // Load them up from local storage.
     const previouslyStoredPatches: { [index: string]: ObjectPatch } =
-      this.appState.getState(this.localStorageVariableName);
+      this.appState.getState(this.localPatchStorageToken);
 
-    // Loop through the stocks we loaded from the worksheet and apply the patches
-    for (const item of this.list) {
-      // See if there is/are patches matching on the unpatched stock name.
-      // NOTE If there ar duplicates in the stock list and a matching patch,
-      // then the patch will be applied to all the duplicate stocks.
-      // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
-      item.applyPatch(previouslyStoredPatches[item.uniqueName]);
+    if (previouslyStoredPatches) {
+      // Loop through the stocks we loaded from the worksheet and apply the patches
+      for (const item of this.list) {
+        // See if there is/are patches matching on the unpatched stock name.
+        // NOTE If there ar duplicates in the stock list and a matching patch,
+        // then the patch will be applied to all the duplicate stocks.
+        // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
+        item.applyPatch(previouslyStoredPatches[item.uniqueName]);
+      }
     }
   }
 
@@ -89,6 +101,8 @@ export abstract class GenericService<T extends GenericType> {
     // ignore the selection if the item is not in the known list of items (or empty)
     if (item && this.list.includes(item)) {
       this._selected = item;
+    } else if (this.list.length > 0) {
+      this._selected = this.list[0];
     } else {
       this._selected = null;
     }
@@ -132,6 +146,51 @@ export abstract class GenericService<T extends GenericType> {
       const objectPatch: ObjectPatch | null = item.extractPatch();
       if (objectPatch) objectPatches[item.uniqueName] = objectPatch;
     }
-    this.appState.setState(this.localStorageVariableName, objectPatches, true);
+    this.appState.setState(this.localPatchStorageToken, objectPatches, true);
   }
+
+  addPatternMapper(pm: PatternMapper) {
+    this._patternMappers.push(pm);
+    this.saveAndExportPatternMappers();
+  }
+
+  loadPatternMappers() {
+    this._patternMappers = [];
+    const storedPlainPatterns = this.appState.getState(this.localPatternMapperStorageToken);
+    if (storedPlainPatterns) {
+      storedPlainPatterns.map((plainPattern: any) => {
+        const pm: PatternMapper = plainToInstance(PatternMapper, plainPattern);
+        pm.makeRegExpFromString();
+        this._patternMappers.push(pm);
+      })
+    }
+    this.exportPatternMappers();
+  }
+
+  createPatternMapper() {
+    this.addPatternMapper(new PatternMapper());
+  }
+
+  deletePatternMapper(patternMapper: PatternMapper) {
+    const index = this._patternMappers.indexOf(patternMapper);
+    if (index >= 0) {
+      this._patternMappers.splice(index, 1);
+      this.saveAndExportPatternMappers()
+    }
+  }
+
+  saveAndExportPatternMappers() {
+    const plainPatterns: any[] = [];
+    this._patternMappers.map((pm: PatternMapper) => {
+      pm.clearResults();
+      plainPatterns.push(instanceToPlain(pm));
+    })
+    this.appState.setState(this.localPatternMapperStorageToken, plainPatterns, true);
+    this.exportPatternMappers();
+  }
+
+  exportPatternMappers() {
+    this.patternMappers.next(this._patternMappers);
+  }
+
 }

@@ -12,7 +12,7 @@ export class PatternMapper {
 
   matches: {[index: string]: string[]} = {};
   matchCount = 0;
-  private regExp: RegExp | null = null;
+  regExp: RegExp | null = null;
 
   set regExpString(regExpString: string) {
     this._regExpString = regExpString;
@@ -24,7 +24,7 @@ export class PatternMapper {
 
   makeRegExpFromString() {
     try {
-      this.regExp = new RegExp(this.regExpString, 'gi');
+      this.regExp = new RegExp(this.regExpString, 'i');
     } catch (e) {
       this.regExp = null;
     }
@@ -35,7 +35,8 @@ export class PatternMapper {
     this.matchCount = 0;
   }
 
-  checkString(s: string): string {
+  // remove any matches of this regExp pattern in a string returning a residual string
+  removeMatches(s: string): string {
     if (this.regExp) {
       const matches = s.match(this.regExp);
       if (matches) {
@@ -52,6 +53,24 @@ export class PatternMapper {
     } else {
       return s;
     }
+  }
+
+  mapStringToTarget(s: string): string {
+    if (!this.target || !this.regExp) {
+      return '';
+    }
+    // A GIANT  wtf?  I used 'this.regExp.test(s)' originally as it is more efficient
+    // But it produced a totally bizarre result.  On any two consecutive tests of the same
+    // regexp against the same string that matched, gave a correct answer on the
+    // first and not on the second.  Incredibly reproducible. Using 'match' works,
+    // but I really hate it.
+    // This just in.  This is known to happen if the regexp has a 'g' flag because
+    // blah blah blah.  For now, I removed the 'g' flag when creating the regExp.
+    // if (s.match(this.regExp)) {
+    if (this.regExp.test(s)) {
+      return this.target;
+    }
+    return '';
   }
 }
 

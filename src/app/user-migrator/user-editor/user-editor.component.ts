@@ -15,20 +15,19 @@ export class UserEditorComponent implements OnInit {
   public mode: 'edit' | 'add' = 'edit';
 
   @Input() set user(user: User | null) {
-
-    if (!user) {
-      this._user = new User();
-      this.mode = 'add';
-    } else {
+    if (user) {
       this._user = user;
-      this.mode = 'edit'
+      if (user.name.original === '') {
+        this.mode = 'add';
+      } else {
+        this.mode = 'edit'
+      }
+      this.nameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'name')]
+      this.usernameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'username')]
+      this.initialsValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'initials')]
     }
-    this.nameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'name')]
-    this.usernameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'username')]
-    this.initialsValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'initials')]
-
   };
-  get user(): User | null {
+  get user(): User | null  {
     return this._user;
   }
 
