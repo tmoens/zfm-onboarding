@@ -19,7 +19,7 @@ export class UserService extends GenericService<User>{
     for (const rawUser of usersFromWorksheet) {
       const user = new User();
       user.datafillFromJson(rawUser);
-      this.add(user);
+      this.addItem(user);
     }
     this.loadPatchesFromLocalStorage();
   }

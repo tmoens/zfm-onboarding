@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormControl, Validators} from '@angular/forms';
 import {PatternMapper, regularExpressionStringValidator} from './pattern-mapper';
 import {BehaviorSubject} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -56,8 +56,8 @@ export class PatternMapperComponent implements OnInit {
 
   openMatchDetailsDialog(): void {
     if (this.patternMapper.matchCount > 0) {
-      const top = this.thisElement.nativeElement.offsetTop + 125;
-      const left = this.thisElement.nativeElement.offsetLeft;
+      const top = 125;
+      const left = 125;
       this.dialogRef = this.matchDetailsDialog.open(MatchDetailsDialogComponent, {
         width: '350 px',
         position: {top: top + "px", left: left + "px"},

@@ -11,6 +11,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import { PatternMapperGroupComponent } from './pattern-mapper-group/pattern-mapper-group.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 
 
 
@@ -36,6 +37,7 @@ import {MatIconModule} from '@angular/material/icon';
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
+    MatSelectModule,
   ]
 })
 export class StringMaulingModule { }

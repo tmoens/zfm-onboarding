@@ -12,14 +12,13 @@
       </mat-form-field>
       <mat-form-field floatLabel="always">
         <mat-label>{{targetType}}</mat-label>
-        <input type="text" matInput [formControl]="targetFC" [matAutocomplete]="mappingOptions"  (change)="onChangeTarget()" >
+        <mat-select (selectionChange)="onChangeTarget()" [formControl]="targetFC">
+          <mat-option *ngFor="let option of mappingTargets" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
       <p (mouseover)="openMatchDetailsDialog()" #foo>matches: {{patternMapper.matchCount}}</p>
     </div>
   </form>
 </div>
-<mat-autocomplete #mappingOptions="matAutocomplete" (optionSelected)="onChangeTarget()">
-  <mat-option *ngFor="let option of mappingTargets" [value]="option">
-    {{option}}
-  </mat-option>
-</mat-autocomplete>

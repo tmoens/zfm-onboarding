@@ -7,6 +7,9 @@ import {JsonForExcel} from '../generics/json-for-excel';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
 import {UserService} from '../user-migrator/user.service';
 import {AppStateService} from '../app-state.service';
+import {WorkBook} from 'xlsx';
+import * as XLSX from 'xlsx';
+import {TgService} from '../tg-migrator/tg.service';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -49,12 +52,14 @@ export class StockService extends GenericService<Stock> {
   constructor(
     private appService: AppStateService,
     private userService: UserService,
+    private tgService: TgService,
   ) {
     super(appService);
     userService.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
       this.applyUserPatternMappers(patternMappers);
     })
   }
+
 
   // This will return more than one if there are duplicate stock names
   getStocksByName(stockName: string | undefined): Stock[] {
@@ -105,7 +110,7 @@ export class StockService extends GenericService<Stock> {
       newStock.row = row;
       row++;
       newStock.datafillFromJson(rawStock);
-      this.add(newStock);
+      this.addItem(newStock);
     }
   }
 
@@ -172,5 +177,52 @@ export class StockService extends GenericService<Stock> {
     this.list.map((s:Stock) => {
       s.applyUserPatternMappers(patternMappers);
     })
+  }
+
+  override exportWorksheet(wb: WorkBook) {
+    // in addition to exporting the patched raw-stock sheet we export other sheets
+    // For the import tool:
+    // - "stocks" bare bones of each stock plus the researcher and pi usernames
+    // - "lineage" parents of each stock
+    // - "markers" mutations and transgenes for each stock
+    super.exportWorksheet(wb);
+    const stockImportDtos: JsonForExcel[] = [];
+    const stockLineageDtos: JsonForExcel[] = [];
+    const stockMarkerDtos: JsonForExcel[] = [];
+
+    this.list.map((stock: Stock) => {
+      const stockImportDto: JsonForExcel = {
+        name: stock.stockName.current,
+        description: stock.genetics.current,
+        comment: stock.comment.current,
+        fertilizationDate: stock.dob.current,
+        countEnteringNursery: stock.countEnteringNursery.current,
+        countLeavingNursery: stock.countLeavingNursery.current,
+        researcherUsername: stock.researcherUsername.current,
+        piUsername: stock.piUsername.current,
+      }
+      stockImportDtos.push(stockImportDto);
+      const stockLineageDto: JsonForExcel = {
+        stockNumber: stock.stockName.current,
+        internalMom: stock.mom?.current,
+        internalDad: stock.dad?.current,
+        externalMomName: '',
+        externalMomDescription: '',
+        externalDadName: '',
+        externalDadDescription: '',
+      }
+      stockLineageDtos.push(stockLineageDto);
+      const stockMarkerDto: JsonForExcel = {
+        stockNumber: stock.stockName.current,
+        alleles: stock.applyTgPatternMappers(this.tgService.patternMappers.value),
+      }
+      stockMarkerDtos.push(stockMarkerDto);
+    })
+    wb.SheetNames.push('stocks');
+    wb.Sheets['stocks'] = XLSX.utils.json_to_sheet(stockImportDtos);
+    wb.SheetNames.push('lineage');
+    wb.Sheets['lineage'] = XLSX.utils.json_to_sheet(stockLineageDtos);
+    wb.SheetNames.push('markers');
+    wb.Sheets['markers'] = XLSX.utils.json_to_sheet(stockMarkerDtos);
   }
 }

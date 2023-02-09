@@ -6,7 +6,7 @@ import {BehaviorSubject} from 'rxjs';
 import {JsonForExcel} from './json-for-excel';
 import {ObjectPatch} from '../shared/patching/object-patch';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
-import {instanceToPlain, plainToInstance} from 'class-transformer';
+import {plainToInstance} from 'class-transformer';
 
 @Injectable({
   providedIn: 'root'
@@ -75,7 +75,7 @@ export abstract class GenericService<T extends GenericType> {
     const previouslyStoredPatches: { [index: string]: ObjectPatch } =
       this.appState.getState(this.localPatchStorageToken);
 
-    if (previouslyStoredPatches) {
+    if (previouslyStoredPatches && Object.keys(previouslyStoredPatches).length > 0) {
       // Loop through the stocks we loaded from the worksheet and apply the patches
       for (const item of this.list) {
         // See if there is/are patches matching on the unpatched stock name.
@@ -85,21 +85,37 @@ export abstract class GenericService<T extends GenericType> {
         item.applyPatch(previouslyStoredPatches[item.uniqueName]);
       }
     }
+    // once all the patches are applied, re-save them.  Why?
+    // Because that will rebuild the set of patches. So,
+    // If you loaded a spreadsheet that included the patches, then the
+    // patches that were waiting in memory will effectively be removed.
+    // On the other hand if you reloaded an older version that did not
+    // contain the in-memory patches, then the in-memory patches will
+    // be re-applied then erased and re-calculated.
+    this.savePatchesToLocalStorage();
   }
 
 
   // TODO Add extra fields from "originalObject"
   exportWorksheet(wb: XLSX.WorkBook) {
-    const data: JsonForExcel[] = [];
+    // export item list to a worksheet
+    const itemsJson: JsonForExcel[] = [];
     for (const item of this.list) {
-      const json: JsonForExcel | null = item.extractJsonForExcel();
-      if (json) data.push(json);
+      const json: JsonForExcel | null = item.extractJsonForExcel(item.originalInstance);
+      if (json) itemsJson.push(json);
     }
     wb.SheetNames.push(this.worksheetName);
-    wb.Sheets[this.worksheetName] = XLSX.utils.json_to_sheet(data);
+    wb.Sheets[this.worksheetName] = XLSX.utils.json_to_sheet(itemsJson);
+
+    // Store pattern mappers if there are any.
+    if (this.patternMappers.value.length > 0) {
+      const patternWorksheetName = `${this.worksheetName}-patterns`
+      wb.SheetNames.push(patternWorksheetName);
+      wb.Sheets[patternWorksheetName] = XLSX.utils.json_to_sheet(this.getJsonPatterns());
+    }
   }
 
-  select(item: T | null) {
+  selectItem(item: T | null) {
     // ignore the selection if the item is not in the known list of items (or empty)
     if (item && this.list.includes(item)) {
       this._selected = item;
@@ -110,21 +126,21 @@ export abstract class GenericService<T extends GenericType> {
     }
   }
 
-  delete(item: T) {
+  deleteItem(item: T) {
     const index = this.list.indexOf(item);
     if (index >= 0) {
       this.list.splice(index,1);
       this.refreshUniqueNames();
     }
     if (item === this._selected) {
-      this.select(null);
+      this.selectItem(null);
     }
   }
 
 
-  add(newItem: T): void {
+  addItem(newItem: T): void {
     this.list.push(newItem);
-    this.select(newItem);
+    this.selectItem(newItem);
   }
 
 
@@ -146,7 +162,6 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   savePatchesToLocalStorage(): void {
-
     const objectPatches: {[index: string]: ObjectPatch} = {};
     // NOTE if there are items with duplicate names, only the patch for the
     // last one in the list will be saved.
@@ -220,13 +235,12 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   saveAndExportPatternMappers() {
-    const plainPatterns: any[] = [];
-    this._patternMappers.map((pm: PatternMapper) => {
-      pm.clearResults();
-      plainPatterns.push(instanceToPlain(pm));
-    })
-    this.appState.setState(this.localPatternMapperStorageToken, plainPatterns, true);
+    this.appState.setState(this.localPatternMapperStorageToken, this.getJsonPatterns(), true);
     this.exportPatternMappers();
+  }
+
+  getJsonPatterns(): JsonForExcel[] {
+    return this._patternMappers.map((pm: PatternMapper) => { return pm.plain;})
   }
 
   exportPatternMappers() {

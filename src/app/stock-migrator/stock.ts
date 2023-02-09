@@ -26,7 +26,8 @@ export class Stock extends GenericType {
   researcher: PatchableAttr = new PatchableAttr();
   genetics: PatchableAttr = new PatchableAttr();
   comment: PatchableAttr = new PatchableAttr();
-  researcherUserName: PatchableAttr = new PatchableAttr();
+  researcherUsername: PatchableAttr = new PatchableAttr();
+  piUsername: PatchableAttr = new PatchableAttr();
   private _row: number | null = null;
   set row(value: number | null) {
     this._row = value;
@@ -126,15 +127,23 @@ export class Stock extends GenericType {
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
   applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
-    this.researcherUserName.update('');
     for (const pm of patternMappers) {
       const target: string = pm.mapStringToTarget(this.researcher.original);
       if (target) {
-        this.researcherUserName.update(target);
+        this.researcherUsername.update(target);
         // take the first match and run.
         return;
       }
     }
+  }
+  applyTgPatternMappers(patternMappers: PatternMapper[] = []): string {
+    const transgenes: string[] = []
+    for (const pm of patternMappers) {
+      const target: string = pm.mapStringToTarget(this.genetics.original);
+      if (target) { transgenes.push(target)
+      }
+    }
+    return transgenes.join(';');
   }
 
   get uniqueName(): string {

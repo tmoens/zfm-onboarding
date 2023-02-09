@@ -1,4 +1,6 @@
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {JsonForExcel} from '../../generics/json-for-excel';
+import {Exclude, instanceToPlain} from 'class-transformer';
 
 export class PatternMapper {
   // A string containing a regular expression used for the matching process.
@@ -10,8 +12,11 @@ export class PatternMapper {
   // regular expression matches, it in a string, then bingo.
   target: string = '';
 
+  @Exclude()
   matches: {[index: string]: string[]} = {};
+  @Exclude()
   matchCount = 0;
+  @Exclude()
   regExp: RegExp | null = null;
 
   set regExpString(regExpString: string) {
@@ -71,6 +76,10 @@ export class PatternMapper {
       return this.target;
     }
     return '';
+  }
+
+  get plain(): JsonForExcel {
+    return instanceToPlain(this);
   }
 }
 

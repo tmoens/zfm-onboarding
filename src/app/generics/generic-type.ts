@@ -4,7 +4,7 @@ import {JsonForExcel} from './json-for-excel';
 
 export abstract class GenericType{
   valid: boolean = false;
-  originalInstance: JsonForExcel | null = null;
+  originalInstance: JsonForExcel = {};
   abstract get uniqueName(): string;
 
   notes: PatchableAttr = new PatchableAttr();
@@ -59,8 +59,7 @@ export abstract class GenericType{
     })
     this.updateValidity();
   }
-  extractJsonForExcel(): JsonForExcel | null {
-    const json: JsonForExcel = {};
+  extractJsonForExcel(item: JsonForExcel): JsonForExcel | null {
     const notes: string[] = [];
     if (this.notes.current) {
       notes.push(this.notes.current);
@@ -68,12 +67,16 @@ export abstract class GenericType{
     Object.entries(this).map(([key, value]) => {
       if (value instanceof PatchableAttr  && key !== 'notes') {
         if (value.isPatched()) {
-          notes.push(`${key} changed from ${value.original}`)
+          if (value.original) {
+            notes.push(`${key} changed from ${value.original}`)
+          } else {
+            notes.push(`${key} added`)
+          }
         }
-          json[key] = value.current;
+          item[key] = value.current;
       }
     })
-    json['notes'] = notes.join('; ');
-    return json;
+    item['notes'] = notes.join('; ');
+    return item;
   }
 }

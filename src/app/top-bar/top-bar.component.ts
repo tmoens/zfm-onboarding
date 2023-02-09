@@ -55,6 +55,7 @@ export class TopBarComponent implements OnInit {
     const wb = XLSX.utils.book_new();
     this.stockService.exportWorksheet(wb);
     this.userService.exportWorksheet(wb);
+    this.transgeneService.exportWorksheet(wb);
     XLSX.writeFile(wb, 'test.xlsx');
   }
 }

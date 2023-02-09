@@ -42,4 +42,14 @@ export class PatchableAttrViewerComponent implements OnInit {
       return null;
     }
   }
+
+  get hintMessage(): string | null {
+    if (this.attr?.hasChanged()) {
+      if(this.attr?.original) {
+        return `originally: ${this.attr.original}`;
+      }
+      return 'originally empty'
+    }
+    return null;
+  }
 }
