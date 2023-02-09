@@ -32,9 +32,6 @@ import {TgMigratorModule} from './tg-migrator/tg-migrator.module';
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
 }
-// export function stockServiceProviderFactory(provider: StockService) {
-//   return () => provider.loadRawStocks();
-// }
 
 @NgModule({
   declarations: [
@@ -75,13 +72,6 @@ export function appStateProviderFactory(provider: AppStateService) {
       deps: [AppStateService],
       multi: true,
     },
-    // {provide: APP_INITIALIZER,
-    //   useFactory: stockServiceProviderFactory,
-    //   deps: [StockService, AppStateService],
-    //   multi: true,
-    // },
-
-
   ],
   exports: [
     TopBarComponent,

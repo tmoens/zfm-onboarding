@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {PatchableAttr} from '../../generics/patchable-attr';
-import {FormControl, FormControlOptions, ValidatorFn} from '@angular/forms';
+import {PatchableAttr} from '../patchable-attr';
+import {FormControl, ValidatorFn} from '@angular/forms';
 
 @Component({
   selector: 'app-patchable-attr-viewer',
@@ -25,7 +25,6 @@ export class PatchableAttrViewerComponent implements OnInit {
   @Output()
   onChange: EventEmitter<string> = new EventEmitter<string>();
 
-  errorMessage: string | null = null;
   constructor() { }
 
   ngOnInit(): void {

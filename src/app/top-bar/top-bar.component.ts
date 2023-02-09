@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {AppStateService, WellKnownStates} from '../app-state.service';
+import {AppStateService} from '../app-state.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
@@ -22,7 +21,6 @@ export class TopBarComponent implements OnInit {
     public stockService: StockService,
     public userService: UserService,
     public transgeneService: TgService,
-    private router: Router,
   ) {
   }
 

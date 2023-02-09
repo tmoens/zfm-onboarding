@@ -15,6 +15,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
 import {UserMigratorRoutingModule} from './user-migrator-routing.module';
+import {SharedModule} from '../shared/shared.module';
 
 
 
@@ -43,6 +44,7 @@ import {UserMigratorRoutingModule} from './user-migrator-routing.module';
     MatButtonModule,
     MatCheckboxModule,
     StockMigratorModule,
+    SharedModule,
   ]
 })
 export class UserMigratorModule { }

@@ -1,8 +1,6 @@
 import {GenericType} from '../generics/generic-type';
-import {PatchableAttr} from '../generics/patchable-attr';
-import {UserService} from './user.service';
+import {PatchableAttr} from '../shared/patching/patchable-attr';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {GenericService} from '../generics/generic-service';
 
 export enum UserRole {
   ADMIN = 'admin',

@@ -1,5 +1,5 @@
-import {ObjectPatch} from './object-patch';
-import {PatchableAttr} from './patchable-attr';
+import {ObjectPatch} from '../shared/patching/object-patch';
+import {PatchableAttr} from '../shared/patching/patchable-attr';
 import {JsonForExcel} from './json-for-excel';
 
 export abstract class GenericType{

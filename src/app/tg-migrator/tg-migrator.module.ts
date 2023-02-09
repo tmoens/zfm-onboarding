@@ -9,6 +9,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatListModule} from '@angular/material/list';
 import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
+import {SharedModule} from '../shared/shared.module';
 
 
 
@@ -23,6 +24,7 @@ import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
   imports: [
     CommonModule,
     TgMigratorRoutingModule,
+    SharedModule,
     FlexModule,
     MatButtonModule,
     MatIconModule,

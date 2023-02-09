@@ -8,13 +8,13 @@ import {MatCardModule} from '@angular/material/card';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import { StockPatcherComponent } from './stock-patcher/stock-patcher.component';
+import {StockPatcherComponent } from './stock-patcher/stock-patcher.component';
 import {StockMigratorRoutingModule} from './stock-migrator-routing.module';
-import { StockSelectorComponent } from './stock-selector/stock-selector.component';
+import {StockSelectorComponent } from './stock-selector/stock-selector.component';
 import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import { StockViewerComponent } from './stock-viewer/stock-viewer.component';
-import { PatchableAttrViewerComponent } from './patchable-attr-viewer/patchable-attr-viewer.component';
+import {StockViewerComponent } from './stock-viewer/stock-viewer.component';
+import {SharedModule} from '../shared/shared.module';
 
 
 
@@ -23,12 +23,10 @@ import { PatchableAttrViewerComponent } from './patchable-attr-viewer/patchable-
     StockPatcherComponent,
     StockSelectorComponent,
     StockViewerComponent,
-    PatchableAttrViewerComponent,
   ],
   exports: [
     StockPatcherComponent,
     StockSelectorComponent,
-    PatchableAttrViewerComponent,
   ],
   imports: [
     StockMigratorRoutingModule,
@@ -42,7 +40,8 @@ import { PatchableAttrViewerComponent } from './patchable-attr-viewer/patchable-
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    SharedModule,
   ]
 })
 export class StockMigratorModule { }

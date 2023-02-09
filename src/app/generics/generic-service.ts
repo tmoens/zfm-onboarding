@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import {GenericType} from './generic-type';
 import {BehaviorSubject} from 'rxjs';
 import {JsonForExcel} from './json-for-excel';
-import {ObjectPatch} from './object-patch';
+import {ObjectPatch} from '../shared/patching/object-patch';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
 import {instanceToPlain, plainToInstance} from 'class-transformer';
 
@@ -195,7 +195,7 @@ export abstract class GenericService<T extends GenericType> {
     if (index > -1 && pms.length > 1) {
       pms.splice(index,1);
       const endIndex = pms.length -1;
-      let targetIndex = 0;
+      let targetIndex: number;
       switch (direction) {
         case 'top':
           targetIndex = 0;

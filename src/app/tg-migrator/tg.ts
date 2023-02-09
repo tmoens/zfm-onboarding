@@ -1,5 +1,5 @@
 import {GenericType} from '../generics/generic-type';
-import {PatchableAttr} from '../generics/patchable-attr';
+import {PatchableAttr} from '../shared/patching/patchable-attr';
 
 export class Tg extends GenericType{
   allele: PatchableAttr = new PatchableAttr();

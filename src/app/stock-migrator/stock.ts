@@ -2,13 +2,12 @@
 // The general idea is that this gets refined as we add more "corrections" for
 // converting the raw stocks to stocks that are ready for import into a zsm system.
 
-import {PatchableAttr} from '../generics/patchable-attr';
+import {PatchableAttr} from '../shared/patching/patchable-attr';
 import {StockService} from './stock.service';
 import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {GenericType} from '../generics/generic-type';
 import {JsonForExcel} from '../generics/json-for-excel';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
-import {UserService} from '../user-migrator/user.service';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
