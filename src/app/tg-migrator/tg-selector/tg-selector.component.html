@@ -1,1 +1,29 @@
-<p>tg-selector works!</p>
+<div fxLayout="column" fxLayoutGap="10px">
+  <button mat-button (click)="create()" color="primary">
+    <mat-icon>add</mat-icon>
+    Add a Transgene
+  </button>
+  <app-tg-editor *ngIf="newItem" mode="add" [tg]="newItem" (onTgCreated)="saveNewTg()"></app-tg-editor>
+  <app-tg-editor *ngIf="!newItem && service.selected" mode="edit" [tg]="service.selected"></app-tg-editor>
+  <mat-divider></mat-divider>
+  <mat-selection-list #items *ngIf="service.list" dense [multiple]="false"
+                      (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
+    <ng-container *ngFor="let tg of service.list">
+      <mat-list-option
+        [value]='tg'
+        [selected]="service.selected === tg"
+        class="zf-selection-item"
+        [class.selected]="service.selected === tg">
+        <div fxLayout="row">
+          <div fxFlex="20px">
+            <mat-icon (click)="delete(tg)" color="primary">delete</mat-icon>
+          </div>
+          <div fxFlex="15px">
+            <mat-icon *ngIf="!tg.valid" class="zf-field-boo-boo">close</mat-icon>
+          </div>
+          <div>{{tg.descriptor.current}}^{{tg.allele.current}}</div>
+        </div>
+      </mat-list-option>
+    </ng-container>
+  </mat-selection-list>
+</div>

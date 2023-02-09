@@ -1,19 +1,34 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TgMigratorComponent } from './tg-migrator/tg-migrator.component';
 import { TgEditorComponent } from './tg-editor/tg-editor.component';
 import { TgSelectorComponent } from './tg-selector/tg-selector.component';
+import {TgMigratorRoutingModule} from './tg-migrator-routing.module';
+import {FlexModule} from '@angular/flex-layout';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
+import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
 
 
 
 @NgModule({
   declarations: [
-    TgMigratorComponent,
     TgEditorComponent,
     TgSelectorComponent
   ],
+  exports: [
+    TgSelectorComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    TgMigratorRoutingModule,
+    FlexModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+    MatListModule,
+    StockMigratorModule,
   ]
 })
 export class TgMigratorModule { }

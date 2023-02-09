@@ -13,6 +13,10 @@
               [routerLink]="zfTool.STOCK_MIGRATOR.route" color="primary">
         {{zfTool.STOCK_MIGRATOR.display_name}}
       </button>
+      <button mat-button [disabled]="appState.activeTool === zfTool.TRANSGENE_MIGRATOR"
+              [routerLink]="zfTool.TRANSGENE_MIGRATOR.route" color="primary">
+        {{zfTool.TRANSGENE_MIGRATOR.display_name}}
+      </button>
       <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
       <button mat-button (click)="fileUpload.click()">
         Import File

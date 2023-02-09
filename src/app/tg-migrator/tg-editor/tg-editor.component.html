@@ -1,1 +1,30 @@
-<p>tg-editor works!</p>
+<div *ngIf="tg" fxLayout="column" fxLayoutGap="5px" style="width: 200px">
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [validators]="alleleValidators"
+    [attr]="tg.allele" label="Allele">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [validators]="requiredValidator"
+    [attr]="tg.descriptor" label="Descriptor">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="tg.source" label="Source">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="tg.nickname" label="Nickname">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="tg.comment" label="Comment">
+  </app-patchable-attr-viewer>
+  <div fxLayout="row" fxLayoutAlign="end">
+    <button *ngIf="mode === 'add'" [disabled]="!tg.valid" mat-button (click)="onSave()" color="primary">
+      Save
+    </button>
+  </div>
+</div>
+

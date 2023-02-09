@@ -15,10 +15,10 @@ import {FlexModule} from '@angular/flex-layout';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StockMigratorModule} from './stock-migrator/stock-migrator.module';
-import { TopBarComponent } from './top-bar/top-bar.component';
+import {TopBarComponent } from './top-bar/top-bar.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterModule} from '@angular/router';
-import { SplashComponent } from './splash/splash.component';
+import {SplashComponent } from './splash/splash.component';
 import {AppRoutingModule} from './app-routing.module';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {AppStateService} from './app-state.service';
@@ -26,6 +26,8 @@ import {UserMigratorComponent} from './user-migrator/user-migrator.component';
 import {UserMigratorModule} from './user-migrator/user-migrator.module';
 import {StringMaulingModule} from './string-mauling/string-mauling.module';
 import {MatIconModule} from '@angular/material/icon';
+import {TgMigratorComponent} from './tg-migrator/tg-migrator/tg-migrator.component';
+import {TgMigratorModule} from './tg-migrator/tg-migrator.module';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
@@ -39,6 +41,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     AppComponent,
     StockMigratorComponent,
     UserMigratorComponent,
+    TgMigratorComponent,
     TopBarComponent,
     SplashComponent,
   ],
@@ -60,10 +63,11 @@ export function appStateProviderFactory(provider: AppStateService) {
     StockMigratorModule,
     MatToolbarModule,
     RouterModule,
-    AppRoutingModule,
     UserMigratorModule,
+    TgMigratorModule,
     StringMaulingModule,
     MatIconModule,
+    AppRoutingModule,
   ],
   providers: [
     {provide: APP_INITIALIZER,

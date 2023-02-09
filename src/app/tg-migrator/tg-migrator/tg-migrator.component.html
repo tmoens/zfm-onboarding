@@ -1,1 +1,13 @@
-<p>tg-migrator works!</p>
+<div fxLayout="row" fxLayoutAlign="center" class="tool-container">
+  <app-tg-selector style="overflow-y: auto"></app-tg-selector>
+  <!-- All the strings (and tokens) in the researcher field of the raw stocks -->
+  <div fxLayout="column" fxLayoutGap="10px" >
+    <h3>Original</h3>
+    <app-string-set style="overflow-y: auto" [uniqueStringsAndTokens]="rawStrings"></app-string-set>
+  </div>
+  <div fxLayout="column" fxLayoutGap="10px">
+    <h3>Residual</h3>
+    <app-string-set style="overflow-y: auto" [uniqueStringsAndTokens]="residualStrings"></app-string-set>
+  </div>
+  <app-pattern-mapper-group [service]="service"></app-pattern-mapper-group>
+</div>

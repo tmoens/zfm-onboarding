@@ -97,15 +97,15 @@ export class StockService extends GenericService<Stock> {
   // For example, it will note that "123.xyz" is not a valid stock number, but will not
   // know that the mom "23.46" does not exist.
   override loadItems(rawStocks: JsonForExcel[]) {
-    let index = -1;
+    let row = 2; // The first stock is on row 2 of the worksheet.
     for (let rawStock of rawStocks) {
-      index++;
 
       // In the worksheet, the first stock is on row 2, but the index in the array is 0;
       const newStock = new Stock(this);
-      newStock.row = index +2;
+      newStock.row = row;
+      row++;
       newStock.datafillFromJson(rawStock);
-      this.list[index] = newStock;
+      this.add(newStock);
     }
   }
 

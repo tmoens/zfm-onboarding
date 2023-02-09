@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import {AppStateService} from '../../app-state.service';
+import {User} from '../user';
 import {UserService} from '../user.service';
-import {User, UserRole} from '../user';
 
 @Component({
   selector: 'app-user-selector',
   templateUrl: './user-selector.component.html',
 })
 export class UserSelectorComponent implements OnInit {
-
+  newUser: User | null = null;
   constructor(
-    public appState: AppStateService,
     public service: UserService,
   ) { }
 
@@ -20,15 +18,23 @@ export class UserSelectorComponent implements OnInit {
     }
   }
 
-  selectUser(user: User) {
+  select(user: User) {
+    // navigation terminates the creation of a new user with extreme prejudice
+    this.newUser = null;
     this.service.select(user);
   }
 
-  addUser() {
-    this.service.createUser();
+  create() {
+    this.newUser = new User();
+  }
+  delete(user: User) {
+    this.service.delete(user);
   }
 
-  deleteUser(user: User) {
-    this.service.delete(user);
+  saveNewUser() {
+    if (this.newUser) {
+      this.service.add(this.newUser);
+      this.newUser = null;
+    }
   }
 }

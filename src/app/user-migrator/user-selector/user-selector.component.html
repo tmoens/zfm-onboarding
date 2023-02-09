@@ -1,13 +1,13 @@
 <div fxLayout="column" fxLayoutGap="10px">
-  <button mat-button (click)="addUser()" color="primary">
+  <button mat-button (click)="create()" color="primary">
     <mat-icon>add</mat-icon>
     Add a user
   </button>
-  <app-user-editor *ngIf="service.newUser" [user]="service.newUser"></app-user-editor>
-  <app-user-editor *ngIf="!service.newUser && service.selected" [user]="service.selected"></app-user-editor>
+  <app-user-editor *ngIf="newUser" mode="add" [user]="newUser" (onUserCreated)="saveNewUser()"></app-user-editor>
+  <app-user-editor *ngIf="!newUser && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
   <mat-divider></mat-divider>
   <mat-selection-list #users *ngIf="service.list" dense [multiple]="false"
-                      (selectionChange)="selectUser(users.selectedOptions.selected[0]?.value)">
+                      (selectionChange)="select(users.selectedOptions.selected[0]?.value)">
     <ng-container *ngFor="let user of service.list">
       <mat-list-option
         [value]='user'
@@ -16,7 +16,7 @@
         [class.selected]="service.selected === user">
         <div fxLayout="row">
           <div fxFlex="20px">
-            <mat-icon (click)="deleteUser(user)" color="primary">delete</mat-icon>
+            <mat-icon (click)="delete(user)" color="primary">delete</mat-icon>
           </div>
           <div fxFlex="15px">
             <mat-icon *ngIf="!user.valid" class="zf-field-boo-boo">close</mat-icon>

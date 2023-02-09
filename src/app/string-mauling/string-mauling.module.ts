@@ -8,6 +8,9 @@ import {MatInputModule} from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatchDetailsDialogComponent } from './pattern-mapper/match-details-dialog/match-details-dialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import { PatternMapperGroupComponent } from './pattern-mapper-group/pattern-mapper-group.component';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
 
 
 
@@ -16,10 +19,12 @@ import {MatDialogModule} from '@angular/material/dialog';
     StringSetComponent,
     PatternMapperComponent,
     MatchDetailsDialogComponent,
+    PatternMapperGroupComponent,
   ],
   exports: [
     StringSetComponent,
     PatternMapperComponent,
+    PatternMapperGroupComponent,
   ],
   imports: [
     CommonModule,
@@ -29,6 +34,8 @@ import {MatDialogModule} from '@angular/material/dialog';
     MatInputModule,
     MatAutocompleteModule,
     MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
   ]
 })
 export class StringMaulingModule { }

@@ -1,16 +1,26 @@
 <div fxLayout="row" fxLayoutGap="10px">
-  <div fxLayout="column" fxLayoutGap="10px">
-    <h3>Unique Tokens</h3>
-    <div *ngFor="let s of stringsAndTokens.tokens | keyvalue" >
-      {{s.key}}
-      <span *ngIf="showCount">({{s.value}})</span>
+  <div fxLayout="column" fxLayoutGap="10px" style="max-width: 250px;">
+    <h3>Unique Tokens ({{stringsAndTokens.filteredTokens.length}} of {{stringsAndTokens.tokenCount}})</h3>
+    <mat-form-field floatLabel="always">
+      <mat-label>RegExp filter</mat-label>
+      <input [formControl]="tokenFilterRegExpFC" type="text" matInput (change)="onChangeTokenRegExp()">
+      <mat-error *ngIf="tokenFilterRegExpFC.invalid">Invalid RegExp</mat-error>
+    </mat-form-field>
+    <div *ngFor="let s of stringsAndTokens.filteredTokens" >
+      {{s}}
+      <span *ngIf="showCount">({{stringsAndTokens.tokens[s]}})</span>
     </div>
   </div>
-  <div fxLayout="column" fxLayoutGap="10px">
-    <h3>Unique strings</h3>
-    <div *ngFor="let s of stringsAndTokens.strings | keyvalue" >
-      {{s.key}}
-      <span *ngIf="showCount">({{s.value}})</span>
+  <div fxLayout="column" fxLayoutGap="10px" style="max-width: 250px;">
+    <h3>Unique Strings ({{stringsAndTokens.filteredStrings.length}} of {{stringsAndTokens.stringCount}})</h3>
+    <mat-form-field floatLabel="always">
+      <mat-label>RegExp filter</mat-label>
+      <input [formControl]="stringFilterRegExpFC" type="text" matInput (change)="onChangeStringRegExp()">
+      <mat-error *ngIf="tokenFilterRegExpFC.invalid">Invalid RegExp</mat-error>
+    </mat-form-field>
+    <div *ngFor="let s of stringsAndTokens.filteredStrings" >
+      {{s}}
+      <span *ngIf="showCount">({{stringsAndTokens.strings[s]}})</span>
     </div>
   </div>
 </div>

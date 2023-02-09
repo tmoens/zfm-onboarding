@@ -14,6 +14,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
+import {UserMigratorRoutingModule} from './user-migrator-routing.module';
 
 
 
@@ -26,6 +27,7 @@ import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
     UserSelectorComponent,
   ],
   imports: [
+    UserMigratorRoutingModule,
     CommonModule,
     FlexLayoutModule,
     FlexModule,

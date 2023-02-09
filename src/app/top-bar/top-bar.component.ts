@@ -6,6 +6,7 @@ import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
 import {UserService} from '../user-migrator/user.service';
 import {interval} from 'rxjs';
+import {TgService} from '../tg-migrator/tg.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -20,6 +21,7 @@ export class TopBarComponent implements OnInit {
     public appState: AppStateService,
     public stockService: StockService,
     public userService: UserService,
+    public transgeneService: TgService,
     private router: Router,
   ) {
   }
@@ -35,11 +37,15 @@ export class TopBarComponent implements OnInit {
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
       this.stockService.loadWorksheet(inputWb);
 
-      // Now start a loop to save any patches to memory every minute
       this.userService.loadWorksheet(inputWb);
+
+      this.transgeneService.loadWorksheet(inputWb);
+
+      // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {
         this.stockService.savePatchesToLocalStorage();
         this.userService.savePatchesToLocalStorage();
+        this.transgeneService.savePatchesToLocalStorage();
       })
 
     }

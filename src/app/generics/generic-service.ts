@@ -17,13 +17,15 @@ export abstract class GenericService<T extends GenericType> {
   abstract localPatchStorageToken: string;
   abstract worksheetName: string;
   // a list of the unique names of all the items in the list.
-  // It is used in pattern mapping. A pattern mated in a text field maps to one of these unique names.
+  // It is used in pattern mapping. A pattern in a text field maps to one of these unique names.
   uniqueNames: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 
   // The set of problems we run into loading items from the worksheet.
   // These are not specific to any one item, but more about the problems with
   // the sheet as a whole.
   loadingProblems: string[] = [];
+
+
 
   private _selected: T | null = null;
   get selected(): T | null {
@@ -119,6 +121,13 @@ export abstract class GenericService<T extends GenericType> {
     }
   }
 
+
+  add(newItem: T): void {
+    this.list.push(newItem);
+    this.select(newItem);
+  }
+
+
   refreshUniqueNames() {
     const uniqueNames: string[] = [];
     this.list.map((item: T) => uniqueNames.push(item.uniqueName));
@@ -179,6 +188,37 @@ export abstract class GenericService<T extends GenericType> {
     }
   }
 
+  movePatternMapper(pm: PatternMapper, direction : 'up' | 'down' | 'top' | 'bottom' | number) {
+    const index = this.patternMappers.value.indexOf(pm);
+    const pms = this.patternMappers.value;
+    // it only makes sense to proceed if the pm actually is in the list and there are at least two items in the list
+    if (index > -1 && pms.length > 1) {
+      pms.splice(index,1);
+      const endIndex = pms.length -1;
+      let targetIndex = 0;
+      switch (direction) {
+        case 'top':
+          targetIndex = 0;
+          break;
+        case 'bottom':
+          targetIndex = endIndex + 1;
+          break;
+        case 'up':
+          targetIndex = index - 1;
+          break;
+        case 'down':
+          targetIndex = index + 1;
+          break;
+        default:
+          targetIndex = index + direction;
+      }
+      if (targetIndex < 0) {targetIndex = 0}
+      if (targetIndex > endIndex + 1) { targetIndex = endIndex + 1}
+      pms.splice(targetIndex, 0, pm);
+      this.saveAndExportPatternMappers();
+    }
+  }
+
   saveAndExportPatternMappers() {
     const plainPatterns: any[] = [];
     this._patternMappers.map((pm: PatternMapper) => {
@@ -192,5 +232,7 @@ export abstract class GenericService<T extends GenericType> {
   exportPatternMappers() {
     this.patternMappers.next(this._patternMappers);
   }
+
+
 
 }

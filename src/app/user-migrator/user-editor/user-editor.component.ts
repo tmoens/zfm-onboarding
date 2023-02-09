@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {User, ValidateUserRoleFC} from '../user';
 import {UserService} from '../user.service';
 import {ValidatorFn, Validators} from '@angular/forms';
@@ -12,16 +12,11 @@ import {uniquenessValidatorFC} from '../../generics/validators/uniqueness.valida
 export class UserEditorComponent implements OnInit {
   private _user: User | null = null;
 
-  public mode: 'edit' | 'add' = 'edit';
+  @Input() mode: 'edit' | 'add' = 'edit';
 
   @Input() set user(user: User | null) {
     if (user) {
       this._user = user;
-      if (user.name.original === '') {
-        this.mode = 'add';
-      } else {
-        this.mode = 'edit'
-      }
       this.nameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'name')]
       this.usernameValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'username')]
       this.initialsValidators = [Validators.required, uniquenessValidatorFC(this.service, this.user, 'initials')]
@@ -31,6 +26,8 @@ export class UserEditorComponent implements OnInit {
     return this._user;
   }
 
+  @Output()
+  onUserCreated: EventEmitter<string> = new EventEmitter<string>();
   nameValidators: ValidatorFn[] = [];
   usernameValidators: ValidatorFn[] = [];
   initialsValidators: ValidatorFn[] = [];
@@ -44,7 +41,7 @@ export class UserEditorComponent implements OnInit {
 
 
   constructor(
-    protected service: UserService,
+    private service: UserService,
   ) {
   }
 
@@ -52,8 +49,8 @@ export class UserEditorComponent implements OnInit {
   }
 
   onSave() {
-    if (this.user) {
-      this.service.addUser();
+    if (this.user && this.user.valid) {
+      this.onUserCreated.emit('user created');
     }
   }
 

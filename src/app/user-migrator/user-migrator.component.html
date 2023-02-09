@@ -16,25 +16,7 @@
           <h3>Residual</h3>
           <app-string-set [uniqueStringsAndTokens]="residualStrings" [showCount]="false"></app-string-set>
         </div>
-        <div fxLayout="column" fxLayoutGap="10px">
-          <button mat-button (click)="userService.createPatternMapper()" color="primary">
-            <mat-icon>add</mat-icon>
-            Add pattern mapper
-          </button>
-
-          <!-- All the patterns that map from strings to specific users -->
-          <ng-container *ngFor="let pm of patternMappers">
-            <div fxLayout="row" fxLayoutGap="10px">
-              <mat-icon (click)="userService.deletePatternMapper(pm)" color="primary">delete</mat-icon>
-              <app-pattern-mapper
-                [patternMapper]="pm"
-                [targetType]="targetType"
-                [mappingTargetsSource]="userService.uniqueNames"
-                (onChange)="onChange(pm)">
-              </app-pattern-mapper>
-            </div>
-          </ng-container>
-        </div>
+        <app-pattern-mapper-group [service]="userService"></app-pattern-mapper-group>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
