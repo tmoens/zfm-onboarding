@@ -10,6 +10,9 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatListModule} from '@angular/material/list';
 import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
 import {SharedModule} from '../shared/shared.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
 
 
 
@@ -31,6 +34,9 @@ import {SharedModule} from '../shared/shared.module';
     MatDividerModule,
     MatListModule,
     StockMigratorModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatInputModule,
   ]
 })
 export class TgMigratorModule { }

@@ -101,7 +101,7 @@ export class StockService extends GenericService<Stock> {
   // validation is performed, but not the validation of relationships between stocks.
   // For example, it will note that "123.xyz" is not a valid stock number, but will not
   // know that the mom "23.46" does not exist.
-  override loadItems(rawStocks: JsonForExcel[]) {
+  override loadJsonItems(rawStocks: JsonForExcel[]) {
     let row = 2; // The first stock is on row 2 of the worksheet.
     for (let rawStock of rawStocks) {
 
@@ -144,7 +144,7 @@ export class StockService extends GenericService<Stock> {
 
 
 
-  override afterLoadWorksheet() {
+  override afterLoadingFromWorkbook() {
     this.refreshStringsAndTokens();
 
     // Once they are all loaded and patched, validate them.

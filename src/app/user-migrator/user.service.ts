@@ -15,7 +15,7 @@ export class UserService extends GenericService<User>{
   localPatchStorageToken = 'userPatches';
   worksheetName = 'users';
 
-  override loadItems(usersFromWorksheet: JsonForExcel[]) {
+  override loadJsonItems(usersFromWorksheet: JsonForExcel[]) {
     for (const rawUser of usersFromWorksheet) {
       const user = new User();
       user.datafillFromJson(rawUser);

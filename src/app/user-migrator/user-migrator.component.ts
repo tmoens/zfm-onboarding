@@ -13,7 +13,6 @@ import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-string
 })
 export class UserMigratorComponent implements OnInit {
   patternMappers: PatternMapper[] = [];
-  targetType = "username";
   rawStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   constructor(
@@ -35,9 +34,6 @@ export class UserMigratorComponent implements OnInit {
     });
   }
 
-  onChange(pm: PatternMapper) {
-    this.userService.saveAndExportPatternMappers();
-  }
   // This is where the work happens
   doPatternMatching() {
     // Clear the existing results and start from scratch;
@@ -45,7 +41,7 @@ export class UserMigratorComponent implements OnInit {
     for (const s of Object.keys(this.rawStrings.strings)) {
       let residual: string = s;
       for (const pm of this.patternMappers) {
-        residual = pm.removeMatches(residual);
+        residual = pm.removedMatchedBitsFromString(residual);
       }
       this.residualStrings.addString(residual);
     }

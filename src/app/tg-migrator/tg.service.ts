@@ -15,12 +15,22 @@ export class TgService extends GenericService<Tg>{
   localPatchStorageToken = 'tgPatches';
   worksheetName = 'transgenes';
 
-  override loadItems(itemsFromWorksheet: JsonForExcel[]) {
+  override loadJsonItems(itemsFromWorksheet: JsonForExcel[]) {
     for (const jsonTg of itemsFromWorksheet) {
       const tg = new Tg();
       tg.datafillFromJson(jsonTg);
       this.list.push(tg);
     }
     this.loadPatchesFromLocalStorage();
+  }
+
+  override sortList() {
+    this.list.sort((tg1: Tg, tg2: Tg) => {
+      if (tg1.descriptor > tg2.descriptor) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
   }
 }

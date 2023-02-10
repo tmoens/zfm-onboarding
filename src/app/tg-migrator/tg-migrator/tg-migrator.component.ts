@@ -20,7 +20,7 @@ export class TgMigratorComponent implements OnInit {
     public stockService: StockService,
     public service: TgService,
   ) {
-    this.appState.setActiveTool(ZFTool.USER_MIGRATOR);
+    this.appState.setActiveTool(ZFTool.TRANSGENE_MIGRATOR);
   }
 
   ngOnInit() {
@@ -44,7 +44,7 @@ export class TgMigratorComponent implements OnInit {
     for (const s of Object.keys(this.rawStrings.strings)) {
       let residual: string = s;
       for (const pm of this.patternMappers) {
-        residual = pm.removeMatches(residual);
+        residual = pm.removedMatchedBitsFromString(residual);
       }
       this.residualStrings.addString(residual, this.rawStrings.strings[s]);
     }

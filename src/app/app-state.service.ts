@@ -53,14 +53,16 @@ export class AppStateService {
   }
 
   setState(name: string, value: any, persist: boolean = false): void {
-    if (persist) {
-      if (this.persistedStates.indexOf(name) === -1) {
-        this.persistedStates.push(name);
-        this.localStorage.set(PERSISTED_STATES, this.persistedStates)
+    if (name) {
+      if (persist) {
+        if (this.persistedStates.indexOf(name) === -1) {
+          this.persistedStates.push(name);
+          this.localStorage.set(PERSISTED_STATES, this.persistedStates)
+        }
+        this.localStorage.set(name, value);
       }
-      this.localStorage.set(name, value);
+      this.state.set(name, value);
     }
-    this.state.set(name, value);
   }
 
   deleteState(name:string): void {

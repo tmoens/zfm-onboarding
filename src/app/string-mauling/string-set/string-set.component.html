@@ -6,9 +6,9 @@
       <input [formControl]="tokenFilterRegExpFC" type="text" matInput (change)="onChangeTokenRegExp()">
       <mat-error *ngIf="tokenFilterRegExpFC.invalid">Invalid RegExp</mat-error>
     </mat-form-field>
-    <div *ngFor="let s of stringsAndTokens.filteredTokens" >
-      {{s}}
-      <span *ngIf="showCount">({{stringsAndTokens.tokens[s]}})</span>
+    <div *ngFor="let s of stringsAndTokens.filteredTokensOrderedByFrequency" >
+      {{s.string}}
+      <span *ngIf="showCount">({{s.frequency}})</span>
     </div>
   </div>
   <div fxLayout="column" fxLayoutGap="10px" style="max-width: 250px;">
@@ -18,9 +18,9 @@
       <input [formControl]="stringFilterRegExpFC" type="text" matInput (change)="onChangeStringRegExp()">
       <mat-error *ngIf="tokenFilterRegExpFC.invalid">Invalid RegExp</mat-error>
     </mat-form-field>
-    <div *ngFor="let s of stringsAndTokens.filteredStrings" >
-      {{s}}
-      <span *ngIf="showCount">({{stringsAndTokens.strings[s]}})</span>
+    <div *ngFor="let s of stringsAndTokens.filteredStingsOrderedByFrequency" >
+      {{s.string}}
+      <span *ngIf="showCount">({{s.frequency}})</span>
     </div>
   </div>
 </div>

@@ -16,8 +16,12 @@ export class PatternMapper {
   matches: {[index: string]: string[]} = {};
   @Exclude()
   matchCount = 0;
+  // regexp without the global flag
   @Exclude()
   regExp: RegExp | null = null;
+  // regexp with the global flag for replacements.
+  @Exclude()
+  gRegExp: RegExp | null = null;
 
   set regExpString(regExpString: string) {
     this._regExpString = regExpString;
@@ -30,8 +34,10 @@ export class PatternMapper {
   makeRegExpFromString() {
     try {
       this.regExp = new RegExp(this.regExpString, 'i');
+      this.gRegExp = new RegExp(this.regExpString, 'gi');
     } catch (e) {
       this.regExp = null;
+      this.gRegExp = null;
     }
   }
 
@@ -41,20 +47,16 @@ export class PatternMapper {
   }
 
   // remove any matches of this regExp pattern in a string returning a residual string
-  removeMatches(s: string): string {
-    if (this.regExp) {
-      const matches = s.match(this.regExp);
+  removedMatchedBitsFromString(s: string): string {
+    if (this.gRegExp) {
+      const matches = s.match(this.gRegExp);
       if (matches) {
         for (const match of matches) {
-          if (this.matches[s]) {
-            this.matches[s].push(match);
-          } else {
-            this.matches[s] = [match];
-          }
+          this.matches[s] = [match];
         }
       }
       this.matchCount = Object.keys(this.matches).length;
-      return  s.replace(this.regExp, '');
+      return  s.replace(this.gRegExp, '');
     } else {
       return s;
     }
@@ -72,6 +74,8 @@ export class PatternMapper {
     // This just in.  This is known to happen if the regexp has a 'g' flag because
     // blah blah blah.  For now, I removed the 'g' flag when creating the regExp.
     // if (s.match(this.regExp)) {
+    // Followed by further wtfageness. I cannot leave out the 'g' flag for further
+    // operations.  So I have now got two versions of the regExp.
     if (this.regExp.test(s)) {
       return this.target;
     }

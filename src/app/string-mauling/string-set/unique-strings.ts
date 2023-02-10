@@ -48,7 +48,7 @@ export class UniqueStringsAndTokens {
       this.tokens[s] = 1;
     }
   }
-    get stringCount(): number {
+  get stringCount(): number {
     return Object.keys(this.strings).length;
   }
   get tokenCount(): number {
@@ -63,6 +63,7 @@ export class UniqueStringsAndTokens {
     } else {
       this.filteredStrings = Object.keys(this.strings);
     }
+
   }
 
   setTokenFilter(regExp?: RegExp) {
@@ -75,5 +76,72 @@ export class UniqueStringsAndTokens {
     }
   }
 
+  get filteredStingsOrderedByFrequency(): StringFrequency[] {
+    return this.filteredStrings.map((s: string) => {
+      return new StringFrequency(s, this.strings[s]);
+    }).sort((sf1: StringFrequency, sf2: StringFrequency): number => {
+      if (sf1.frequency < sf2.frequency) {
+        return 1;
+      }
+      if (sf1.frequency > sf2.frequency) {
+        return -1;
+      }
+      if (sf1.string < sf2.string) {
+        return 1;
+      }
+      if (sf1.string > sf2.string) {
+        return -1;
+      }
+      return 0;
+    })
+  }
+  get filteredTokensOrderedByFrequency(): StringFrequency[] {
+    return this.filteredTokens.map((s: string) => {
+      return new StringFrequency(s, this.tokens[s]);
+    }).sort((sf1: StringFrequency, sf2: StringFrequency): number => {
+      if (sf1.frequency < sf2.frequency) {
+        return 1;
+      }
+      if (sf1.frequency > sf2.frequency) {
+        return -1;
+      }
+      if (sf1.string < sf2.string) {
+        return 1;
+      }
+      if (sf1.string > sf2.string) {
+        return -1;
+      }
+      return 0;
+    })
+  }
+  get filteredStingsOrderedByString(): StringFrequency[] {
+    return this.filteredStrings.sort((s1, s2) => {
+      if (s1 > s2) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }).map((s: string) => {
+      return new StringFrequency(s, this.strings[s]);
+    })
+  }
+  get filteredTokensOrderedByString(): StringFrequency[] {
+    return this.filteredTokens.sort((s1, s2) => {
+      if (s1 > s2) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }).map((s: string) => {
+      return new StringFrequency(s, this.tokens[s]);
+    })
+  }
 
+}
+
+export class StringFrequency {
+  constructor(
+    public string: string,
+    public frequency: number,
+  ) {}
 }

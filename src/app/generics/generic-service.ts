@@ -44,7 +44,25 @@ export abstract class GenericService<T extends GenericType> {
   ) {
   }
 
-  loadWorksheet(wb: XLSX.WorkBook): void {
+  // makes sense to override this function for some lists, not for stocks, though.
+  sortList() {}
+  loadFromWorkbook(wb: XLSX.WorkBook): void {
+    this.loadItemsFromWorkBook(wb);
+
+    // Load all the "in progress" patches from local storage.
+    this.loadPatchesFromLocalStorage();
+
+    this.refreshUniqueNames();
+
+    this._patternMappers = [];
+    this.loadPatternMappersFromLocalStorage();
+    this.loadPatternMappersFromWorkbook(wb);
+    this.exportPatternMappers();
+
+    this.afterLoadingFromWorkbook();
+  }
+
+  loadItemsFromWorkBook(wb: XLSX.WorkBook) {
     this.list = [];
     const ws = wb.Sheets[this.worksheetName];
     if (!ws) {
@@ -53,23 +71,14 @@ export abstract class GenericService<T extends GenericType> {
     }
 
     // Create all the items of type T.
-    this.loadItems(XLSX.utils.sheet_to_json(ws));
+    this.loadJsonItems(XLSX.utils.sheet_to_json(ws));
 
-    // Load all the "in progress" patches from local storage.
-    this.loadPatchesFromLocalStorage();
-
-    this.refreshUniqueNames();
-
-    this.loadPatternMappers();
-
-    this.afterLoadWorksheet();
+    this.sortList();
   }
 
   // Give derived classes a hook to do something after loading a worksheet.
-  afterLoadWorksheet() : void {
-
-  }
-  abstract loadItems(itemsFromWorksheet: JsonForExcel[]): void;
+  afterLoadingFromWorkbook() : void {}
+  abstract loadJsonItems(itemsFromWorksheet: JsonForExcel[]): void;
   loadPatchesFromLocalStorage(): void {
     // Load them up from local storage.
     const previouslyStoredPatches: { [index: string]: ObjectPatch } =
@@ -95,6 +104,36 @@ export abstract class GenericService<T extends GenericType> {
     this.savePatchesToLocalStorage();
   }
 
+  loadPatternMappersFromLocalStorage() {
+    this._patternMappers = [];
+    const jsonPatternMappers = this.appState.getState(this.localPatternMapperStorageToken);
+    if (jsonPatternMappers) {
+      this.loadJsonPatterns(jsonPatternMappers)
+    }
+  }
+
+  loadPatternMappersFromWorkbook(wb: XLSX.WorkBook) {
+    const ws = wb.Sheets[`${this.worksheetName}-patterns`];
+    if (ws) {
+      const jsonPatternMappers: JsonForExcel[] = XLSX.utils.sheet_to_json(ws);
+      if (jsonPatternMappers) {
+        this.loadJsonPatterns(jsonPatternMappers);
+      }
+    }
+  }
+
+  loadJsonPatterns(jsonPatterns: JsonForExcel[]) {
+    jsonPatterns.map((plainPattern: any) => {
+      const pm: PatternMapper = plainToInstance(PatternMapper, plainPattern);
+      pm.makeRegExpFromString(); // for full reconstitution of the pm
+      const existingPm = this._patternMappers.find((existingPm: PatternMapper) =>
+         existingPm.regExpString === pm.regExpString
+      )
+      if  (!existingPm) {
+        this._patternMappers.push(pm);
+      }
+    })
+  }
 
   // TODO Add extra fields from "originalObject"
   exportWorksheet(wb: XLSX.WorkBook) {
@@ -141,6 +180,7 @@ export abstract class GenericService<T extends GenericType> {
   addItem(newItem: T): void {
     this.list.push(newItem);
     this.selectItem(newItem);
+    this.sortList();
   }
 
 
@@ -176,19 +216,6 @@ export abstract class GenericService<T extends GenericType> {
   addPatternMapper(pm: PatternMapper) {
     this._patternMappers.push(pm);
     this.saveAndExportPatternMappers();
-  }
-
-  loadPatternMappers() {
-    this._patternMappers = [];
-    const storedPlainPatterns = this.appState.getState(this.localPatternMapperStorageToken);
-    if (storedPlainPatterns) {
-      storedPlainPatterns.map((plainPattern: any) => {
-        const pm: PatternMapper = plainToInstance(PatternMapper, plainPattern);
-        pm.makeRegExpFromString();
-        this._patternMappers.push(pm);
-      })
-    }
-    this.exportPatternMappers();
   }
 
   createPatternMapper() {

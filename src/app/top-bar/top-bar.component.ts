@@ -33,11 +33,11 @@ export class TopBarComponent implements OnInit {
     reader.onload = (e: any) => {
       const binaryString: string = e.target.result;
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
-      this.stockService.loadWorksheet(inputWb);
+      this.stockService.loadFromWorkbook(inputWb);
 
-      this.userService.loadWorksheet(inputWb);
+      this.userService.loadFromWorkbook(inputWb);
 
-      this.transgeneService.loadWorksheet(inputWb);
+      this.transgeneService.loadFromWorkbook(inputWb);
 
       // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {

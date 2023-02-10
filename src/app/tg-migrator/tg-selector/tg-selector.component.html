@@ -6,9 +6,14 @@
   <app-tg-editor *ngIf="newItem" mode="add" [tg]="newItem" (onTgCreated)="saveNewTg()"></app-tg-editor>
   <app-tg-editor *ngIf="!newItem && service.selected" mode="edit" [tg]="service.selected"></app-tg-editor>
   <mat-divider></mat-divider>
+  <mat-form-field floatLabel="always">
+    <mat-label>Filter (regExp)</mat-label>
+    <input [formControl]="filterRegExpFC" type="text" matInput (change)="onChangeFilterRegExp()">
+    <mat-error *ngIf="filterRegExpFC.invalid">Invalid RegExp</mat-error>
+  </mat-form-field>
   <mat-selection-list #items *ngIf="service.list" dense [multiple]="false"
                       (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let tg of service.list">
+    <ng-container *ngFor="let tg of filteredList">
       <mat-list-option
         [value]='tg'
         [selected]="service.selected === tg"
