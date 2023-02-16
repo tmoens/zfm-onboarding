@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Tg} from '../tg';
 import {TgService} from '../tg.service';
-import {FormControl} from '@angular/forms';
-import {regularExpressionStringValidator} from '../../string-mauling/pattern-mapper/pattern-mapper';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-tg-selector',
@@ -11,18 +10,18 @@ import {regularExpressionStringValidator} from '../../string-mauling/pattern-map
 export class TgSelectorComponent implements OnInit {
 
   filteredList: Tg[] = [];
-  filterRegExpFC: FormControl = new FormControl (null, [regularExpressionStringValidator()]);
   newItem: Tg | null = null;
+
+  @Input() filteredListInput: BehaviorSubject<Tg[]> = new BehaviorSubject<Tg[]>([]);
   constructor(
     public service: TgService,
   ) { }
 
 
   ngOnInit(): void {
-    this.filteredList = this.service.list;
-    if (this.service.list.length > 0) {
-      this.service.selectItem(this.service.list[0]);
-    }
+    this.filteredListInput.subscribe((tgs: Tg[]) => {
+      this.filteredList = tgs;
+    })
   }
 
   select(user: Tg) {
@@ -38,19 +37,14 @@ export class TgSelectorComponent implements OnInit {
     this.service.deleteItem(user);
   }
 
-  saveNewTg() {
+  saveNewItem() {
     if (this.newItem) {
       this.service.addItem(this.newItem);
       this.newItem = null;
     }
   }
-  onChangeFilterRegExp() {
-    if (this.filterRegExpFC.valid) {
-      const regExp: RegExp = new RegExp(this.filterRegExpFC.value, 'i');
-      this.filteredList = this.service.list.filter((tg: Tg) => {
-        return (regExp.test(tg.descriptor.current) || regExp.test(tg.allele.current));
-      })
-    }
+  regExpFilterChange(regExp: RegExp) {
+    this.service.regExpFilter = regExp;
   }
 
 }

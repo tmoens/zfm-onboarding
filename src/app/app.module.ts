@@ -28,6 +28,7 @@ import {StringMaulingModule} from './string-mauling/string-mauling.module';
 import {MatIconModule} from '@angular/material/icon';
 import {TgMigratorComponent} from './tg-migrator/tg-migrator/tg-migrator.component';
 import {TgMigratorModule} from './tg-migrator/tg-migrator.module';
+import {SharedModule} from './shared/shared.module';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
@@ -65,6 +66,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     StringMaulingModule,
     MatIconModule,
     AppRoutingModule,
+    SharedModule,
   ],
   providers: [
     {provide: APP_INITIALIZER,

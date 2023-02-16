@@ -1,4 +1,4 @@
-<div fxLayout="row" fxLayoutGap="10ps" #me>
+<div fxLayout="row" fxLayoutGap="10ps">
   <form>
     <div fxLayout="row" fxLayoutGap="10px">
       <mat-form-field floatLabel="always">
@@ -12,13 +12,16 @@
       </mat-form-field>
       <mat-form-field floatLabel="always">
         <mat-label>{{targetType}}</mat-label>
-        <mat-select (selectionChange)="onChangeTarget()" [formControl]="targetFC">
-          <mat-option *ngFor="let option of mappingTargets" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-select>
+        <input matInput type="text" [formControl]="targetFC" [matAutocomplete]="transgenes">
       </mat-form-field>
-      <p (mouseover)="openMatchDetailsDialog()" #foo>matches: {{patternMapper.matchCount}}</p>
+      <button [disabled]="patternMapper.matchCount < 1" mat-button (click)="openMatchDetailsDialog()" color="primary">
+        matches: {{patternMapper.matchCount}}
+      </button>
     </div>
   </form>
 </div>
+<mat-autocomplete #transgenes="matAutocomplete">
+  <mat-option *ngFor="let option of filteredMappingTargets | async" [value]="option">
+    {{option}}
+  </mat-option>
+</mat-autocomplete>

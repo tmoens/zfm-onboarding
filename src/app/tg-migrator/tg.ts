@@ -9,7 +9,7 @@ export class Tg extends GenericType{
   comment: PatchableAttr = new PatchableAttr();
 
   override get uniqueName(): string {
-    return this.descriptor.original;
+    return this.descriptor.current;
   }
 
   getPatchableAttrValue(attrName: string): string | null {

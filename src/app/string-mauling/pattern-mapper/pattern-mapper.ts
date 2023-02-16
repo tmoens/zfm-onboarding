@@ -8,9 +8,6 @@ export class PatternMapper {
   // A note about what this regular expression match is supposed to find.
   // Sometimes regular expressions can be arcane.
   comment: string = '';
-  // The thing we are trying to fine (e.g. a transgene or mutation). If the
-  // regular expression matches, it in a string, then bingo.
-  target: string = '';
 
   @Exclude()
   matches: {[index: string]: string[]} = {};
@@ -22,6 +19,10 @@ export class PatternMapper {
   // regexp with the global flag for replacements.
   @Exclude()
   gRegExp: RegExp | null = null;
+
+  // The thing we are trying to map to (e.g. a transgene or mutation). If the
+  // regular expression matches, it in a string, then bingo.
+  public target: string = '';
 
   set regExpString(regExpString: string) {
     this._regExpString = regExpString;
@@ -39,11 +40,6 @@ export class PatternMapper {
       this.regExp = null;
       this.gRegExp = null;
     }
-  }
-
-  clearResults() {
-    this.matches = {};
-    this.matchCount = 0;
   }
 
   // remove any matches of this regExp pattern in a string returning a residual string
@@ -89,8 +85,7 @@ export class PatternMapper {
 
 export function regularExpressionStringValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    try {
-      new RegExp(control.value);
+    try {new RegExp(control.value);
       return null;
     } catch {
       return {invalidRegExp: 'Fix it'};

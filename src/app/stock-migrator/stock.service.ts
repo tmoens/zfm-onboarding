@@ -68,33 +68,33 @@ export class StockService extends GenericService<Stock> {
     // There may be several stocks with no name in the stock list if the
     // raw data from the Excel sheet is bad.
     if (!stockName) return [];
-    return this.list.filter((stock) => stock.stockName.current === stockName);
+    return this._list.filter((stock) => stock.stockName.current === stockName);
   }
 
   getStockBefore(stock: Stock): Stock {
     if (stock.index === 0) {
-      return this.list[this.list.length -1];
+      return this._list[this._list.length -1];
     } else {
-      return this.list[stock.index - 1];
+      return this._list[stock.index - 1];
     }
   }
 
   getStockAfter(stock: Stock): Stock {
-    if (stock.index === this.list.length - 1) {
-      return this.list[0];
+    if (stock.index === this._list.length - 1) {
+      return this._list[0];
     } else {
-      return this.list[stock.index + 1];
+      return this._list[stock.index + 1];
     }
   }
 
   getKids(stockName: string | undefined): Stock[] {
     if (!stockName) return [];
-    return this.list.filter((stock: Stock) => (
+    return this._list.filter((stock: Stock) => (
       stock.mom.current === stockName || stock.dad.current === stockName
     ))
   }
   getStockByIndex(index: number): Stock | undefined {
-    return this.list[index];
+    return this._list[index];
   }
 
   // When a stock is loaded from a raw stock, validation all the "per attribute"
@@ -104,8 +104,6 @@ export class StockService extends GenericService<Stock> {
   override loadJsonItems(rawStocks: JsonForExcel[]) {
     let row = 2; // The first stock is on row 2 of the worksheet.
     for (let rawStock of rawStocks) {
-
-      // In the worksheet, the first stock is on row 2, but the index in the array is 0;
       const newStock = new Stock(this);
       newStock.row = row;
       row++;
@@ -118,24 +116,24 @@ export class StockService extends GenericService<Stock> {
     let filteredList: Stock[] = [];
     switch (problemArea) {
       case ('allStocks'):
-        filteredList = this.list;
+        filteredList = this._list;
         break;
       case ('allProblems'):
-        filteredList = this.list.filter((s: Stock) => !s.isValid());
+        filteredList = this._list.filter((s: Stock) => !s.isValid());
         break;
       case ('stockName'):
-        filteredList = this.list.filter((s: Stock) => !s.stockName.isValid());
+        filteredList = this._list.filter((s: Stock) => !s.stockName.isValid());
         break;
       case ('dob'):
-        filteredList = this.list.filter((s: Stock) => !s.dob.isValid());
+        filteredList = this._list.filter((s: Stock) => !s.dob.isValid());
         break;
       case ('parent'):
-        filteredList = this.list.filter((s: Stock) =>
+        filteredList = this._list.filter((s: Stock) =>
           ( !s.mom.isValid() ||
             !s.dad.isValid()));
         break;
       case ('duplicates'):
-        filteredList = this.list.filter((s: Stock) =>
+        filteredList = this._list.filter((s: Stock) =>
           ( s.hasDuplicates() ));
         break;
     }
@@ -155,7 +153,7 @@ export class StockService extends GenericService<Stock> {
   }
 
   validateAll() {
-    this.list.map((s: Stock) => s.validate());
+    this._list.map((s: Stock) => s.validate());
   }
 
   /**
@@ -163,9 +161,9 @@ export class StockService extends GenericService<Stock> {
    * and the researchers associated with each stock.
    */
   refreshStringsAndTokens() {
-    const userSandT = new UniqueStringsAndTokens();
-    const geneticsSandT = new UniqueStringsAndTokens();
-    this.list.map((s: Stock) => {
+    const userSandT = new UniqueStringsAndTokens('Original');
+    const geneticsSandT = new UniqueStringsAndTokens('Original');
+    this._list.map((s: Stock) => {
       userSandT.addString(s.researcher.current);
       geneticsSandT.addString(s.genetics.current);
     });
@@ -174,7 +172,7 @@ export class StockService extends GenericService<Stock> {
   }
 
   applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
-    this.list.map((s:Stock) => {
+    this._list.map((s:Stock) => {
       s.applyUserPatternMappers(patternMappers);
     })
   }
@@ -190,7 +188,7 @@ export class StockService extends GenericService<Stock> {
     const stockLineageDtos: JsonForExcel[] = [];
     const stockMarkerDtos: JsonForExcel[] = [];
 
-    this.list.map((stock: Stock) => {
+    this._list.map((stock: Stock) => {
       const stockImportDto: JsonForExcel = {
         name: stock.stockName.current,
         description: stock.genetics.current,

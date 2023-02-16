@@ -19,18 +19,29 @@ export class TgService extends GenericService<Tg>{
     for (const jsonTg of itemsFromWorksheet) {
       const tg = new Tg();
       tg.datafillFromJson(jsonTg);
-      this.list.push(tg);
+      // Icky - while loading items we do not use the "add" method because that triggers
+      // re-sorting, re-filtering and re-exporting data.
+      this._list.push(tg);
     }
-    this.loadPatchesFromLocalStorage();
   }
 
   override sortList() {
-    this.list.sort((tg1: Tg, tg2: Tg) => {
-      if (tg1.descriptor > tg2.descriptor) {
+    this._list.sort((tg1: Tg, tg2: Tg) => {
+      if (tg1.descriptor.current.toLowerCase() > tg2.descriptor.current.toLowerCase()) {
         return 1;
       } else {
         return -1;
       }
     })
+    this.flexList.next(this._list);
+  }
+
+  override filterList() {
+    if (this._regExpFilter) {
+      this._filteredList = this._list.filter((tg: Tg) => {
+        return (this._regExpFilter?.test(tg.descriptor.current) || this._regExpFilter?.test(tg.allele.current));
+      })
+    }
+    this.filteredList.next(this._filteredList);
   }
 }

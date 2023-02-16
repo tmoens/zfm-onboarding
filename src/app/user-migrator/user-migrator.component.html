@@ -1,6 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
   <mat-sidenav-container style="width: 100%">
-
     <mat-sidenav #selector fixedInViewport="false" mode="side" opened>
       <app-user-selector></app-user-selector>
     </mat-sidenav>
@@ -14,7 +13,7 @@
         </div>
         <div fxLayout="column" fxLayoutGap="10px">
           <h3>Residual</h3>
-          <app-string-set [uniqueStringsAndTokens]="residualStrings" [showCount]="false"></app-string-set>
+          <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
         </div>
         <app-pattern-mapper-group [service]="userService"></app-pattern-mapper-group>
       </div>

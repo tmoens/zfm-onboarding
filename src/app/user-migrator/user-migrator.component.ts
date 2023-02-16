@@ -23,6 +23,7 @@ export class UserMigratorComponent implements OnInit {
     this.appState.setActiveTool(ZFTool.USER_MIGRATOR);
   }
 
+
   ngOnInit() {
     this.userService.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
       this.patternMappers = patternMappers;

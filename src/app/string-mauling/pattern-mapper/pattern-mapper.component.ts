@@ -1,7 +1,7 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {PatternMapper, regularExpressionStringValidator} from './pattern-mapper';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable, startWith, map} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-dialog.component';
 
@@ -11,7 +11,6 @@ import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-
 
 })
 export class PatternMapperComponent implements OnInit {
-  @ViewChild('foo') public thisElement!: ElementRef;
   regExpStringFC: FormControl = new FormControl('', [Validators.required, regularExpressionStringValidator()]);
   commentFC: FormControl = new FormControl('');
   targetFC: FormControl = new FormControl('');
@@ -22,22 +21,25 @@ export class PatternMapperComponent implements OnInit {
   @Input()
   targetType: string | null = null;
   @Input()
-  mappingTargetsSource: BehaviorSubject<string[]> | null = null;
+  mappingTargetsSource!: BehaviorSubject<string[]>;
   @Output()
   onChange: EventEmitter<string> = new EventEmitter<string>();
   mappingTargets: string[] = [];
+  filteredMappingTargets: Observable<string[]> | undefined;
 
   constructor(
     public matchDetailsDialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    if (this.mappingTargetsSource) {
-      this.mappingTargetsSource.subscribe((strings: string[]) => this.mappingTargets = strings);
-    }
+    this.mappingTargetsSource.subscribe((strings: string[]) => this.mappingTargets = strings);
     this.regExpStringFC.setValue(this.patternMapper.regExpString);
     this.commentFC.setValue(this.patternMapper.comment);
     this.targetFC.setValue(this.patternMapper.target);
+    this.filteredMappingTargets = this.targetFC.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
   }
 
   onChangeRegExp() {
@@ -45,10 +47,6 @@ export class PatternMapperComponent implements OnInit {
       this.patternMapper.regExpString = this.regExpStringFC.value;
       this.onChange.emit('regExp')
     }
-  }
-  onChangeTarget() {
-    this.patternMapper.target = this.targetFC.value;
-    this.onChange.emit('target')
   }
   onChangeComment() {
     this.patternMapper.comment = this.targetFC.value;
@@ -62,7 +60,13 @@ export class PatternMapperComponent implements OnInit {
         width: '350 px',
         position: {top: top + "px", left: left + "px"},
         data: this.patternMapper.matches,
-        });
+      });
     }
   }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.mappingTargets.filter((option: string) => option.toLowerCase().includes(filterValue));
+  }
+
 }

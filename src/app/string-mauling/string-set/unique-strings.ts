@@ -11,7 +11,10 @@ export class UniqueStringsAndTokens {
   tokens: {[index: string]: number} = {}
   filteredTokens: string [] = [];
 
-  // allow a space after the Tg
+  constructor(
+    public name: string = '',
+  ) {
+  }
 
   addString(string: string, count = 1) {
     // tidy up whitespace including multiple consecutive whitespace characters
@@ -41,11 +44,11 @@ export class UniqueStringsAndTokens {
   addTokens(tokens: string[] | null, count = 1) {
     tokens?.map((token: string) => this.addToken(token, count));
   }
-  addToken(s: string, count = 0) {
+  addToken(s: string, count = 1) {
     if (this.tokens[s]) {
       this.tokens[s]++;
     } else {
-      this.tokens[s] = 1;
+      this.tokens[s] = count;
     }
   }
   get stringCount(): number {
@@ -55,26 +58,21 @@ export class UniqueStringsAndTokens {
     return Object.keys(this.tokens).length;
   }
 
-  setStringFilter(regExp?: RegExp) {
+  setFilter(regExp?: RegExp) {
     if (regExp) {
       this.filteredStrings = Object.keys(this.strings).filter((s: string) => {
         return regExp.test(s);
       })
-    } else {
-      this.filteredStrings = Object.keys(this.strings);
-    }
-
-  }
-
-  setTokenFilter(regExp?: RegExp) {
-    if (regExp) {
       this.filteredTokens = Object.keys(this.tokens).filter((s: string) => {
         return regExp.test(s);
       })
     } else {
+      this.filteredStrings = Object.keys(this.strings);
       this.filteredTokens = Object.keys(this.tokens);
     }
+
   }
+
 
   get filteredStingsOrderedByFrequency(): StringFrequency[] {
     return this.filteredStrings.map((s: string) => {

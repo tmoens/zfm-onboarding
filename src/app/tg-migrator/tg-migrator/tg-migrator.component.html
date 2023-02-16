@@ -1,13 +1,12 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
-  <app-tg-selector style="overflow-y: auto"></app-tg-selector>
+  <app-tg-selector fxFlex="20%" [filteredListInput]="service.filteredList"></app-tg-selector>
   <!-- All the strings (and tokens) in the researcher field of the raw stocks -->
-  <div fxLayout="column" fxLayoutGap="10px" >
-    <h3>Original</h3>
-    <app-string-set style="overflow-y: auto" [uniqueStringsAndTokens]="rawStrings"></app-string-set>
-  </div>
-  <div fxLayout="column" fxLayoutGap="10px">
-    <h3>Residual</h3>
-    <app-string-set style="overflow-y: auto" [uniqueStringsAndTokens]="residualStrings"></app-string-set>
+  <div fxFlex fxLayout="column" fxLayoutGap="10px" >
+    <app-reg-exp-input (onChange)="regExpChanged($event)"></app-reg-exp-input>
+    <div fxLayout="row" fxLayoutGap="10px">
+      <app-string-set [uniqueStringsAndTokens]="originalStrings"></app-string-set>
+      <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
+    </div>
   </div>
   <app-pattern-mapper-group [service]="service"></app-pattern-mapper-group>
 </div>

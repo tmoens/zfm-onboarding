@@ -3,12 +3,12 @@
     <mat-icon>add</mat-icon>
     Add a user
   </button>
-  <app-user-editor *ngIf="newUser" mode="add" [user]="newUser" (onUserCreated)="saveNewUser()"></app-user-editor>
-  <app-user-editor *ngIf="!newUser && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
+  <app-user-editor *ngIf="newItem" mode="add" [user]="newItem" (onUserCreated)="saveNewUser()"></app-user-editor>
+  <app-user-editor *ngIf="!newItem && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
   <mat-divider></mat-divider>
-  <mat-selection-list #users *ngIf="service.list" dense [multiple]="false"
+  <mat-selection-list #users dense [multiple]="false"
                       (selectionChange)="select(users.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let user of service.list">
+    <ng-container *ngFor="let user of filteredList">
       <mat-list-option
         [value]='user'
         [selected]="service.selected === user"

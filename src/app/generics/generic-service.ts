@@ -33,7 +33,17 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   // The set of items
-  list: T[] = [];
+  _list: T[] = [];
+  flexList: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
+
+  protected _filteredList: T[] = [];
+  filteredList: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
+
+  _regExpFilter: RegExp | null = null;
+  set regExpFilter(regexp: RegExp | null) {
+    this._regExpFilter = regexp;
+    this.filterList();
+  }
 
   // The set of patterns that map to instances of this type
   private _patternMappers: PatternMapper[] = [];
@@ -44,14 +54,38 @@ export abstract class GenericService<T extends GenericType> {
   ) {
   }
 
-  // makes sense to override this function for some lists, not for stocks, though.
-  sortList() {}
+  // sorting is type dependent so this should be overridden
+  sortList() {
+    this.flexList.next(this._list);
+  }
+  //  filtering is type dependent so this should be overridden
+  filterList() {
+    this._filteredList = this._list;
+    this.filteredList.next(this._filteredList);
+  }
+
+  refreshUniqueNames() {
+    const uniqueNames: string[] = [];
+    this._list.map((item: T) => uniqueNames.push(item.uniqueName));
+    this.uniqueNames.next(uniqueNames);
+  }
+
+  // In general items are loaded from a workbook. When starting out, there may be
+  // no users or mutations or transgenes in the workbook, but the tool will build
+  // them over successive sessions and save them in new versions of the workbook.
+  // So, after to the first session, there will be users, transgenes and/or mutations
+  // to load in subsequent sessions.
   loadFromWorkbook(wb: XLSX.WorkBook): void {
     this.loadItemsFromWorkBook(wb);
 
     // Load all the "in progress" patches from local storage.
+    // If these patches were not saved, they get reapplied, if they were saved,
+    // they go away from local memory.
     this.loadPatchesFromLocalStorage();
 
+    // After loading, tell anyone who is listening to our main behavior subjects
+    this.sortList();
+    this.filterList();
     this.refreshUniqueNames();
 
     this._patternMappers = [];
@@ -62,8 +96,11 @@ export abstract class GenericService<T extends GenericType> {
     this.afterLoadingFromWorkbook();
   }
 
+  // Give derived classes a hook to do something after loading a worksheet.
+  afterLoadingFromWorkbook(): void {}
+
   loadItemsFromWorkBook(wb: XLSX.WorkBook) {
-    this.list = [];
+    this._list = [];
     const ws = wb.Sheets[this.worksheetName];
     if (!ws) {
       this.loadingProblems.push(`Could not find worksheet: ${this.worksheetName}`);
@@ -72,12 +109,8 @@ export abstract class GenericService<T extends GenericType> {
 
     // Create all the items of type T.
     this.loadJsonItems(XLSX.utils.sheet_to_json(ws));
-
-    this.sortList();
   }
 
-  // Give derived classes a hook to do something after loading a worksheet.
-  afterLoadingFromWorkbook() : void {}
   abstract loadJsonItems(itemsFromWorksheet: JsonForExcel[]): void;
   loadPatchesFromLocalStorage(): void {
     // Load them up from local storage.
@@ -86,9 +119,9 @@ export abstract class GenericService<T extends GenericType> {
 
     if (previouslyStoredPatches && Object.keys(previouslyStoredPatches).length > 0) {
       // Loop through the stocks we loaded from the worksheet and apply the patches
-      for (const item of this.list) {
+      for (const item of this._list) {
         // See if there is/are patches matching on the unpatched stock name.
-        // NOTE If there ar duplicates in the stock list and a matching patch,
+        // NOTE If there ar duplicates in the list and a matching patch,
         // then the patch will be applied to all the duplicate stocks.
         // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
         item.applyPatch(previouslyStoredPatches[item.uniqueName]);
@@ -135,11 +168,10 @@ export abstract class GenericService<T extends GenericType> {
     })
   }
 
-  // TODO Add extra fields from "originalObject"
   exportWorksheet(wb: XLSX.WorkBook) {
     // export item list to a worksheet
     const itemsJson: JsonForExcel[] = [];
-    for (const item of this.list) {
+    for (const item of this._list) {
       const json: JsonForExcel | null = item.extractJsonForExcel(item.originalInstance);
       if (json) itemsJson.push(json);
     }
@@ -156,19 +188,20 @@ export abstract class GenericService<T extends GenericType> {
 
   selectItem(item: T | null) {
     // ignore the selection if the item is not in the known list of items (or empty)
-    if (item && this.list.includes(item)) {
+    if (item && this._list.includes(item)) {
       this._selected = item;
-    } else if (this.list.length > 0) {
-      this._selected = this.list[0];
+    } else if (this._list.length > 0) {
+      this._selected = this._list[0];
     } else {
       this._selected = null;
     }
   }
 
   deleteItem(item: T) {
-    const index = this.list.indexOf(item);
+    const index = this._list.indexOf(item);
     if (index >= 0) {
-      this.list.splice(index,1);
+      this._list.splice(index,1);
+      this.filterList();
       this.refreshUniqueNames();
     }
     if (item === this._selected) {
@@ -178,22 +211,19 @@ export abstract class GenericService<T extends GenericType> {
 
 
   addItem(newItem: T): void {
-    this.list.push(newItem);
+    this._list.push(newItem);
     this.selectItem(newItem);
     this.sortList();
+    this.filterList();
+    this.refreshUniqueNames();
   }
 
 
-  refreshUniqueNames() {
-    const uniqueNames: string[] = [];
-    this.list.map((item: T) => uniqueNames.push(item.uniqueName));
-    this.uniqueNames.next(uniqueNames);
-  }
 
   // Used to validate uniqueness of an attribute value.
   // Check if any item in the list *except the item we are looking at* has the proposed new value
   attrValueExistsAlready(attrName: string, itemInQuestion: T, proposedValue: string): boolean {
-    for (const u of this.list) {
+    for (const u of this._list) {
       if (u !== itemInQuestion && proposedValue === u.getPatchableAttrValue(attrName)) {
         return true;
       }
@@ -206,7 +236,7 @@ export abstract class GenericService<T extends GenericType> {
     // NOTE if there are items with duplicate names, only the patch for the
     // last one in the list will be saved.
     // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
-    for (const item of this.list) {
+    for (const item of this._list) {
       const objectPatch: ObjectPatch | null = item.extractPatch();
       if (objectPatch) objectPatches[item.uniqueName] = objectPatch;
     }
@@ -273,7 +303,4 @@ export abstract class GenericService<T extends GenericType> {
   exportPatternMappers() {
     this.patternMappers.next(this._patternMappers);
   }
-
-
-
 }

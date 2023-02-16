@@ -24,3 +24,5 @@ export class UserService extends GenericService<User>{
     this.loadPatchesFromLocalStorage();
   }
 }
+
+

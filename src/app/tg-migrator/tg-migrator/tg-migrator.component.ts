@@ -13,7 +13,7 @@ import {UniqueStringsAndTokens} from '../../string-mauling/string-set/unique-str
 export class TgMigratorComponent implements OnInit {
   patternMappers: PatternMapper[] = [];
   targetType = 'transgeneAllele';
-  rawStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
+  originalStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   constructor(
     public appState: AppStateService,
@@ -24,29 +24,29 @@ export class TgMigratorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.stockService.geneticsStrings.subscribe((sAndT: UniqueStringsAndTokens) => {
+      this.originalStrings = sAndT;
+    });
     this.service.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
       this.patternMappers = patternMappers;
       this.doPatternMatching();
     })
-    this.stockService.geneticsStrings.subscribe((sAndT: UniqueStringsAndTokens) => {
-      this.rawStrings = sAndT;
-      this.doPatternMatching();
-    });
   }
 
-  onChange(pm: PatternMapper) {
-    this.service.saveAndExportPatternMappers();
+  regExpChanged(regExp: RegExp) {
+    this.originalStrings.setFilter(regExp);
+    this.residualStrings.setFilter(regExp);
   }
   // This is where the work happens
   doPatternMatching() {
     // Clear the existing results and start from scratch;
-    this.residualStrings = new UniqueStringsAndTokens();
-    for (const s of Object.keys(this.rawStrings.strings)) {
+    this.residualStrings = new UniqueStringsAndTokens('Residual');
+    for (const s of Object.keys(this.originalStrings.strings)) {
       let residual: string = s;
       for (const pm of this.patternMappers) {
         residual = pm.removedMatchedBitsFromString(residual);
       }
-      this.residualStrings.addString(residual, this.rawStrings.strings[s]);
+      this.residualStrings.addString(residual, this.originalStrings.strings[s]);
     }
   }
 }
