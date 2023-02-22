@@ -71,7 +71,8 @@ export class PatternMapper {
     // blah blah blah.  For now, I removed the 'g' flag when creating the regExp.
     // if (s.match(this.regExp)) {
     // Followed by further wtfageness. I cannot leave out the 'g' flag for further
-    // operations.  So I have now got two versions of the regExp.
+    // operations because sometimes a pattern will matche more than once in a given string.
+    // So I have now got two versions of the regExp.
     if (this.regExp.test(s)) {
       return this.target;
     }
@@ -79,7 +80,13 @@ export class PatternMapper {
   }
 
   get plain(): JsonForExcel {
+    this.clearResults();
     return instanceToPlain(this);
+  }
+
+  clearResults() {
+    this.matches = {};
+    this.matchCount = 0;
   }
 }
 

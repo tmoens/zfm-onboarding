@@ -1,17 +1,13 @@
-<div fxLayout="row" fxLayoutGap="10ps">
+<div fxLayout="row" fxLayoutGap="10px">
   <form>
     <div fxLayout="row" fxLayoutGap="10px">
-      <mat-form-field floatLabel="always">
-        <mat-label>RegExp</mat-label>
-        <input [formControl]="regExpStringFC" type="text" matInput (change)="onChangeRegExp()">
-        <mat-error *ngIf="regExpStringFC.invalid">Invalid RegExp</mat-error>
-      </mat-form-field>
+      <app-reg-exp-input [regExpString]="patternMapper.regExpString" (onRegExpStringChange)="onRegExpStringChange($event)"></app-reg-exp-input>
       <mat-form-field floatLabel="always">
         <mat-label>comment</mat-label>
         <input [formControl]="commentFC" type="text" matInput (change)="onChangeComment()">
       </mat-form-field>
       <mat-form-field floatLabel="always">
-        <mat-label>{{targetType}}</mat-label>
+        <mat-label>Maps to</mat-label>
         <input matInput type="text" [formControl]="targetFC" [matAutocomplete]="transgenes">
       </mat-form-field>
       <button [disabled]="patternMapper.matchCount < 1" mat-button (click)="openMatchDetailsDialog()" color="primary">

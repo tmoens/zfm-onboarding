@@ -39,7 +39,9 @@ export class TgService extends GenericService<Tg>{
   override filterList() {
     if (this._regExpFilter) {
       this._filteredList = this._list.filter((tg: Tg) => {
-        return (this._regExpFilter?.test(tg.descriptor.current) || this._regExpFilter?.test(tg.allele.current));
+        return (this._regExpFilter?.test(tg.descriptor.current) ||
+          this._regExpFilter?.test(tg.allele.current) ||
+          this._regExpFilter?.test(tg.nickname.current));
       })
     }
     this.filteredList.next(this._filteredList);

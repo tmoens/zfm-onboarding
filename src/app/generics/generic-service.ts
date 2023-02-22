@@ -244,12 +244,16 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   addPatternMapper(pm: PatternMapper) {
-    this._patternMappers.push(pm);
+    this._patternMappers.unshift(pm);
     this.saveAndExportPatternMappers();
   }
 
   createPatternMapper() {
-    this.addPatternMapper(new PatternMapper());
+    const pm = new PatternMapper();
+    if (this.selected) {
+      pm.target = this.selected.uniqueName;
+    }
+    this.addPatternMapper(pm);
   }
 
   deletePatternMapper(patternMapper: PatternMapper) {

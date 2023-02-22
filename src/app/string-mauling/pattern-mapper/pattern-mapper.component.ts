@@ -11,19 +11,14 @@ import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-
 
 })
 export class PatternMapperComponent implements OnInit {
-  regExpStringFC: FormControl = new FormControl('', [Validators.required, regularExpressionStringValidator()]);
   commentFC: FormControl = new FormControl('');
   targetFC: FormControl = new FormControl('');
 
   dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
   @Input() patternMapper!: PatternMapper;
+  @Input() mappingTargetsSource!: BehaviorSubject<string[]>;
 
-  @Input()
-  targetType: string | null = null;
-  @Input()
-  mappingTargetsSource!: BehaviorSubject<string[]>;
-  @Output()
-  onChange: EventEmitter<string> = new EventEmitter<string>();
+  @Output() onRegExpChange: EventEmitter<string> = new EventEmitter<string>();
   mappingTargets: string[] = [];
   filteredMappingTargets: Observable<string[]> | undefined;
 
@@ -33,7 +28,6 @@ export class PatternMapperComponent implements OnInit {
 
   ngOnInit(): void {
     this.mappingTargetsSource.subscribe((strings: string[]) => this.mappingTargets = strings);
-    this.regExpStringFC.setValue(this.patternMapper.regExpString);
     this.commentFC.setValue(this.patternMapper.comment);
     this.targetFC.setValue(this.patternMapper.target);
     this.filteredMappingTargets = this.targetFC.valueChanges.pipe(
@@ -42,14 +36,12 @@ export class PatternMapperComponent implements OnInit {
     );
   }
 
-  onChangeRegExp() {
-    if (this.regExpStringFC.valid) {
-      this.patternMapper.regExpString = this.regExpStringFC.value;
-      this.onChange.emit('regExp')
-    }
+  onRegExpStringChange(regExpString: string) {
+    this.patternMapper.regExpString = String(regExpString)
+    this.onRegExpChange.emit(regExpString)
   }
   onChangeComment() {
-    this.patternMapper.comment = this.targetFC.value;
+    this.patternMapper.comment = this.commentFC.value;
   }
 
   openMatchDetailsDialog(): void {
@@ -68,5 +60,4 @@ export class PatternMapperComponent implements OnInit {
     const filterValue = value.toLowerCase();
     return this.mappingTargets.filter((option: string) => option.toLowerCase().includes(filterValue));
   }
-
 }

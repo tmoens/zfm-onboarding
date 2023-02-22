@@ -17,7 +17,7 @@
       <app-pattern-mapper
         [patternMapper]="pm"
         [mappingTargetsSource]="service.uniqueNames"
-        (onChange)="onChange(pm)">
+        (onRegExpChange)="onChange(pm)">
       </app-pattern-mapper>
       <button mat-icon-button [disabled]="disableDown(i)" (click)="move(pm, 'down')" color="primary">
         <mat-icon>keyboard_arrow_down</mat-icon>

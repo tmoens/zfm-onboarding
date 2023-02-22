@@ -11,6 +11,7 @@ import {UniqueStringsAndTokens} from '../../string-mauling/string-set/unique-str
   templateUrl: './tg-migrator.component.html',
 })
 export class TgMigratorComponent implements OnInit {
+  private _regExp: RegExp | undefined;
   patternMappers: PatternMapper[] = [];
   targetType = 'transgeneAllele';
   originalStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
@@ -36,6 +37,7 @@ export class TgMigratorComponent implements OnInit {
   regExpChanged(regExp: RegExp) {
     this.originalStrings.setFilter(regExp);
     this.residualStrings.setFilter(regExp);
+    this._regExp = regExp;
   }
   // This is where the work happens
   doPatternMatching() {
@@ -47,6 +49,9 @@ export class TgMigratorComponent implements OnInit {
         residual = pm.removedMatchedBitsFromString(residual);
       }
       this.residualStrings.addString(residual, this.originalStrings.strings[s]);
+    }
+    if (this._regExp) {
+      this.residualStrings.setFilter(this._regExp);
     }
   }
 }
