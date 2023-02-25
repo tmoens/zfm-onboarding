@@ -6,7 +6,7 @@ import {BehaviorSubject} from 'rxjs';
 import {JsonForExcel} from './json-for-excel';
 import {ObjectPatch} from '../shared/patching/object-patch';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
-import {plainToInstance} from 'class-transformer';
+import {PatternMapperDto} from '../string-mauling/pattern-mapper/pattern-mapper-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,6 @@ export abstract class GenericService<T extends GenericType> {
   loadingProblems: string[] = [];
 
 
-
   private _selected: T | null = null;
   get selected(): T | null {
     return this._selected;
@@ -34,7 +33,7 @@ export abstract class GenericService<T extends GenericType> {
 
   // The set of items
   _list: T[] = [];
-  flexList: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
+  list: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
 
   protected _filteredList: T[] = [];
   filteredList: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
@@ -46,8 +45,8 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   // The set of patterns that map to instances of this type
-  private _patternMappers: PatternMapper[] = [];
-  patternMappers: BehaviorSubject<PatternMapper[]> = new BehaviorSubject<PatternMapper[]>([]);
+  private _patternMappers: PatternMapper<T>[] = [];
+  patternMappers: BehaviorSubject<PatternMapper<T>[]> = new BehaviorSubject<PatternMapper<T>[]>([]);
 
   constructor(
     protected appState: AppStateService
@@ -56,7 +55,7 @@ export abstract class GenericService<T extends GenericType> {
 
   // sorting is type dependent so this should be overridden
   sortList() {
-    this.flexList.next(this._list);
+    this.list.next(this._list);
   }
   //  filtering is type dependent so this should be overridden
   filterList() {
@@ -66,7 +65,7 @@ export abstract class GenericService<T extends GenericType> {
 
   refreshUniqueNames() {
     const uniqueNames: string[] = [];
-    this._list.map((item: T) => uniqueNames.push(item.uniqueName));
+    this._list.map((item: T) => uniqueNames.push(item.id));
     this.uniqueNames.next(uniqueNames);
   }
 
@@ -124,7 +123,7 @@ export abstract class GenericService<T extends GenericType> {
         // NOTE If there ar duplicates in the list and a matching patch,
         // then the patch will be applied to all the duplicate stocks.
         // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
-        item.applyPatch(previouslyStoredPatches[item.uniqueName]);
+        item.applyPatch(previouslyStoredPatches[item.id]);
       }
     }
     // once all the patches are applied, re-save them.  Why?
@@ -139,30 +138,39 @@ export abstract class GenericService<T extends GenericType> {
 
   loadPatternMappersFromLocalStorage() {
     this._patternMappers = [];
-    const jsonPatternMappers = this.appState.getState(this.localPatternMapperStorageToken);
-    if (jsonPatternMappers) {
-      this.loadJsonPatterns(jsonPatternMappers)
+    const pmDtos: PatternMapperDto[] = this.appState.getState(this.localPatternMapperStorageToken);
+    if (pmDtos) {
+      this.loadJsonPatterns(pmDtos)
     }
   }
 
   loadPatternMappersFromWorkbook(wb: XLSX.WorkBook) {
     const ws = wb.Sheets[`${this.worksheetName}-patterns`];
     if (ws) {
-      const jsonPatternMappers: JsonForExcel[] = XLSX.utils.sheet_to_json(ws);
-      if (jsonPatternMappers) {
-        this.loadJsonPatterns(jsonPatternMappers);
+      const pmDtos: PatternMapperDto[] = XLSX.utils.sheet_to_json(ws);
+      if (pmDtos) {
+        this.loadJsonPatterns(pmDtos);
       }
     }
   }
 
-  loadJsonPatterns(jsonPatterns: JsonForExcel[]) {
-    jsonPatterns.map((plainPattern: any) => {
-      const pm: PatternMapper = plainToInstance(PatternMapper, plainPattern);
-      pm.makeRegExpFromString(); // for full reconstitution of the pm
-      const existingPm = this._patternMappers.find((existingPm: PatternMapper) =>
-         existingPm.regExpString === pm.regExpString
-      )
-      if  (!existingPm) {
+  // Here we reconstitute a pattern mapper from json that was stored elsewhere.
+  // Specifically a worksheet or as an unsaved pattern in memory in the browser.
+  // In some situations you may run across a mapper for the same pattern more than once.
+  // We take the first and ignore the rest.
+  loadJsonPatterns(pmDtos: PatternMapperDto[]) {
+    pmDtos.map((pmDto: any) => {
+      const regExpString = (pmDto.regExpString) ? pmDto.regExpString as string : '';
+
+      // See if there is already a pattern mapper for this pattern
+      const existingPatternMapper = (this._patternMappers.find((existingPm: PatternMapper<T>) =>
+          existingPm.regExpString === regExpString
+      ));
+
+      // skip a pattern mapper if we already have a mapper for this pattern
+      if (!existingPatternMapper) {
+        const pm: PatternMapper<T> = new PatternMapper<T>(this);
+        pm.reconstituteFromDto(pmDto);
         this._patternMappers.push(pm);
       }
     })
@@ -238,25 +246,25 @@ export abstract class GenericService<T extends GenericType> {
     // The moral of the story - FIX DUPLICATES FIRST.  Thank you for your attention.
     for (const item of this._list) {
       const objectPatch: ObjectPatch | null = item.extractPatch();
-      if (objectPatch) objectPatches[item.uniqueName] = objectPatch;
+      if (objectPatch) objectPatches[item.id] = objectPatch;
     }
     this.appState.setState(this.localPatchStorageToken, objectPatches, true);
   }
 
-  addPatternMapper(pm: PatternMapper) {
+  addPatternMapper(pm: PatternMapper<T>) {
     this._patternMappers.unshift(pm);
     this.saveAndExportPatternMappers();
   }
 
   createPatternMapper() {
-    const pm = new PatternMapper();
-    if (this.selected) {
-      pm.target = this.selected.uniqueName;
+    const pm = new PatternMapper<T>(this);
+    if (this.selected?.id) {
+      pm.setTargetFromIdString(this.selected.id);
     }
     this.addPatternMapper(pm);
   }
 
-  deletePatternMapper(patternMapper: PatternMapper) {
+  deletePatternMapper(patternMapper: PatternMapper<T>) {
     const index = this._patternMappers.indexOf(patternMapper);
     if (index >= 0) {
       this._patternMappers.splice(index, 1);
@@ -264,7 +272,7 @@ export abstract class GenericService<T extends GenericType> {
     }
   }
 
-  movePatternMapper(pm: PatternMapper, direction : 'up' | 'down' | 'top' | 'bottom' | number) {
+  movePatternMapper(pm: PatternMapper<T>, direction : 'up' | 'down' | 'top' | 'bottom' | number) {
     const index = this.patternMappers.value.indexOf(pm);
     const pms = this.patternMappers.value;
     // it only makes sense to proceed if the pm actually is in the list and there are at least two items in the list
@@ -300,11 +308,18 @@ export abstract class GenericService<T extends GenericType> {
     this.exportPatternMappers();
   }
 
-  getJsonPatterns(): JsonForExcel[] {
-    return this._patternMappers.map((pm: PatternMapper) => { return pm.plain;})
+  getJsonPatterns(): PatternMapperDto[] {
+    return this._patternMappers.map((pm: PatternMapper<T>) => { return pm.dto;})
   }
 
   exportPatternMappers() {
     this.patternMappers.next(this._patternMappers);
+  }
+
+  findById(id: string): T | undefined {
+    if (!id) {
+      return undefined;
+    }
+    return this._list.find((item: T) => item.id === id)
   }
 }

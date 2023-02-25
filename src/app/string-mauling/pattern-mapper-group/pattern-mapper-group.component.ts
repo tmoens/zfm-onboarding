@@ -7,22 +7,18 @@ import {GenericType} from '../../generics/generic-type';
   selector: 'app-pattern-mapper-group',
   templateUrl: './pattern-mapper-group.component.html',
 })
-export class PatternMapperGroupComponent implements OnInit {
-  patternMappers: PatternMapper[] = [];
+export class PatternMapperGroupComponent<TargetType extends GenericType> implements OnInit {
+  patternMappers: PatternMapper<TargetType>[] = [];
   lastPMIndex = 0;
-  validTargets: string[] = [];
 
   @Input() service!: GenericService<GenericType>;
 
   constructor() { }
 
   ngOnInit(): void {
-    this.service.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
+    this.service.patternMappers.subscribe((patternMappers: PatternMapper<TargetType>[]) => {
       this.patternMappers = patternMappers;
       this.lastPMIndex = patternMappers.length -1;
-    })
-    this.service.uniqueNames.subscribe((targets: string[]) => {
-      this.validTargets = targets;
     })
   }
 
@@ -30,13 +26,13 @@ export class PatternMapperGroupComponent implements OnInit {
     this.service.createPatternMapper()
   }
 
-  delete(pm: PatternMapper) {
+  delete(pm: PatternMapper<TargetType>) {
     this.service.deletePatternMapper(pm);
   }
-  onChange(pm: PatternMapper) {
+  onChange(pm: PatternMapper<TargetType>) {
     this.service.saveAndExportPatternMappers();
   }
-  move(pm: PatternMapper, direction : 'up' | 'down' | 'top' | 'bottom' | number) {
+  move(pm: PatternMapper<TargetType>, direction : 'up' | 'down' | 'top' | 'bottom' | number) {
     this.service.movePatternMapper(pm, direction);
   }
   disableUp(i: number): boolean {

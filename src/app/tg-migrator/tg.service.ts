@@ -33,7 +33,7 @@ export class TgService extends GenericService<Tg>{
         return -1;
       }
     })
-    this.flexList.next(this._list);
+    this.list.next(this._list);
   }
 
   override filterList() {

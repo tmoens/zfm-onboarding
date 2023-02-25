@@ -16,7 +16,6 @@
         <mat-icon (click)="delete(pm)" color="primary">delete</mat-icon>
       <app-pattern-mapper
         [patternMapper]="pm"
-        [mappingTargetsSource]="service.uniqueNames"
         (onRegExpChange)="onChange(pm)">
       </app-pattern-mapper>
       <button mat-icon-button [disabled]="disableDown(i)" (click)="move(pm, 'down')" color="primary">

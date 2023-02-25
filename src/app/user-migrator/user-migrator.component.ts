@@ -5,6 +5,7 @@ import {ZFTool} from '../../helpers/zf-tool';
 import {UserService} from './user.service';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings';
+import {User} from './user';
 
 
 @Component({
@@ -12,7 +13,7 @@ import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-string
   templateUrl: './user-migrator.component.html',
 })
 export class UserMigratorComponent implements OnInit {
-  patternMappers: PatternMapper[] = [];
+  patternMappers: PatternMapper<User>[] = [];
   rawStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   constructor(
@@ -25,7 +26,7 @@ export class UserMigratorComponent implements OnInit {
 
 
   ngOnInit() {
-    this.userService.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
+    this.userService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
       this.patternMappers = patternMappers;
       this.doPatternMatching();
     })

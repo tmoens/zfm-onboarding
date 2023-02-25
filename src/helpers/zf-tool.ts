@@ -19,6 +19,10 @@ export class ZFTool {
     'transgene-migrator',
     ZFTypes.TRANSGENE_MIGRATOR,
     'Transgenes');
+  static readonly MUTATION_MIGRATOR  = new ZFTool(
+    'mutation-migrator',
+    ZFTypes.MUTATION_MIGRATOR,
+    'Mutations');
 
   // private to disallow creating other instances than the static ones above.
   private constructor(

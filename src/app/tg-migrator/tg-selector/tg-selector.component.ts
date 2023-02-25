@@ -24,10 +24,10 @@ export class TgSelectorComponent implements OnInit {
     })
   }
 
-  select(user: Tg) {
+  select(tg: Tg) {
     // navigation terminates the creation of a new user with extreme prejudice
     this.newItem = null;
-    this.service.selectItem(user);
+    this.service.selectItem(tg);
   }
 
   create() {

@@ -8,6 +8,9 @@ import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {GenericType} from '../generics/generic-type';
 import {JsonForExcel} from '../generics/json-for-excel';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
+import {Tg} from '../tg-migrator/tg';
+import {Mutation} from '../mutation-migrator/mutation';
+import {User} from '../user-migrator/user';
 
 // stock name look like this 121 or 4534.01 or 34.10
 // In general, some digits designating the stock number sometimes
@@ -52,7 +55,7 @@ export class Stock extends GenericType {
 
   constructor(
     private service: StockService,
-    ) {
+  ) {
     super();
   }
 
@@ -126,30 +129,48 @@ export class Stock extends GenericType {
     this.mom.setValidity(!ValidateParent(this.service, this, this.mom.current));
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
-  applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
+  applyUserPatternMappers(patternMappers: PatternMapper<User>[] = []) {
     for (const pm of patternMappers) {
-      const target: string = pm.mapStringToTarget(this.researcher.original);
+      const target: User = pm.mapStringToTarget(this.researcher.current);
       if (target) {
-        this.researcherUsername.update(target);
+        this.researcherUsername.update(target.username.current);
         // take the first match and run.
         return;
       }
     }
   }
-  applyTgPatternMappers(patternMappers: PatternMapper[] = []): string {
-    const transgenes: string[] = []
-    for (const pm of patternMappers) {
-      const target: string = pm.mapStringToTarget(this.genetics.original);
-      if (target) { transgenes.push(target)
+  applyGeneticsPatternMappers(
+    tgPatternMappers: PatternMapper<Tg>[] = [],
+    mutationPatternMappers: PatternMapper<Mutation>[] = []): string {
+    const alleles: string[] = [];
+    let geneticsString = this.genetics.current;
+
+    for (const pm of tgPatternMappers) {
+      const target: Tg = pm.mapStringToTarget(geneticsString);
+      if (target) {
+        geneticsString = pm.removedMatchedBitsFromString(geneticsString);
+        alleles.push(target.allele.current);
       }
     }
-    return transgenes.join(';');
+    for (const pm of mutationPatternMappers) {
+      const target: Mutation = pm.mapStringToTarget(geneticsString);
+      if (target) {
+        geneticsString = pm.removedMatchedBitsFromString(geneticsString);
+        alleles.push(target.allele.current);
+      }
+    }
+    return alleles.join(';');
   }
 
-  get uniqueName(): string {
+
+  get id(): string {
+    return this.stockName.current;
+  }
+  override get informalName(): string {
     return this.stockName.current;
   }
 }
+
 
 export function ValidateStockNameFC(service: StockService, stock: Stock): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

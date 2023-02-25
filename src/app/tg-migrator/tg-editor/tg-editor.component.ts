@@ -25,18 +25,12 @@ export class TgEditorComponent implements OnInit {
 
   requiredValidator: ValidatorFn[] = [Validators.required]
 
-  @Output()
-  onTgCreated: EventEmitter<string> = new EventEmitter<string>();
+  @Output() onTgCreated: EventEmitter<string> = new EventEmitter<string>();
   alleleValidators: ValidatorFn[] = [];
-
-  // TODO since the allele field is used as the "target" of pattern matching,
-  // changes to a allele should trigger changes to any matching rules that use it as a target.
-
 
   constructor(
     private service: TgService,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
   }

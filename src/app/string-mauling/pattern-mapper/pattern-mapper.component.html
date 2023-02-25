@@ -9,6 +9,7 @@
       <mat-form-field floatLabel="always">
         <mat-label>Maps to</mat-label>
         <input matInput type="text" [formControl]="targetFC" [matAutocomplete]="transgenes">
+        <mat-hint>{{targetHint}}</mat-hint>
       </mat-form-field>
       <button [disabled]="patternMapper.matchCount < 1" mat-button (click)="openMatchDetailsDialog()" color="primary">
         matches: {{patternMapper.matchCount}}
@@ -17,7 +18,7 @@
   </form>
 </div>
 <mat-autocomplete #transgenes="matAutocomplete">
-  <mat-option *ngFor="let option of filteredMappingTargets | async" [value]="option">
-    {{option}}
+  <mat-option *ngFor="let option of filteredMappingTargets | async" [value]="option.id">
+    {{option.id}}^{{option.informalName}}
   </mat-option>
 </mat-autocomplete>

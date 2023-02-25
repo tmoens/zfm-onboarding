@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
+import {UniqueStringsAndTokens} from '../../string-mauling/string-set/unique-strings';
 import {AppStateService} from '../../app-state.service';
 import {StockService} from '../../stock-migrator/stock.service';
 import {ZFTool} from '../../../helpers/zf-tool';
-import {TgService} from '../tg.service';
-import {UniqueStringsAndTokens} from '../../string-mauling/string-set/unique-strings';
+import {MutationService} from '../mutation.service';
 
 @Component({
-  selector: 'app-tg-migrator',
-  templateUrl: './tg-migrator.component.html',
+  selector: 'app-mutation-migrator',
+  templateUrl: './mutation-migrator.component.html',
 })
-export class TgMigratorComponent implements OnInit {
+export class MutationMigratorComponent implements OnInit {
   private _regExp: RegExp | undefined;
   originalStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
-    public service: TgService,
+    public service: MutationService,
   ) {
-    this.appState.setActiveTool(ZFTool.TRANSGENE_MIGRATOR);
+    this.appState.setActiveTool(ZFTool.MUTATION_MIGRATOR);
   }
 
   ngOnInit() {
@@ -37,8 +37,8 @@ export class TgMigratorComponent implements OnInit {
   }
 
   regExpChanged(regExp: RegExp) {
-    this._regExp = regExp;
     this.originalStrings.setFilter(regExp);
     this.residualStrings.setFilter(regExp);
+    this._regExp = regExp;
   }
 }

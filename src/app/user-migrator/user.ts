@@ -17,8 +17,12 @@ export class User extends GenericType{
   isResearcher: PatchableAttr = new PatchableAttr();
   isActive: PatchableAttr = new PatchableAttr();
 
-  override get uniqueName(): string {
+  override get id(): string {
     return this.username.original;
+  }
+
+  override get informalName(): string {
+    return this.name.current;
   }
 
   getPatchableAttrValue(attrName: string): string | null {

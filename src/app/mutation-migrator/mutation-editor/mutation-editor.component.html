@@ -1,0 +1,37 @@
+<div *ngIf="mutation" fxLayout="column" fxLayoutGap="5px" style="width: 200px">
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [validators]="alleleValidators"
+    [attr]="mutation.allele" label="Allele">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [validators]="requiredValidator"
+    [attr]="mutation.gene" label="Descriptor">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="mutation.source" label="Source">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="mutation.nickname" label="Nickname">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="mutation.comment" label="Comment">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="mutation.screenType" label="Screen Type">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer
+    (onChange)="onChange($event)"
+    [attr]="mutation.mutationType" label="Mutation Type">
+  </app-patchable-attr-viewer>
+  <div fxLayout="row" fxLayoutAlign="end">
+    <button *ngIf="mode === 'add'" [disabled]="!mutation.valid" mat-button (click)="onSave()" color="primary">
+      Save
+    </button>
+  </div>
+</div>

@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import {UserService} from '../user-migrator/user.service';
 import {interval} from 'rxjs';
 import {TgService} from '../tg-migrator/tg.service';
+import {MutationService} from '../mutation-migrator/mutation.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -21,6 +22,7 @@ export class TopBarComponent implements OnInit {
     public stockService: StockService,
     public userService: UserService,
     public transgeneService: TgService,
+    public mutationService: MutationService,
   ) {
   }
 
@@ -34,16 +36,16 @@ export class TopBarComponent implements OnInit {
       const binaryString: string = e.target.result;
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
       this.stockService.loadFromWorkbook(inputWb);
-
       this.userService.loadFromWorkbook(inputWb);
-
       this.transgeneService.loadFromWorkbook(inputWb);
+      this.mutationService.loadFromWorkbook(inputWb);
 
       // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {
         this.stockService.savePatchesToLocalStorage();
         this.userService.savePatchesToLocalStorage();
         this.transgeneService.savePatchesToLocalStorage();
+        this.mutationService.savePatchesToLocalStorage();
       })
 
     }
@@ -56,6 +58,7 @@ export class TopBarComponent implements OnInit {
     this.stockService.exportWorksheet(wb);
     this.userService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
+    this.mutationService.exportWorksheet(wb);
     XLSX.writeFile(wb, 'test.xlsx');
   }
 }

@@ -29,6 +29,8 @@ import {MatIconModule} from '@angular/material/icon';
 import {TgMigratorComponent} from './tg-migrator/tg-migrator/tg-migrator.component';
 import {TgMigratorModule} from './tg-migrator/tg-migrator.module';
 import {SharedModule} from './shared/shared.module';
+import {MutationMigratorComponent} from './mutation-migrator/mutation-migrator/mutation-migrator.component';
+import {MutationMigratorModule} from './mutation-migrator/mutation-migrator.module';
 
 export function appStateProviderFactory(provider: AppStateService) {
   return () => provider.initialize();
@@ -40,6 +42,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     StockMigratorComponent,
     UserMigratorComponent,
     TgMigratorComponent,
+    MutationMigratorComponent,
     TopBarComponent,
     SplashComponent,
   ],
@@ -63,6 +66,7 @@ export function appStateProviderFactory(provider: AppStateService) {
     RouterModule,
     UserMigratorModule,
     TgMigratorModule,
+    MutationMigratorModule,
     StringMaulingModule,
     MatIconModule,
     AppRoutingModule,

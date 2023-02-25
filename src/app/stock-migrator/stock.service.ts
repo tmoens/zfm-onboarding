@@ -10,6 +10,10 @@ import {AppStateService} from '../app-state.service';
 import {WorkBook} from 'xlsx';
 import * as XLSX from 'xlsx';
 import {TgService} from '../tg-migrator/tg.service';
+import {Tg} from '../tg-migrator/tg';
+import {Mutation} from '../mutation-migrator/mutation';
+import {User} from '../user-migrator/user';
+import {MutationService} from '../mutation-migrator/mutation.service';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -38,7 +42,12 @@ export class StockService extends GenericService<Stock> {
   localPatchStorageToken = 'stockPatches'
   worksheetName = 'raw-stocks'
   userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  _tgPatternMappers: PatternMapper<Tg>[] = [];
+  _mutationPatternMappers: PatternMapper<Mutation>[] = [];
   geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  // After applying transgene and mutation pattern mappers to the genetics strings,
+  // you get the residual genetics strings - the ones that still need taking care of.
+  residualGeneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
   private _stockBeingPatched: Stock | undefined;
 
@@ -53,10 +62,19 @@ export class StockService extends GenericService<Stock> {
     private appService: AppStateService,
     private userService: UserService,
     private tgService: TgService,
+    private mutationService: MutationService,
   ) {
     super(appService);
-    userService.patternMappers.subscribe((patternMappers: PatternMapper[]) => {
+    userService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
       this.applyUserPatternMappers(patternMappers);
+    })
+    tgService.patternMappers.subscribe((patternMappers: PatternMapper<Tg>[]) => {
+      this._tgPatternMappers = patternMappers;
+      this.applyGeneticsPatternMappers();
+    })
+    mutationService.patternMappers.subscribe((patternMappers: PatternMapper<Mutation>[]) => {
+      this._mutationPatternMappers = patternMappers;
+      this.applyGeneticsPatternMappers();
     })
   }
 
@@ -150,6 +168,12 @@ export class StockService extends GenericService<Stock> {
     // whether the stock has duplicates or like whether a parent exists or whether
     // a child is older than a parent.)
     this.validateAll();
+
+    // Once loaded and patched and validated, we start watching for changes.
+    this.geneticsStrings.subscribe(_ => {
+      this.applyGeneticsPatternMappers();
+    })
+
   }
 
   validateAll() {
@@ -171,10 +195,36 @@ export class StockService extends GenericService<Stock> {
     this.geneticsStrings.next(geneticsSandT);
   }
 
-  applyUserPatternMappers(patternMappers: PatternMapper[] = []) {
+  applyUserPatternMappers(patternMappers: PatternMapper<User>[] = []) {
     this._list.map((s:Stock) => {
       s.applyUserPatternMappers(patternMappers);
     })
+  }
+
+  /**
+   * Take all the "genetics" strings that describe a stock and use the mutation
+   * and transgene pattern mappers to map the strings to specific transgenes and mutations.
+   * At the same time compute what is left of the original strings once the transgene
+   * and mutation patterns have been removed.
+   *
+   * Note - this happens a lot.  Whenever a new pattern mapper is made or when they change order
+   * or when the "original" genetics strings get changed by the user.
+   */
+  applyGeneticsPatternMappers() {
+    const originalStrings: UniqueStringsAndTokens = this.geneticsStrings.value;
+    const residualStrings = new UniqueStringsAndTokens('Residual');
+    for (const s of Object.keys(originalStrings.strings)) {
+      let residual: string = s;
+      // do transgene patterns first as some mutation patterns can occur within a transgene.
+      for (const pm of this._tgPatternMappers) {
+        residual = pm.removedMatchedBitsFromString(residual);
+      }
+      for (const pm of this._mutationPatternMappers) {
+        residual = pm.removedMatchedBitsFromString(residual);
+      }
+      residualStrings.addString(residual, originalStrings.strings[s]);
+    }
+    this.residualGeneticsStrings.next(residualStrings);
   }
 
   override exportWorksheet(wb: WorkBook) {
@@ -212,7 +262,7 @@ export class StockService extends GenericService<Stock> {
       stockLineageDtos.push(stockLineageDto);
       const stockMarkerDto: JsonForExcel = {
         stockNumber: stock.stockName.current,
-        alleles: stock.applyTgPatternMappers(this.tgService.patternMappers.value),
+        alleles: stock.applyGeneticsPatternMappers(this._tgPatternMappers, this._mutationPatternMappers),
       }
       stockMarkerDtos.push(stockMarkerDto);
     })
