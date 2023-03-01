@@ -16,39 +16,26 @@ export class UniqueStringsAndTokens {
   }
 
   addString(string: string, count = 1) {
-    // tidy up whitespace including multiple consecutive whitespace characters
-    let s = string.trim();
-    s = s.replace(/\s{2,}/, ' ')
-
-    // tidy up things like "sox7 +/-" (which is really a token) to "sox7+/-" so that
-    // it does not get split into two tokens.
-    s = s.replace(/\s([+-]\/[+-])/g, '$1');
-
-    // assume that any parenthetical stuff belongs to whatever token preceded it.
-    // eg Tg (what:ever) is really Tg(what:ever)
-    // eg mstn (+/+, or +/- or -/-) is really mstn(+/+, or +/- or -/-)
-    // this runs the risk of grouping things that do not belong together in a token
-    // "mstn (sox+/-)" (whatever *that* means) becomes "mstn(sox+/-)";
-    s = s.replace(/\s(\([^)]*\))/g, '$1');
-
+    let s = string;
     if (this.strings[s]) {
       this.strings[s] = this.strings[s] + count;
     } else {
       this.strings[s] = count;
     }
 
-    // Now extract all the tokens from the cleaned up strings
+    // Now extract tokens from the strings.
 
     // extract anything that looks like tg(a:g; g:y) as a token, then erase it;
-    this.addTokens(s.match(/tg\([^)]*\)/gi), count);
-    s = s.replace(/tg\([^)]*\)/gi, '');
+    // also catch any trailing text like tg(what:ever)+/- or tg(what:ever)-L1
+    this.addTokens(s.match(/tg\([^)]*\)[^;^\s]*/gi), count);
+    s = s.replace(/tg\([^)]*\)[^;^\s]*/gi, '');
 
     // extract anything enclosed in parens at token, then erase it.
     this.addTokens(s.match(/\([^)]*\)/g), count);
     s = s.replace(/\([^)]*\)/g, '');
 
-    // finally split the thing with whitespace
-    this.addTokens(s.split(/\s+/), count);
+    // finally split the thing with whitespace or semicolon
+    this.addTokens(s.split(/[\s;]+/), count);
 
     // TODO we *could refresh the filtered list at this pont, but in practice it isn't needed
     // because all the strings are loaded before any filtering operations. Still.

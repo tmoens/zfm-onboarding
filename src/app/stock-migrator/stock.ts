@@ -97,6 +97,34 @@ export class Stock extends GenericType {
         this.dob.initialize(new Date(Date.UTC(0, 0, Number(this.dob.original) - 1)).toISOString().substring(0, 10));
       }
     }
+
+    // The string describing the genetics of a stock are often messy as they have
+    // been entered by humans who seem to be notoriously inconsistent and don't see
+    // the potential impact of using 23 different ways to write Tg(fli1a:GFP).
+    // So, here we do a little tidy up work.
+    // tidy up whitespace including multiple consecutive whitespace characters
+    let s = this.genetics.original.trim();
+    s = s.replace(/\s{2,}/, ' ')
+
+    // tidy up things like "sox7 +/-" (which is really a token) to "sox7+/-" so that
+    // it does not get split into two tokens.
+    s = s.replace(/\s([+-]\/[+-])/g, '$1');
+
+    // assume that any parenthetical stuff belongs to whatever token preceded it.
+    // e.g. Tg (what:ever) is really Tg(what:ever)
+    // e.g. mstn (+/+, or +/- or -/-) is really mstn(+/+, or +/- or -/-)
+    // this runs the risk of grouping things that do not belong together in a token
+    // "mstn (sox+/-)" (whatever *that* means) becomes "mstn(sox+/-)";
+    s = s.replace(/\s(\([^)]*\))/g, '$1');
+
+    // some few people think Tg[what:ever] looks nicer than Tg(what:ever) and so
+    // adjust nomenclature to their own sense of art and beauty.  Just makes it hard
+    // to find patterns.  Therefore:
+    s = s.replace(/Tg\[([^\]]*)]/gi, 'Tg($1)');
+
+    if (s !== this.genetics.original) {
+      this.genetics.current = s;
+    }
   }
 
   static validateStockNameSyntax(putativeName: string): boolean {
@@ -149,14 +177,18 @@ export class Stock extends GenericType {
       const target: Tg = pm.mapStringToTarget(geneticsString);
       if (target) {
         geneticsString = pm.removedMatchedBitsFromString(geneticsString);
-        alleles.push(target.allele.current);
+        if (!alleles.includes(target.allele.current)) {
+          alleles.push(target.allele.current);
+        }
       }
     }
     for (const pm of mutationPatternMappers) {
       const target: Mutation = pm.mapStringToTarget(geneticsString);
       if (target) {
         geneticsString = pm.removedMatchedBitsFromString(geneticsString);
-        alleles.push(target.allele.current);
+        if (!alleles.includes(target.allele.current)) {
+          alleles.push(target.allele.current);
+        }
       }
     }
     return alleles.join(';');
