@@ -322,4 +322,17 @@ export abstract class GenericService<T extends GenericType> {
     }
     return this._list.find((item: T) => item.id === id)
   }
+
+  getMatchesForSelected(): {[index: string]: string[]} {
+  const matches: {[index: string]: string[]} = {};
+  if (!this.selected) return matches;
+  for (const pm of this.patternMappers.value) {
+    if (pm.target === this.selected) {
+      for (const [string, matchList] of Object.entries(pm.matches)) {
+        matches[string] = matchList;
+      }
+    }
+  }
+  return matches;
+  }
 }

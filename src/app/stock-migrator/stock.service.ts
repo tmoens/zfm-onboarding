@@ -41,13 +41,15 @@ export class StockService extends GenericService<Stock> {
   localPatternMapperStorageToken = 'stockPatternMappersNotUsed' // Not used but required by GenericService
   localPatchStorageToken = 'stockPatches'
   worksheetName = 'raw-stocks'
-  userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
   _tgPatternMappers: PatternMapper<Tg>[] = [];
   _mutationPatternMappers: PatternMapper<Mutation>[] = [];
+  _userPatternMappers: PatternMapper<User>[] = [];
   geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
   // After applying transgene and mutation pattern mappers to the genetics strings,
   // you get the residual genetics strings - the ones that still need taking care of.
   residualGeneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  residualUserStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
   private _stockBeingPatched: Stock | undefined;
 
@@ -66,7 +68,8 @@ export class StockService extends GenericService<Stock> {
   ) {
     super(appService);
     userService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
-      this.applyUserPatternMappers(patternMappers);
+      this._userPatternMappers = patternMappers;
+      this.applyUserPatternMappers();
     })
     tgService.patternMappers.subscribe((patternMappers: PatternMapper<Tg>[]) => {
       this._tgPatternMappers = patternMappers;
@@ -126,7 +129,9 @@ export class StockService extends GenericService<Stock> {
       newStock.row = row;
       row++;
       newStock.datafillFromJson(rawStock);
-      this.addItem(newStock);
+      // Icky - while loading items we do not use the "add" method because that triggers
+      // re-sorting, re-filtering and re-exporting data.
+      this._list.push(newStock);
     }
   }
 
@@ -173,6 +178,9 @@ export class StockService extends GenericService<Stock> {
     this.geneticsStrings.subscribe(_ => {
       this.applyGeneticsPatternMappers();
     })
+    this.userStrings.subscribe(_ => {
+      this.applyUserPatternMappers();
+    })
 
   }
 
@@ -182,7 +190,7 @@ export class StockService extends GenericService<Stock> {
 
   /**
    * Itemize and tokenize the input strings that represent the genetics for each stock
-   * and the researchers associated with each stock.
+   * and the researchers (users) associated with each stock.
    */
   refreshStringsAndTokens() {
     const userSandT = new UniqueStringsAndTokens('Original');
@@ -195,11 +203,6 @@ export class StockService extends GenericService<Stock> {
     this.geneticsStrings.next(geneticsSandT);
   }
 
-  applyUserPatternMappers(patternMappers: PatternMapper<User>[] = []) {
-    this._list.map((s:Stock) => {
-      s.applyUserPatternMappers(patternMappers);
-    })
-  }
 
   /**
    * Take all the "genetics" strings that describe a stock and use the mutation
@@ -225,6 +228,19 @@ export class StockService extends GenericService<Stock> {
       residualStrings.addString(residual, originalStrings.strings[s]);
     }
     this.residualGeneticsStrings.next(residualStrings);
+  }
+  applyUserPatternMappers() {
+    const originalStrings: UniqueStringsAndTokens = this.userStrings.value;
+    const residualStrings = new UniqueStringsAndTokens('Residual');
+    for (const s of Object.keys(originalStrings.strings)) {
+      let residual: string = s;
+      // do transgene patterns first as some mutation patterns can occur within a transgene.
+      for (const pm of this._userPatternMappers) {
+        residual = pm.removedMatchedBitsFromString(residual);
+      }
+      residualStrings.addString(residual, originalStrings.strings[s]);
+    }
+    this.residualUserStrings.next(residualStrings);
   }
 
   override exportWorksheet(wb: WorkBook) {

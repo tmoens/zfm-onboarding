@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
-import {regularExpressionStringValidator} from '../../string-mauling/pattern-mapper/pattern-mapper';
+import {AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-reg-exp-input',
@@ -24,11 +23,21 @@ export class RegExpInputComponent implements OnInit {
           this.onRegExpChange.emit(new RegExp(this.regExpStringFC.value, 'i'));
           this.onRegExpStringChange.emit(this.regExpStringFC.value);
         } catch {
-          // because the validity test does exactly the same try/catch, this catch
-          // block should never get hit.  And if it does, fine, we just ignore
+          // because the regularExpressionStringValidator does exactly the same try/catch,
+          // this catch block should never get hit.  And if it does, fine, we just ignore
           // the failure which means no change events are triggered.
         }
       }
     })
+  }
+}
+
+export function regularExpressionStringValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    try {new RegExp(control.value);
+      return null;
+    } catch {
+      return {invalidRegExp: 'Fix it'};
+    }
   }
 }

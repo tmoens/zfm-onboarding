@@ -3,7 +3,6 @@
 // is often interested in the ones that occur the most often.
 // It also breaks each string into tokens separated by whitespace and tracks how often each appears.
 //
-import {doubleWhiteSPaceRegExp, parenRegExp, tgRegExp} from '../useful-reg-exps';
 
 export class UniqueStringsAndTokens {
   strings: {[index: string]: number} = {};
@@ -19,20 +18,34 @@ export class UniqueStringsAndTokens {
   addString(string: string, count = 1) {
     // tidy up whitespace including multiple consecutive whitespace characters
     let s = string.trim();
-    s = s.replace(doubleWhiteSPaceRegExp, ' ')
+    s = s.replace(/\s{2,}/, ' ')
+
+    // tidy up things like "sox7 +/-" (which is really a token) to "sox7+/-" so that
+    // it does not get split into two tokens.
+    s = s.replace(/\s([+-]\/[+-])/g, '$1');
+
+    // assume that any parenthetical stuff belongs to whatever token preceded it.
+    // eg Tg (what:ever) is really Tg(what:ever)
+    // eg mstn (+/+, or +/- or -/-) is really mstn(+/+, or +/- or -/-)
+    // this runs the risk of grouping things that do not belong together in a token
+    // "mstn (sox+/-)" (whatever *that* means) becomes "mstn(sox+/-)";
+    s = s.replace(/\s(\([^)]*\))/g, '$1');
+
     if (this.strings[s]) {
       this.strings[s] = this.strings[s] + count;
     } else {
       this.strings[s] = count;
     }
 
+    // Now extract all the tokens from the cleaned up strings
+
     // extract anything that looks like tg(a:g; g:y) as a token, then erase it;
-    this.addTokens(s.match(tgRegExp), count);
-    s = s.replace(tgRegExp, '');
+    this.addTokens(s.match(/tg\([^)]*\)/gi), count);
+    s = s.replace(/tg\([^)]*\)/gi, '');
 
     // extract anything enclosed in parens at token, then erase it.
-    this.addTokens(s.match(parenRegExp), count);
-    s = s.replace(parenRegExp, '');
+    this.addTokens(s.match(/\([^)]*\)/g), count);
+    s = s.replace(/\([^)]*\)/g, '');
 
     // finally split the thing with whitespace
     this.addTokens(s.split(/\s+/), count);

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import {AbstractControl, FormControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {PatternMapper} from './pattern-mapper';
 import {Observable, startWith, map} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -13,13 +13,12 @@ import {GenericType} from '../../generics/generic-type';
 })
 export class PatternMapperComponent<TargetType extends GenericType> implements OnInit {
   commentFC: FormControl = new FormControl('');
+  dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
+  mappingTargets: TargetType[] = [];
+  @Input() patternMapper!: PatternMapper<TargetType>;
   targetFC: FormControl = new FormControl('');
 
-  dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
-  @Input() patternMapper!: PatternMapper<TargetType>;
-
   @Output() onRegExpChange: EventEmitter<string> = new EventEmitter<string>();
-  mappingTargets: TargetType[] = [];
   filteredMappingTargets: Observable<TargetType[]> | undefined;
   private _targetHint: string = '';
 
@@ -30,9 +29,8 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
   ngOnInit(): void {
     this.patternMapper.service.list.subscribe((targets: TargetType[]) => this.mappingTargets = targets);
     this.commentFC.setValue(this.patternMapper.comment);
-    if (this.patternMapper.target?.id) {
-      this.targetFC.setValue(this.patternMapper.target.id);
-    }
+    this.targetFC.setValue(this.patternMapper.targetString);
+    this.targetFC.addValidators([targetValidator(this.patternMapper)]);
     this.filteredMappingTargets = this.targetFC.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value)),
@@ -54,11 +52,9 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
 
   openMatchDetailsDialog(): void {
     if (this.patternMapper.matchCount > 0) {
-      const top = 125;
-      const left = 125;
       this.dialogRef = this.matchDetailsDialog.open(MatchDetailsDialogComponent, {
         width: '350 px',
-        position: {top: top + "px", left: left + "px"},
+        height: '90%',
         data: this.patternMapper.matches,
       });
     }
@@ -70,7 +66,7 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
     } else if (this.patternMapper.target) {
       this._targetHint = this.patternMapper.target.informalName;
     } else {
-      this._targetHint = 'Unknown target';
+      this._targetHint = 'hmmmmm';
     }
   }
 
@@ -87,5 +83,21 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
         option.id.toLowerCase().includes(filterValue) || option.informalName.includes(filterValue)
       );
     }
+  }
+}
+
+function targetValidator(pm: PatternMapper<any>): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const targetIdString = control.value;
+    if (!targetIdString) {
+      return null;
+    }
+    if (pm.service.findById(targetIdString)) {
+      return null;
+    }
+    // the next line allows the target to show errors when creating the pattern mapper
+    // so if it was saved with an error, it is reconstituted with an error
+    control.markAsTouched();
+    return {unknownTarget: "Unknown Target"};
   }
 }

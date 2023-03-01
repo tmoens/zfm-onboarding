@@ -15,7 +15,7 @@
         [selected]="service.selected === tg"
         class="zf-selection-item"
         [class.selected]="service.selected === tg">
-        <div fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="spacebetween center">
           <div fxFlex="20px">
             <mat-icon (click)="delete(tg)" color="primary">delete</mat-icon>
           </div>
@@ -23,6 +23,9 @@
             <mat-icon *ngIf="!tg.valid" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>{{tg.descriptor.current}}^{{tg.allele.current}}</div>
+          <button mat-icon-button (click)="openMatchDetailsDialog(tg)" color="primary">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
         </div>
       </mat-list-option>
     </ng-container>

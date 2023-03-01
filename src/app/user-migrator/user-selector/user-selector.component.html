@@ -3,7 +3,7 @@
     <mat-icon>add</mat-icon>
     Add a user
   </button>
-  <app-user-editor *ngIf="newItem" mode="add" [user]="newItem" (onUserCreated)="saveNewUser()"></app-user-editor>
+  <app-user-editor *ngIf="newItem" mode="add" [user]="newItem" (onUserCreated)="saveNewItem()"></app-user-editor>
   <app-user-editor *ngIf="!newItem && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
   <mat-divider></mat-divider>
   <mat-selection-list #users dense [multiple]="false"
@@ -14,7 +14,7 @@
         [selected]="service.selected === user"
         class="zf-selection-item"
         [class.selected]="service.selected === user">
-        <div fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="spacebetween center">
           <div fxFlex="20px">
             <mat-icon (click)="delete(user)" color="primary">delete</mat-icon>
           </div>

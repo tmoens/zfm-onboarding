@@ -2,4 +2,4 @@
 export const tgRegExp: RegExp = new RegExp(/(tg\s?\([^)]*\))/, 'gi');
 // a regular expression to capture everything between parens as an expression
 export const parenRegExp: RegExp = new RegExp(/(\([^)]*\))/, 'gi');
-export const doubleWhiteSPaceRegExp: RegExp = new RegExp(/\s{2,}/, 'gi')
+export const doubleWhiteSpaceRegExp: RegExp = new RegExp(/\s{2,}/, 'gi')

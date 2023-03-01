@@ -1,22 +1,13 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
-  <mat-sidenav-container style="width: 100%">
-    <mat-sidenav #selector fixedInViewport="false" mode="side" opened>
-      <app-user-selector></app-user-selector>
-    </mat-sidenav>
+  <app-user-selector fxFlex="20%" [filteredListInput]="userService.filteredList"></app-user-selector>
 
-    <mat-sidenav-content>
-      <div fxLayout="row" fxLayoutGap="10px">
-        <!-- All the strings (and tokens) in the researcher field of the raw stocks -->
-        <div fxLayout="column" fxLayoutGap="10px">
-          <h3>Original</h3>
-          <app-string-set [uniqueStringsAndTokens]="rawStrings"></app-string-set>
-        </div>
-        <div fxLayout="column" fxLayoutGap="10px">
-          <h3>Residual</h3>
-          <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
-        </div>
-        <app-pattern-mapper-group [service]="userService"></app-pattern-mapper-group>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+  <!-- All the strings (and tokens) in the researcher field of the raw stocks worksheet -->
+  <div fxLayout="column" fxLayoutGap="10px">
+    <app-reg-exp-input (onRegExpChange)="regExpChanged($event)"></app-reg-exp-input>
+    <div fxLayout="row" fxLayoutGap="10px">
+      <app-string-set [uniqueStringsAndTokens]="originalStrings"></app-string-set>
+      <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
+    </div>
+  </div>
+  <app-pattern-mapper-group [service]="userService"></app-pattern-mapper-group>
 </div>

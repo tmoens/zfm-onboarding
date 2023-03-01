@@ -1,6 +1,7 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
-  <app-tg-selector fxFlex="20%" [filteredListInput]="service.filteredList"></app-tg-selector>
-  <!-- All the strings (and tokens) in the researcher field of the raw stocks -->
+  <app-tg-selector fxFlex="20%" [filteredListInput]="tgService.filteredList"></app-tg-selector>
+
+  <!-- All the strings (and tokens) in the researcher genetics column of the raw stocks worksheet -->
   <div fxFlex fxLayout="column" fxLayoutGap="10px" >
     <app-reg-exp-input (onRegExpChange)="regExpChanged($event)"></app-reg-exp-input>
     <div fxLayout="row" fxLayoutGap="10px">
@@ -8,5 +9,5 @@
       <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
     </div>
   </div>
-  <app-pattern-mapper-group [service]="service"></app-pattern-mapper-group>
+  <app-pattern-mapper-group [service]="tgService"></app-pattern-mapper-group>
 </div>

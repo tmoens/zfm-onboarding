@@ -3,19 +3,17 @@ import {AppStateService} from '../app-state.service';
 import {StockService} from '../stock-migrator/stock.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {UserService} from './user.service';
-import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings';
-import {User} from './user';
-
 
 @Component({
   selector: 'app-user-migrator',
   templateUrl: './user-migrator.component.html',
 })
 export class UserMigratorComponent implements OnInit {
-  patternMappers: PatternMapper<User>[] = [];
-  rawStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
+  private _regExp: RegExp | undefined;
+  originalStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
   residualStrings: UniqueStringsAndTokens = new UniqueStringsAndTokens();
+
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
@@ -26,26 +24,24 @@ export class UserMigratorComponent implements OnInit {
 
 
   ngOnInit() {
-    this.userService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
-      this.patternMappers = patternMappers;
-      this.doPatternMatching();
-    })
     this.stockService.userStrings.subscribe((sAndT: UniqueStringsAndTokens) => {
-      this.rawStrings = sAndT;
-      this.doPatternMatching();
+      this.originalStrings = sAndT;
+      if (this._regExp) {
+        this.originalStrings.setFilter(this._regExp)
+      }
+    });
+    this.stockService.residualUserStrings.subscribe((sAndT: UniqueStringsAndTokens) => {
+      this.residualStrings = sAndT;
+      if (this._regExp) {
+        this.residualStrings.setFilter(this._regExp)
+      }
     });
   }
 
-  // This is where the work happens
-  doPatternMatching() {
-    // Clear the existing results and start from scratch;
-    this.residualStrings = new UniqueStringsAndTokens();
-    for (const s of Object.keys(this.rawStrings.strings)) {
-      let residual: string = s;
-      for (const pm of this.patternMappers) {
-        residual = pm.removedMatchedBitsFromString(residual);
-      }
-      this.residualStrings.addString(residual);
-    }
+  regExpChanged(regExp: RegExp) {
+    this._regExp = regExp;
+    this.originalStrings.setFilter(regExp);
+    this.residualStrings.setFilter(regExp);
   }
+
 }

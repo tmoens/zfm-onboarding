@@ -2,6 +2,10 @@ import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {Mutation} from '../mutation';
 import {MutationService} from '../mutation.service';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {
+  MatchDetailsDialogComponent
+} from '../../string-mauling/pattern-mapper/match-details-dialog/match-details-dialog.component';
 
 @Component({
   selector: 'app-mutation-selector',
@@ -11,10 +15,11 @@ export class MutationSelectorComponent implements OnInit {
 
   filteredList: Mutation[] = [];
   newItem: Mutation | null = null;
-
+  dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
   @Input() filteredListInput: BehaviorSubject<Mutation[]> = new BehaviorSubject<Mutation[]>([]);
   constructor(
     public service: MutationService,
+    public matchDetailsDialog: MatDialog,
   ) { }
 
 
@@ -45,5 +50,13 @@ export class MutationSelectorComponent implements OnInit {
   }
   regExpFilterChange(regExp: RegExp) {
     this.service.regExpFilter = regExp;
+  }
+  openMatchDetailsDialog(mutation: Mutation): void {
+    this.select(mutation);
+    this.dialogRef = this.matchDetailsDialog.open(MatchDetailsDialogComponent, {
+      width: '350 px',
+      height: '90%',
+      data: this.service.getMatchesForSelected(),
+    });
   }
 }

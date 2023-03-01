@@ -16,7 +16,7 @@ export class TgMigratorComponent implements OnInit {
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
-    public service: TgService,
+    public tgService: TgService,
   ) {
     this.appState.setActiveTool(ZFTool.TRANSGENE_MIGRATOR);
   }

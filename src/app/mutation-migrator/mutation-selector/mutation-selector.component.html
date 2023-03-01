@@ -15,7 +15,7 @@
         [selected]="service.selected === mutation"
         class="zf-selection-item"
         [class.selected]="service.selected === mutation">
-        <div fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="spacebetween center">
           <div fxFlex="20px">
             <mat-icon (click)="delete(mutation)" color="primary">delete</mat-icon>
           </div>
@@ -23,6 +23,9 @@
             <mat-icon *ngIf="!mutation.valid" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>{{mutation.gene.current}}^{{mutation.allele.current}}</div>
+          <button mat-icon-button (click)="openMatchDetailsDialog(mutation)" color="primary">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
         </div>
       </mat-list-option>
     </ng-container>

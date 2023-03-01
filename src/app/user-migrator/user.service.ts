@@ -19,7 +19,9 @@ export class UserService extends GenericService<User>{
     for (const rawUser of usersFromWorksheet) {
       const user = new User();
       user.datafillFromJson(rawUser);
-      this.addItem(user);
+      // Icky - while loading items we do not use the "add" method because that triggers
+      // re-sorting, re-filtering and re-exporting data.
+      this._list.push(user);
     }
     this.loadPatchesFromLocalStorage();
   }
