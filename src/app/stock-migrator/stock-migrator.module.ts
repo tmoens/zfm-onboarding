@@ -10,7 +10,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {StockPatcherComponent } from './stock-patcher/stock-patcher.component';
 import {StockMigratorRoutingModule} from './stock-migrator-routing.module';
-import {StockSelectorComponent } from './stock-selector/stock-selector.component';
+import {StockProblemSelectorComponent } from './stock-problem-selector/stock-problem-selector.component';
 import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {StockViewerComponent } from './stock-viewer/stock-viewer.component';
@@ -21,12 +21,12 @@ import {SharedModule} from '../shared/shared.module';
 @NgModule({
   declarations: [
     StockPatcherComponent,
-    StockSelectorComponent,
+    StockProblemSelectorComponent,
     StockViewerComponent,
   ],
   exports: [
     StockPatcherComponent,
-    StockSelectorComponent,
+    StockProblemSelectorComponent,
   ],
   imports: [
     StockMigratorRoutingModule,

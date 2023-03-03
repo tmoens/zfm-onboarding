@@ -12,10 +12,21 @@ export class PatchableAttrViewerComponent implements OnInit {
     this._attr = attr;
     this.fc.setValue(this.attr?.current);
   }
-
   get attr(): PatchableAttr | null {
     return this._attr;
   }
+  private _disabled: boolean = false;
+
+  @Input() set disabled(disabled: boolean | undefined) {
+    if (disabled) {
+      this._disabled = true;
+      this.fc.disable();
+    }
+  }
+  get disabled() {
+    return this._disabled;
+  }
+
   @Input() label!: string;
   fc: FormControl = new FormControl();
   @Input() set validators(validators: ValidatorFn[]) {

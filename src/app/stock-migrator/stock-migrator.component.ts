@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {AppStateService} from '../app-state.service';
 import {StockService} from './stock.service';
 import {ZFTool} from '../../helpers/zf-tool';

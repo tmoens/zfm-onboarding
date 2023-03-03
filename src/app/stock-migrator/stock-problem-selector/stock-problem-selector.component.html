@@ -24,21 +24,20 @@
                       (selectionChange)="stockSelected(problems.selectedOptions.selected[0]?.value)">
 
     <!-- List the stocks that have problems that meet the focus criteria -->
-    <ng-container *ngFor="let s of filteredStocks">
+    <ng-container *ngFor="let s of problemStocks">
       <mat-list-option
         [value]='s'
-        [selected]="service.stockBeingPatched === s"
+        [selected]="service.selected === s"
         class="zf-selection-item"
-        [class.selected]="service.stockBeingPatched === s">
+        [class.selected]="service.selected === s">
         <div fxLayout="row">
           <div fxFlex="15px">
             <mat-icon *ngIf="!s.isValid()" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>
-            row: {{s.row}}, stock: {{(s.originalInstance) ? s.originalInstance['stockName'] : ''}}
+            row: {{s.row}}, stock: {{(s.stockName).current}}
           </div>
         </div>
-
       </mat-list-option>
     </ng-container>
   </mat-selection-list>

@@ -1,11 +1,11 @@
 <div fxLayout="row" fxLayoutGap="10px">
 
-  <div fxLayout="column" fxLayoutGap="10px" *ngIf="stock">
+  <div fxLayout="column" fxLayoutGap="10px" *ngIf="_stock">
     <div fxLayout="row" fxLayoutAlign="start center">
       <button mat-icon-button (click)="goToPrev()" color="primary">
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <h3 style="margin: 0">Patcher (row: {{stock.row}})</h3>
+      <h3 style="margin: 0">Patcher (row: {{_stock.row}})</h3>
       <button mat-icon-button (click)="goToNext()" color="primary">
         <mat-icon>navigate_next</mat-icon>
       </button>
@@ -13,70 +13,56 @@
     <!----------------------------- Stock name ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.stockName.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.stockName.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="!_stock.stockName.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.stockName.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Stock Name</mat-label>
-          <input matInput type="text" [formControl]="stockNameFC" required>
-          <mat-error *ngIf="stockNameFC.invalid">{{stockNameFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.stockName.hasChanged()" class="zf-note">
-          originally:{{stock.stockName.original}}
-        </div>
-      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Stock Name</mat-label>
+        <input matInput type="text" [formControl]="stockNameFC" required>
+        <mat-error *ngIf="stockNameFC.invalid">{{stockNameFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.stockName.hasChanged()">
+          originally:{{_stock.stockName.original}}
+        </mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- DOB ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.dob.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.dob.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="!_stock.dob.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.dob.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Fertilization date</mat-label>
-          <input matInput type="text" [formControl]="dobFC">
-          <mat-error *ngIf="dobFC.invalid">{{dobFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.dob.hasChanged()" class="zf-note">
-          originally:{{stock.dob.original}}
-        </div>
-      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Fertilization date</mat-label>
+        <input matInput type="text" [formControl]="dobFC">
+        <mat-error *ngIf="dobFC.invalid">{{dobFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.dob.hasChanged()">originally:{{_stock.dob.original}}</mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Mom ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.mom.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.mom.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="!_stock.mom.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.mom.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field floatLabel="always">
-          <mat-label>Mom</mat-label>
-          <input matInput type="text" [formControl]="momFC">
-          <mat-error *ngIf="momFC.invalid">{{momFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.mom.hasChanged()" class="zf-note">
-          originally:{{stock.mom.original}}
-        </div>
-      </div>
+      <mat-form-field floatLabel="always">
+        <mat-label>Mom</mat-label>
+        <input matInput type="text" [formControl]="momFC">
+        <mat-error *ngIf="momFC.invalid">{{momFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.mom.hasChanged()">originally:{{_stock.mom.original}}</mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Dad ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.dad.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.dad.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="!_stock.dad.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.dad.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Dad</mat-label>
-          <input matInput type="text" [formControl]="dadFC">
-          <mat-error *ngIf="dadFC.invalid">{{dadFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.dad.hasChanged()" class="zf-note">
-          originally:{{stock.dad.original}}
-        </div>
-      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Dad</mat-label>
+        <input matInput type="text" [formControl]="dadFC">
+        <mat-error *ngIf="dadFC.invalid">{{dadFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.dad.hasChanged()">originally:{{_stock.dad.original}}</mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Researcher ----------------------------------------->
     <div fxLayout="row">
@@ -87,45 +73,37 @@
           <mat-label>Researcher</mat-label>
           <input matInput type="text" [formControl]="researcherFC">
           <mat-error *ngIf="researcherFC.invalid">{{researcherFC.errors?.['invalid']}}</mat-error>
+          <mat-hint *ngIf="_stock.researcher.hasChanged()">originally:{{_stock.researcher.original}}</mat-hint>
         </mat-form-field>
-        <div *ngIf="stock.researcher.hasChanged()" class="zf-note">
-          originally:{{stock.researcher.original}}
-        </div>
       </div>
     </div>
     <!----------------------------- Entering Nursery Count ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.countEnteringNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.countEnteringNursery.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="!_stock.countEnteringNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.countEnteringNursery.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Count entering nursery</mat-label>
-          <input matInput type="number" [formControl]="countEnteringNurseryFC">
-          <mat-error *ngIf="countEnteringNurseryFC.invalid">{{countEnteringNurseryFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.countEnteringNursery.hasChanged()" class="zf-note">
-          originally:{{stock.countEnteringNursery.original}}
-        </div>
-      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Count entering nursery</mat-label>
+        <input matInput type="number" [formControl]="countEnteringNurseryFC">
+        <mat-error *ngIf="countEnteringNurseryFC.invalid">{{countEnteringNurseryFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.countEnteringNursery.hasChanged()">originally:{{_stock.countEnteringNursery.original}}</mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Leaving Nursery Count ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
-        <mat-icon *ngIf="!stock.countLeavingNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
-        <mat-icon *ngIf="stock.countLeavingNursery.isPatched()" class="zf-patched">check</mat-icon>
+        <mat-icon *ngIf="countLeavingNurseryFC.invalid" class="zf-field-boo-boo">close</mat-icon>
+        <mat-icon *ngIf="_stock.countLeavingNursery.isPatched()" class="zf-patched">check</mat-icon>
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Count leaving nursery</mat-label>
-          <input matInput type="number" [formControl]="countLeavingNurseryFC">
-          <mat-error *ngIf="countLeavingNurseryFC.invalid">{{countLeavingNurseryFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.countLeavingNursery.hasChanged()" class="zf-note">
-          originally:{{stock.countLeavingNursery.original}}
-        </div>
-      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Count leaving nursery</mat-label>
+        <input matInput type="number" [formControl]="countLeavingNurseryFC">
+        <mat-error *ngIf="countLeavingNurseryFC.invalid">{{countLeavingNurseryFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.countLeavingNursery.hasChanged()">
+          originally:{{_stock.countLeavingNursery.original}}
+        </mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Genetics ----------------------------------------->
     <div fxLayout="row">
@@ -136,40 +114,32 @@
           <mat-label>Genetics</mat-label>
           <input matInput type="text" [formControl]="geneticsFC">
           <mat-error *ngIf="geneticsFC.invalid">{{geneticsFC.errors?.['invalid']}}</mat-error>
+          <mat-hint *ngIf="_stock.genetics.hasChanged()">originally:{{_stock.genetics.original}}</mat-hint>
         </mat-form-field>
-        <div *ngIf="stock.genetics.hasChanged()" class="zf-note">
-          originally:{{stock.genetics.original}}
-        </div>
       </div>
     </div>
     <!----------------------------- Comments ----------------------------------------->
     <div fxLayout="row">
       <div fxFlex="30px">
       </div>
-      <div fxLayout="column">
-        <mat-form-field  floatLabel="always">
-          <mat-label>Comment</mat-label>
-          <input matInput type="text" [formControl]="commentFC">
-          <mat-error *ngIf="commentFC.invalid">{{commentFC.errors?.['invalid']}}</mat-error>
-        </mat-form-field>
-        <div *ngIf="stock.comment.hasChanged()" class="zf-note">
-          originally:{{stock.comment.original}}
-        </div>
-      </div>
-    </div>
-    <div>
-      putative researcher: {{stock?.researcherUsername?.current}}
+      <mat-form-field  floatLabel="always">
+        <mat-label>Comment</mat-label>
+        <input matInput type="text" [formControl]="commentFC">
+        <mat-error *ngIf="commentFC.invalid">{{commentFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.comment.hasChanged()">originally:{{_stock.comment.original}}</mat-hint>
+      </mat-form-field>
     </div>
   </div>
+  <!----------------------------- Parents and kids ----------------------------------------->
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-card *ngIf="moms.length > 0">
-      <h3>Mom(s)</h3>
+      <h3>Mom</h3>
       <mat-card-content fxLayoutGap="10px">
         <app-stock-viewer *ngFor="let mom of moms" [stock]="mom"></app-stock-viewer>
       </mat-card-content>
     </mat-card>
     <mat-card *ngIf="dads.length > 0">
-      <h3>Dad(s)</h3>
+      <h3>Dad</h3>
       <mat-card-content fxLayoutGap="10px">
         <app-stock-viewer *ngFor="let dad of dads" [stock]="dad"></app-stock-viewer>
       </mat-card-content>

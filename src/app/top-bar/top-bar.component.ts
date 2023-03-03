@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AppStateService} from '../app-state.service';
+import {AppStateService, WellKnownStates} from '../app-state.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
@@ -17,6 +17,7 @@ import {MutationService} from '../mutation-migrator/mutation.service';
 export class TopBarComponent implements OnInit {
   zfTool = ZFTool;
 
+
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
@@ -31,6 +32,9 @@ export class TopBarComponent implements OnInit {
 
   async onFileSelected(event: any) {
     const file: File = event.target?.files[0];
+    const fileName: string = file.name.replace(/ \([/d]*]\)]/, '');
+    this.appState.setState(WellKnownStates.FILENAME, fileName, true);
+
     const reader: FileReader = new FileReader();
     reader.onload = (e: any) => {
       const binaryString: string = e.target.result;
@@ -59,6 +63,6 @@ export class TopBarComponent implements OnInit {
     this.userService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
     this.mutationService.exportWorksheet(wb);
-    XLSX.writeFile(wb, 'test.xlsx');
+    XLSX.writeFile(wb, this.appState.getState(WellKnownStates.FILENAME));
   }
 }

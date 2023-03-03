@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Stock} from '../stock';
-import {Router} from '@angular/router';
-import {ZFTool} from '../../../helpers/zf-tool';
+import {StockService} from '../stock.service';
 
 @Component({
   selector: 'app-stock-viewer',
@@ -12,14 +11,13 @@ export class StockViewerComponent implements OnInit {
   @Input() stock!: Stock;
   @Input() mini: boolean = false;
   constructor(
-    private router: Router,
+    private stockService: StockService,
   ) { }
 
   ngOnInit(): void {
   }
 
   patchStock() {
-    this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + this.stock.index]).then();
+    this.stockService.selectItem(this.stock)
   }
-
 }

@@ -2,30 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import {Stock} from '../stock';
 import {AppStateService} from '../../app-state.service';
 import {StockService} from '../stock.service';
-import {Router} from '@angular/router';
-import {ZFTool} from '../../../helpers/zf-tool';
 
 const STOCK_PROBLEM_FOCUS_STATE = 'stockProblemFocusState';
 
 
 @Component({
-  selector: 'app-stock-selector',
-  templateUrl: './stock-selector.component.html',
+  selector: 'app-stock-problem-selector',
+  templateUrl: './stock-problem-selector.component.html',
 })
 
 
-export class StockSelectorComponent implements OnInit {
+export class StockProblemSelectorComponent implements OnInit {
 
-  filteredStocks: Stock[] = [];
+  problemStocks: Stock[] = [];
 
   // The stock that the user is currently patching
-  selectedStock: Stock | null = null;
   problemFocus: string | null = null;
   patched: boolean = true;
   constructor(
     public appState: AppStateService,
     public service: StockService,
-    private router: Router
   ) {
   }
 
@@ -40,14 +36,12 @@ export class StockSelectorComponent implements OnInit {
   }
 
   getFilteredStocks() {
-    this.filteredStocks = this.service.filterByProblemArea(this.problemFocus);
+    this.problemStocks = this.service.filterByProblemArea(this.problemFocus);
   }
 
 
   // When the user chooses a stock, set up the environment for patching it.
   stockSelected(stock: Stock) {
-    this.selectedStock = stock;
-    this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + stock.index]).then();
+    this.service.selectItem(stock);
   }
-
 }

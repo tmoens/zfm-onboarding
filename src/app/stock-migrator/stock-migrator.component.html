@@ -1,14 +1,4 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
-    <mat-sidenav-container style="width: 100%">
-
-      <mat-sidenav #selector fixedInViewport="false" mode="side" opened>
-        <app-stock-selector></app-stock-selector>
-      </mat-sidenav>
-
-      <mat-sidenav-content>
-        <div class="zf-tool-content">
-          <router-outlet></router-outlet>
-        </div>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+  <app-stock-problem-selector></app-stock-problem-selector>
+  <app-stock-patcher [stock]="service.selected"></app-stock-patcher>
 </div>

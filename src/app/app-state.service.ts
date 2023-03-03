@@ -7,7 +7,7 @@ export enum WellKnownStates {
   ERROR_MESSAGE_DURATION = 'emd',
   CONFIRM_MESSAGE_DURATION = 'cmd',
   FACILITY = 'facility',
-
+  FILENAME = 'filename',
 }
 
 export enum ZFToolStates {
@@ -40,6 +40,7 @@ export class AppStateService {
     this.defaults.set(WellKnownStates.ERROR_MESSAGE_DURATION, 4000);
     this.defaults.set(WellKnownStates.CONFIRM_MESSAGE_DURATION, 2000);
     this.defaults.set(WellKnownStates.FACILITY, 'test');
+    this.defaults.set(WellKnownStates.FILENAME, 'test');
   }
 
   initialize() {
