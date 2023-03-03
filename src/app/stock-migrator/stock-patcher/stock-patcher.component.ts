@@ -1,9 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {StockService} from '../stock.service';
 import {FormControl, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
 import {Stock, ValidateDobFC, ValidateParentFC, ValidateStockNameFC} from '../stock';
-import {ZFTool} from '../../../helpers/zf-tool';
 
 @Component({
   selector: 'app-stock-patcher',
@@ -35,8 +33,6 @@ export class StockPatcherComponent implements OnInit {
 
   constructor(
     public service: StockService,
-    private route: ActivatedRoute,
-    private router: Router,
   ) {
   }
 
@@ -44,7 +40,6 @@ export class StockPatcherComponent implements OnInit {
   }
 
   initialize(stock: Stock)  {
-    this.service.patchingStock(stock);
     this.stockNameFC = new FormControl(null, [Validators.required, ValidateStockNameFC(this.service, stock)]);
     this.dobFC = new FormControl(null, [Validators.required, ValidateDobFC()]);
     this.momFC = new FormControl(null, [ValidateParentFC(this.service, this._stock)]);
@@ -149,18 +144,18 @@ export class StockPatcherComponent implements OnInit {
   }
 
   goToPrev() {
-    if (this.stock) {
-      const prevStock = this.service.getStockBefore(this.stock)
+    if (this._stock) {
+      const prevStock = this.service.getStockBefore(this._stock);
       if (prevStock) {
-        this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + prevStock.index]).then();
+        this.service.selectItem(prevStock);
       }
     }
   }
   goToNext() {
-    if (this.stock) {
-      const nextStock = this.service.getStockAfter(this.stock)
+    if (this._stock) {
+      const nextStock = this.service.getStockAfter(this._stock);
       if (nextStock) {
-        this.router.navigate([ZFTool.STOCK_MIGRATOR.route + '/patch/' + nextStock.index]).then();
+        this.service.selectItem(nextStock);
       }
     }
   }

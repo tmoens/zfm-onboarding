@@ -27,9 +27,9 @@
     <ng-container *ngFor="let s of problemStocks">
       <mat-list-option
         [value]='s'
-        [selected]="service.selected === s"
+        [selected]="stockService.selected === s"
         class="zf-selection-item"
-        [class.selected]="service.selected === s">
+        [class.selected]="stockService.selected === s">
         <div fxLayout="row">
           <div fxFlex="15px">
             <mat-icon *ngIf="!s.isValid()" class="zf-field-boo-boo">close</mat-icon>
@@ -41,6 +41,4 @@
       </mat-list-option>
     </ng-container>
   </mat-selection-list>
-
-  <mat-divider></mat-divider>
 </div>

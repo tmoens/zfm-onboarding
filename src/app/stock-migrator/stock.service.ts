@@ -51,15 +51,6 @@ export class StockService extends GenericService<Stock> {
   userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
   residualUserStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
-  private _stockBeingPatched: Stock | undefined;
-
-  get stockBeingPatched(): Stock | undefined {
-    return this._stockBeingPatched;
-  }
-  patchingStock(value: Stock | undefined) {
-    this._stockBeingPatched = value;
-  }
-
   constructor(
     private appService: AppStateService,
     private userService: UserService,
@@ -114,9 +105,6 @@ export class StockService extends GenericService<Stock> {
       stock.mom.current === stockName || stock.dad.current === stockName
     ))
   }
-  getStockByIndex(index: number): Stock | undefined {
-    return this._list[index];
-  }
 
   // When a stock is loaded from a raw stock, validation all the "per attribute"
   // validation is performed, but not the validation of relationships between stocks.
@@ -133,6 +121,17 @@ export class StockService extends GenericService<Stock> {
       // re-sorting, re-filtering and re-exporting data.
       this._list.push(newStock);
     }
+  }
+
+  override filterList() {
+    if (this._regExpFilter) {
+      this._filteredList = this._list.filter((stock: Stock) => {
+        return (this._regExpFilter?.test(stock.stockName.current) ||
+          this._regExpFilter?.test(stock.genetics.current) ||
+          this._regExpFilter?.test(stock.comment.current));
+      })
+    }
+    this.filteredList.next(this._filteredList);
   }
 
   filterByProblemArea(problemArea: string | null): Stock[] {

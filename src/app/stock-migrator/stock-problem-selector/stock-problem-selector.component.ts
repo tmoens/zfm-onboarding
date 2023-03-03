@@ -21,7 +21,7 @@ export class StockProblemSelectorComponent implements OnInit {
   patched: boolean = true;
   constructor(
     public appState: AppStateService,
-    public service: StockService,
+    public stockService: StockService,
   ) {
   }
 
@@ -36,12 +36,12 @@ export class StockProblemSelectorComponent implements OnInit {
   }
 
   getFilteredStocks() {
-    this.problemStocks = this.service.filterByProblemArea(this.problemFocus);
+    this.problemStocks = this.stockService.filterByProblemArea(this.problemFocus);
   }
 
 
   // When the user chooses a stock, set up the environment for patching it.
   stockSelected(stock: Stock) {
-    this.service.selectItem(stock);
+    this.stockService.selectItem(stock);
   }
 }

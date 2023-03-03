@@ -1,0 +1,17 @@
+<div fxLayout="column" fxLayoutGap="10px">
+  <app-reg-exp-input (onRegExpChange)="regExpFilterChange($event)"></app-reg-exp-input>
+  <mat-selection-list #items dense [multiple]="false"
+                      (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
+    <ng-container *ngFor="let stock of filteredList">
+      <mat-list-option
+        [value]='stock'
+        [selected]="service.selected === stock"
+        class="zf-selection-item"
+        [class.selected]="service.selected === stock">
+        <span>{{stock.stockName.current}}: {{stock.comment.current}}</span>
+        <span>{{stock.genetics.current}}</span>
+      </mat-list-option>
+    </ng-container>
+  </mat-selection-list>
+</div>
+

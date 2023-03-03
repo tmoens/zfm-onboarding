@@ -15,6 +15,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {StockViewerComponent } from './stock-viewer/stock-viewer.component';
 import {SharedModule} from '../shared/shared.module';
+import { StockSelectorComponent } from './stock-selector/stock-selector.component';
 
 
 
@@ -23,10 +24,12 @@ import {SharedModule} from '../shared/shared.module';
     StockPatcherComponent,
     StockProblemSelectorComponent,
     StockViewerComponent,
+    StockSelectorComponent,
   ],
   exports: [
     StockPatcherComponent,
     StockProblemSelectorComponent,
+    StockSelectorComponent,
   ],
   imports: [
     StockMigratorRoutingModule,

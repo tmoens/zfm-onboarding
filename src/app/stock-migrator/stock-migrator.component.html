@@ -1,4 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="center" class="tool-container">
-  <app-stock-problem-selector></app-stock-problem-selector>
-  <app-stock-patcher [stock]="service.selected"></app-stock-patcher>
+  <app-stock-problem-selector style="width: 290px"></app-stock-problem-selector>
+  <app-stock-patcher style="width: 480px" [stock]="service.selected"></app-stock-patcher>
+  <app-stock-selector style="width:380px" [filteredListInput]="service.filteredList"> </app-stock-selector>
 </div>
