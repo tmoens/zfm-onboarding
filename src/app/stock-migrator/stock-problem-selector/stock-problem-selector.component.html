@@ -1,4 +1,4 @@
-<div fxLayout="column">
+<div fxLayout="column" class="zf-full-height">
   <!-- filter area -->
   <div fxLayout="row">
     <button mat-icon-button (click)="getFilteredStocks()" color="primary">
@@ -19,7 +19,7 @@
 
   <mat-divider></mat-divider>
   <!-- filtered stocks -->
-  <mat-selection-list #problems
+  <mat-selection-list #problems class="zf-full-height-scroll"
                       dense [multiple]="false"
                       (selectionChange)="stockSelected(problems.selectedOptions.selected[0]?.value)">
 

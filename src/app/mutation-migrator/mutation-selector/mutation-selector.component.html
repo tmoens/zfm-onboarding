@@ -1,4 +1,4 @@
-<div fxLayout="column" fxLayoutGap="10px">
+<div fxLayout="column" fxLayoutGap="10px" class="zf-full-height">
   <button mat-button (click)="create()" color="primary">
     <mat-icon>add</mat-icon>
     Add a Mutation
@@ -7,7 +7,7 @@
   <app-mutation-editor *ngIf="!newItem && service.selected" mode="edit" [mutation]="service.selected"></app-mutation-editor>
   <mat-divider></mat-divider>
   <app-reg-exp-input (onRegExpChange)="regExpFilterChange($event)"></app-reg-exp-input>
-  <mat-selection-list #items dense [multiple]="false"
+  <mat-selection-list #items dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
     <ng-container *ngFor="let mutation of filteredList">
       <mat-list-option

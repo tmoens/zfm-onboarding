@@ -1,6 +1,7 @@
-<div fxLayout="column" fxLayoutGap="10px">
+<div fxLayout="column" class="zf-full-height">
   <app-reg-exp-input (onRegExpChange)="regExpFilterChange($event)"></app-reg-exp-input>
-  <mat-selection-list #items dense [multiple]="false"
+  <mat-divider></mat-divider>
+  <mat-selection-list #items dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
     <ng-container *ngFor="let stock of filteredList">
       <mat-list-option
