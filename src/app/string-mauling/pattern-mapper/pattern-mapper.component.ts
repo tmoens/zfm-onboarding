@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AbstractControl, FormControl, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {AbstractControl, UntypedFormControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {PatternMapper} from './pattern-mapper';
 import {Observable, startWith, map} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -12,11 +12,11 @@ import {GenericType} from '../../generics/generic-type';
 
 })
 export class PatternMapperComponent<TargetType extends GenericType> implements OnInit {
-  commentFC: FormControl = new FormControl('');
+  commentFC: UntypedFormControl = new UntypedFormControl('');
   dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
   mappingTargets: TargetType[] = [];
   @Input() patternMapper!: PatternMapper<TargetType>;
-  targetFC: FormControl = new FormControl('');
+  targetFC: UntypedFormControl = new UntypedFormControl('');
 
   @Output() onRegExpChange: EventEmitter<string> = new EventEmitter<string>();
   filteredMappingTargets: Observable<TargetType[]> | undefined;

@@ -1,12 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import {AbstractControl, UntypedFormControl, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-reg-exp-input',
   templateUrl: './reg-exp-input.component.html',
 })
 export class RegExpInputComponent implements OnInit {
-  regExpStringFC: FormControl = new FormControl('.*', [Validators.required, regularExpressionStringValidator()]);
+  regExpStringFC: UntypedFormControl = new UntypedFormControl('.*', [Validators.required, regularExpressionStringValidator()]);
   @Input() regExpString: string | undefined;
   @Input() fieldLabel: string = 'regExp';
   @Output() onRegExpChange: EventEmitter<RegExp> = new EventEmitter<RegExp>();
@@ -18,7 +18,7 @@ export class RegExpInputComponent implements OnInit {
     if (this.regExpString) {
       this.regExpStringFC.setValue(this.regExpString);
     }
-    this.regExpStringFC.valueChanges.subscribe((regExpString: string) => {
+    this.regExpStringFC.valueChanges.subscribe(_ => {
       if (this.regExpStringFC.valid) {
         try {
           this.onRegExpChange.emit(new RegExp(this.regExpStringFC.value, 'i'));

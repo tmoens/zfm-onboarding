@@ -103,5 +103,7 @@
       }
     }
   },
-  "defaultProject": "zfm-onboarding"
+  "cli": {
+    "analytics": false
+  }
 }

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PatchableAttr} from '../patchable-attr';
-import {FormControl, ValidatorFn} from '@angular/forms';
+import {UntypedFormControl, ValidatorFn} from '@angular/forms';
 
 @Component({
   selector: 'app-patchable-attr-viewer',
@@ -27,7 +27,7 @@ export class PatchableAttrViewerComponent implements OnInit {
   }
 
   @Input() label!: string;
-  fc: FormControl = new FormControl();
+  fc: UntypedFormControl = new UntypedFormControl();
   @Input() set validators(validators: ValidatorFn[]) {
     this.fc.setValidators(validators);
   }

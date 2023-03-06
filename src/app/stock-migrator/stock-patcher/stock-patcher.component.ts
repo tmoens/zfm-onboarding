@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {StockService} from '../stock.service';
-import {FormControl, Validators} from '@angular/forms';
+import {UntypedFormControl, Validators} from '@angular/forms';
 import {Stock, ValidateDobFC, ValidateParentFC, ValidateStockNameFC} from '../stock';
 
 @Component({
@@ -16,15 +16,15 @@ export class StockPatcherComponent implements OnInit {
     }
   }
   // Form controls for the fields the user can patch
-  stockNameFC: FormControl = new FormControl();
-  dobFC: FormControl = new FormControl();
-  momFC: FormControl = new FormControl();
-  dadFC: FormControl = new FormControl();
-  countEnteringNurseryFC: FormControl = new FormControl();
-  countLeavingNurseryFC: FormControl = new FormControl();
-  researcherFC: FormControl = new FormControl();
-  geneticsFC: FormControl = new FormControl();
-  commentFC: FormControl = new FormControl();
+  stockNameFC: UntypedFormControl = new UntypedFormControl();
+  dobFC: UntypedFormControl = new UntypedFormControl();
+  momFC: UntypedFormControl = new UntypedFormControl();
+  dadFC: UntypedFormControl = new UntypedFormControl();
+  countEnteringNurseryFC: UntypedFormControl = new UntypedFormControl();
+  countLeavingNurseryFC: UntypedFormControl = new UntypedFormControl();
+  researcherFC: UntypedFormControl = new UntypedFormControl();
+  geneticsFC: UntypedFormControl = new UntypedFormControl();
+  commentFC: UntypedFormControl = new UntypedFormControl();
 
   _stock: Stock | undefined;
   moms: Stock[] = [];
@@ -40,15 +40,15 @@ export class StockPatcherComponent implements OnInit {
   }
 
   initialize(stock: Stock)  {
-    this.stockNameFC = new FormControl(null, [Validators.required, ValidateStockNameFC(this.service, stock)]);
-    this.dobFC = new FormControl(null, [Validators.required, ValidateDobFC()]);
-    this.momFC = new FormControl(null, [ValidateParentFC(this.service, this._stock)]);
-    this.dadFC = new FormControl(null, [ValidateParentFC(this.service, this._stock)]);
-    this.countEnteringNurseryFC = new FormControl(null, [Validators.min(0)]);
-    this.countLeavingNurseryFC = new FormControl(null, [Validators.min(0)]);
-    this.researcherFC = new FormControl();
-    this.geneticsFC = new FormControl();
-    this.commentFC = new FormControl();
+    this.stockNameFC = new UntypedFormControl(null, [Validators.required, ValidateStockNameFC(this.service, stock)]);
+    this.dobFC = new UntypedFormControl(null, [Validators.required, ValidateDobFC()]);
+    this.momFC = new UntypedFormControl(null, [ValidateParentFC(this.service, this._stock)]);
+    this.dadFC = new UntypedFormControl(null, [ValidateParentFC(this.service, this._stock)]);
+    this.countEnteringNurseryFC = new UntypedFormControl(null, [Validators.min(0)]);
+    this.countLeavingNurseryFC = new UntypedFormControl(null, [Validators.min(0)]);
+    this.researcherFC = new UntypedFormControl();
+    this.geneticsFC = new UntypedFormControl();
+    this.commentFC = new UntypedFormControl();
 
     //------------------------- Stock Name --------------------------
     this.stockNameFC.valueChanges.subscribe((value: any) => {
