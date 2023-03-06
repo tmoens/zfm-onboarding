@@ -2,8 +2,15 @@
 <div class="app-top-bar" fxLayout="row" fxLayoutAlign="center">
   <div class="zf-full-width">
 
-    <mat-toolbar fxLayoutGap="10px">
+    <mat-toolbar fxLayoutGap="20px">
       <span>Zebrafish Stock Migrator</span>
+      <span class="mat-body"> (migrating: {{appState.getState('filename')}})</span>
+      <app-reg-exp-input
+        [regExpString]="stockService.regExpFilterString"
+        (onRegExpStringChange)="stockService.regExpFilterString = $event"
+        style="font-size: 10pt"
+        fieldLabel="App wide regExp filter">
+      </app-reg-exp-input>
       <span class="fill-remaining-space"></span>
       <button mat-button [disabled]="appState.activeTool === zfTool.USER_MIGRATOR"
               [routerLink]="zfTool.USER_MIGRATOR.route" color="primary">
@@ -28,7 +35,6 @@
       <button mat-button (click)="exportToExcel()">
         Export Changes
       </button>
-      <p>{{appState.getState('filename')}}</p>
     </mat-toolbar>
   </div>
 </div>

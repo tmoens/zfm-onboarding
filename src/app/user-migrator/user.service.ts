@@ -11,9 +11,11 @@ import {JsonForExcel} from '../generics/json-for-excel';
   providedIn: 'root'
 })
 export class UserService extends GenericService<User>{
-  localPatternMapperStorageToken = 'userPatterns'
-  localPatchStorageToken = 'userPatches';
-  worksheetName = 'users';
+  serviceName = 'user';
+  override get worksheetName(): string {
+    return 'users';
+  }
+
 
   override loadJsonItems(usersFromWorksheet: JsonForExcel[]) {
     for (const rawUser of usersFromWorksheet) {

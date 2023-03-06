@@ -8,6 +8,7 @@ import {AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators}
 export class RegExpInputComponent implements OnInit {
   regExpStringFC: FormControl = new FormControl('.*', [Validators.required, regularExpressionStringValidator()]);
   @Input() regExpString: string | undefined;
+  @Input() fieldLabel: string = 'regExp';
   @Output() onRegExpChange: EventEmitter<RegExp> = new EventEmitter<RegExp>();
   @Output() onRegExpStringChange: EventEmitter<string> = new EventEmitter<string>();
 

@@ -47,9 +47,6 @@ export class TgSelectorComponent implements OnInit {
       this.newItem = null;
     }
   }
-  regExpFilterChange(regExp: RegExp) {
-    this.service.regExpFilter = regExp;
-  }
   openMatchDetailsDialog(tg: Tg): void {
     this.select(tg);
     this.dialogRef = this.matchDetailsDialog.open(MatchDetailsDialogComponent, {

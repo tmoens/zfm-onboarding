@@ -11,9 +11,11 @@ import {Tg} from './tg';
   providedIn: 'root'
 })
 export class TgService extends GenericService<Tg>{
-  localPatternMapperStorageToken = 'tgPatterns'
-  localPatchStorageToken = 'tgPatches';
-  worksheetName = 'transgenes';
+  serviceName = 'transgene';
+  override get worksheetName(): string {
+    return 'transgenes';
+  }
+
 
   override loadJsonItems(itemsFromWorksheet: JsonForExcel[]) {
     for (const jsonTg of itemsFromWorksheet) {

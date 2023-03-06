@@ -11,9 +11,11 @@ import {Mutation} from './mutation';
   providedIn: 'root'
 })
 export class MutationService extends GenericService<Mutation>{
-  localPatternMapperStorageToken = 'mutPatterns'
-  localPatchStorageToken = 'mutPatches';
-  worksheetName = 'mutations';
+  serviceName = 'mutation';
+  override get worksheetName(): string {
+    return 'mutations';
+  }
+
 
   override loadJsonItems(itemsFromWorksheet: JsonForExcel[]) {
     for (const jsonTg of itemsFromWorksheet) {

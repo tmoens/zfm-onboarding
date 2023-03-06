@@ -48,9 +48,6 @@ export class MutationSelectorComponent implements OnInit {
       this.newItem = null;
     }
   }
-  regExpFilterChange(regExp: RegExp) {
-    this.service.regExpFilter = regExp;
-  }
   openMatchDetailsDialog(mutation: Mutation): void {
     this.select(mutation);
     this.dialogRef = this.matchDetailsDialog.open(MatchDetailsDialogComponent, {

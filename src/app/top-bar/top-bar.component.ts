@@ -17,6 +17,7 @@ import {MutationService} from '../mutation-migrator/mutation.service';
 export class TopBarComponent implements OnInit {
   zfTool = ZFTool;
 
+  regExpString: string = '.*'
 
   constructor(
     public appState: AppStateService,
@@ -32,8 +33,8 @@ export class TopBarComponent implements OnInit {
 
   async onFileSelected(event: any) {
     const file: File = event.target?.files[0];
-    const fileName: string = file.name.replace(/ \([/d]*]\)]/, '');
-    this.appState.setState(WellKnownStates.FILENAME, fileName, true);
+    const fileName: string = file.name.replace(/\s*\(\d*\)/, '');
+    this.appState.setState(WellKnownStates.FILENAME, fileName);
 
     const reader: FileReader = new FileReader();
     reader.onload = (e: any) => {

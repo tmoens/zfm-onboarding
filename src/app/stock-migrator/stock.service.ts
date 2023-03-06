@@ -38,18 +38,24 @@ import {MutationService} from '../mutation-migrator/mutation.service';
   providedIn: 'root'
 })
 export class StockService extends GenericService<Stock> {
-  localPatternMapperStorageToken = 'stockPatternMappersNotUsed' // Not used but required by GenericService
-  localPatchStorageToken = 'stockPatches'
-  worksheetName = 'raw-stocks'
+
+  serviceName = 'stock';
+  override get worksheetName(): string {
+    return 'raw-stocks';
+  }
   _tgPatternMappers: PatternMapper<Tg>[] = [];
   _mutationPatternMappers: PatternMapper<Mutation>[] = [];
   _userPatternMappers: PatternMapper<User>[] = [];
-  geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  geneticsStrings: BehaviorSubject<UniqueStringsAndTokens> =
+    new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens('Original X'));
   // After applying transgene and mutation pattern mappers to the genetics strings,
   // you get the residual genetics strings - the ones that still need taking care of.
-  residualGeneticsStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
-  userStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
-  residualUserStrings: BehaviorSubject<UniqueStringsAndTokens> = new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  residualGeneticsStrings: BehaviorSubject<UniqueStringsAndTokens> =
+    new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens('Residual X'));
+  userStrings: BehaviorSubject<UniqueStringsAndTokens> =
+    new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
+  residualUserStrings: BehaviorSubject<UniqueStringsAndTokens> =
+    new BehaviorSubject<UniqueStringsAndTokens>(new UniqueStringsAndTokens());
 
   constructor(
     private appService: AppStateService,
@@ -70,6 +76,19 @@ export class StockService extends GenericService<Stock> {
       this._mutationPatternMappers = patternMappers;
       this.applyGeneticsPatternMappers();
     })
+  }
+
+  override set regExpFilterString(regExpString) {
+    try {
+      this._regExpFilter = new RegExp(regExpString, 'i');
+    } catch {
+      console.log('Oopsy, this should not happen.');
+    }
+    this.appState.setState(this.localStorageRegExpFilterStringToken, regExpString, true);
+    this.geneticsStrings.value.setFilter(this.regExpFilter);
+    this.residualGeneticsStrings.value.setFilter(this.regExpFilter);
+    this.filterList();
+
   }
 
 
@@ -180,7 +199,7 @@ export class StockService extends GenericService<Stock> {
     this.userStrings.subscribe(_ => {
       this.applyUserPatternMappers();
     })
-
+    this.filterList();
   }
 
   validateAll() {
@@ -194,6 +213,7 @@ export class StockService extends GenericService<Stock> {
   refreshStringsAndTokens() {
     const userSandT = new UniqueStringsAndTokens('Original');
     const geneticsSandT = new UniqueStringsAndTokens('Original');
+    geneticsSandT.setFilter(this.regExpFilter);
     this._list.map((s: Stock) => {
       userSandT.addString(s.researcher.current);
       geneticsSandT.addString(s.genetics.current);
@@ -226,6 +246,7 @@ export class StockService extends GenericService<Stock> {
       }
       residualStrings.addString(residual, originalStrings.strings[s]);
     }
+    residualStrings.setFilter(this.regExpFilter);
     this.residualGeneticsStrings.next(residualStrings);
   }
   applyUserPatternMappers() {

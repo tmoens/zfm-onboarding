@@ -6,7 +6,7 @@
   <app-mutation-editor *ngIf="newItem" mode="add" [mutation]="newItem" (onMutationCreated)="saveNewItem()"></app-mutation-editor>
   <app-mutation-editor *ngIf="!newItem && service.selected" mode="edit" [mutation]="service.selected"></app-mutation-editor>
   <mat-divider></mat-divider>
-  <app-reg-exp-input (onRegExpChange)="regExpFilterChange($event)"></app-reg-exp-input>
+  <app-reg-exp-input [regExpString]="service.regExpFilterString" (onRegExpStringChange)="service.regExpFilterString = $event"></app-reg-exp-input>
   <mat-selection-list #items dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
     <ng-container *ngFor="let mutation of filteredList">

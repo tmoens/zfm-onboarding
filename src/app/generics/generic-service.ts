@@ -13,9 +13,19 @@ import {PatternMapperDto} from '../string-mauling/pattern-mapper/pattern-mapper-
 })
 export abstract class GenericService<T extends GenericType> {
 
-  abstract localPatternMapperStorageToken: string;
-  abstract localPatchStorageToken: string;
-  abstract worksheetName: string;
+  abstract serviceName: string;
+  get worksheetName(): string {
+    return `${this.serviceName}`;
+  }
+  get localStoragePatchToken(): string {
+    return `${this.serviceName}Patches`;
+  }
+  get localStoragePatternMapToken(): string {
+    return `${this.serviceName}Patterns`;
+  }
+  get localStorageRegExpFilterStringToken(): string {
+    return `${this.serviceName}RegExp`;
+  }
   // a list of the unique names of all the items in the list.
   // It is used in pattern mapping. A pattern in a text field maps to one of these unique names.
   uniqueNames: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
@@ -38,10 +48,26 @@ export abstract class GenericService<T extends GenericType> {
   protected _filteredList: T[] = [];
   filteredList: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
 
-  _regExpFilter: RegExp | null = null;
-  set regExpFilter(regexp: RegExp | null) {
-    this._regExpFilter = regexp;
+  _regExpFilter: RegExp = /.*/;
+  set regExpFilterString(regExpString: string) {
+    try {
+      this._regExpFilter = new RegExp(regExpString, 'i');
+    } catch {
+      console.log('Oopsy, this should not happen.');
+    }
+    this.appState.setState(this.localStorageRegExpFilterStringToken, regExpString, true);
     this.filterList();
+  }
+  get regExpFilterString(): string {
+    const regExpString = this.appState.getState(this.localStorageRegExpFilterStringToken);
+    if (regExpString) {
+      return regExpString;
+    } else {
+      return '.*';
+    }
+  }
+  get regExpFilter(): RegExp {
+    return this._regExpFilter;
   }
 
   // The set of patterns that map to instances of this type
@@ -51,6 +77,10 @@ export abstract class GenericService<T extends GenericType> {
   constructor(
     protected appState: AppStateService
   ) {
+    const storedRegExpFilterString: string = this.appState.getState(this.localStorageRegExpFilterStringToken);
+    if (storedRegExpFilterString) {
+      this.regExpFilterString = storedRegExpFilterString;
+    }
   }
 
   // sorting is type dependent so this should be overridden
@@ -114,7 +144,7 @@ export abstract class GenericService<T extends GenericType> {
   loadPatchesFromLocalStorage(): void {
     // Load them up from local storage.
     const previouslyStoredPatches: { [index: string]: ObjectPatch } =
-      this.appState.getState(this.localPatchStorageToken);
+      this.appState.getState(this.localStoragePatchToken);
 
     if (previouslyStoredPatches && Object.keys(previouslyStoredPatches).length > 0) {
       // Loop through the stocks we loaded from the worksheet and apply the patches
@@ -138,7 +168,7 @@ export abstract class GenericService<T extends GenericType> {
 
   loadPatternMappersFromLocalStorage() {
     this._patternMappers = [];
-    const pmDtos: PatternMapperDto[] = this.appState.getState(this.localPatternMapperStorageToken);
+    const pmDtos: PatternMapperDto[] = this.appState.getState(this.localStoragePatternMapToken);
     if (pmDtos) {
       this.loadJsonPatterns(pmDtos)
     }
@@ -248,7 +278,7 @@ export abstract class GenericService<T extends GenericType> {
       const objectPatch: ObjectPatch | null = item.extractPatch();
       if (objectPatch) objectPatches[item.id] = objectPatch;
     }
-    this.appState.setState(this.localPatchStorageToken, objectPatches, true);
+    this.appState.setState(this.localStoragePatchToken, objectPatches, true);
   }
 
   addPatternMapper(pm: PatternMapper<T>) {
@@ -304,7 +334,7 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   saveAndExportPatternMappers() {
-    this.appState.setState(this.localPatternMapperStorageToken, this.getJsonPatterns(), true);
+    this.appState.setState(this.localStoragePatternMapToken, this.getJsonPatterns(), true);
     this.exportPatternMappers();
   }
 
