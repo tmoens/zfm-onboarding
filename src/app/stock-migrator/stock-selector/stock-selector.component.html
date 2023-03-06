@@ -1,14 +1,21 @@
-  <mat-selection-list #items dense [multiple]="false" class="zf-full-height-scroll"
-                      (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let stock of service.filteredList | async">
-      <mat-list-option
-        [value]='stock'
-        [selected]="service.selected === stock"
-        class="zf-selection-item"
-        [class.selected]="service.selected === stock">
-        <span>{{stock.stockName.current}}: {{stock.comment.current}}</span>
-        <span>{{stock.genetics.current}}</span>
-      </mat-list-option>
-    </ng-container>
-  </mat-selection-list>
-
+<div fxLayout="column" class="zf-full-height">
+  <h3>Stock List</h3>
+  <mat-divider></mat-divider>
+  <mat-list class="zf-full-height-scroll" dense>
+    <mat-list-item
+      *ngFor="let stock of service.filteredList | async"
+      class="zf-selection-item"
+      [class.selected]="service.selected === stock"
+      (click)="select(stock)">
+      <div fxLayout="row">
+        <div fxFlex="15px">
+          <mat-icon *ngIf="!stock.isValid()" class="zf-field-boo-boo">close</mat-icon>
+        </div>
+        <div fxLayout="column">
+          <div matLine class="zf-list-item-title">{{stock.stockName.current}}: {{stock.comment.current}}</div>
+          <p  matLine>{{stock.genetics.current}}</p>
+        </div>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>

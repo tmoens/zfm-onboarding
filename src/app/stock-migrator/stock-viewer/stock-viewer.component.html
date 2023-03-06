@@ -6,7 +6,6 @@
       *ngIf="stock.stockName.current" [attr]="stock.stockName" label="Stock name">
     </app-patchable-attr-viewer>
   </button>
-    <mat-icon *ngIf="!stock.isValid()" class="zf-field-boo-boo">close</mat-icon>
   </div>
   <app-patchable-attr-viewer [disabled]=true
     *ngIf="stock.dob.current" [attr]="stock.dob" label="Fertilization date">

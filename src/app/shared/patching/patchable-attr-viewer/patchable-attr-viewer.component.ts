@@ -16,7 +16,6 @@ export class PatchableAttrViewerComponent implements OnInit {
     return this._attr;
   }
   private _disabled: boolean = false;
-
   @Input() set disabled(disabled: boolean | undefined) {
     if (disabled) {
       this._disabled = true;
