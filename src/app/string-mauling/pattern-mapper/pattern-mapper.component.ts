@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AbstractControl, UntypedFormControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {PatternMapper} from './pattern-mapper';
 import {Observable, startWith, map} from 'rxjs';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-dialog.component';
 import {GenericType} from '../../generics/generic-type';
 

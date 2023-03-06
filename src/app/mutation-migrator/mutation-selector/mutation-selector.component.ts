@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Mutation} from '../mutation';
 import {MutationService} from '../mutation.service';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {
   MatchDetailsDialogComponent
 } from '../../string-mauling/pattern-mapper/match-details-dialog/match-details-dialog.component';

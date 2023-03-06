@@ -4,7 +4,7 @@ import {TgService} from '../tg.service';
 import {
   MatchDetailsDialogComponent
 } from '../../string-mauling/pattern-mapper/match-details-dialog/match-details-dialog.component';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'app-tg-selector',
