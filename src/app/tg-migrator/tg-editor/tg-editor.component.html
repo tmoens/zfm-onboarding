@@ -1,4 +1,4 @@
-<div *ngIf="tg" fxLayout="column" fxLayoutGap="5px" style="width: 200px">
+<div *ngIf="tg" class="lo-column lo-gap5" style="width: 200px">
   <app-patchable-attr-viewer
     (onChange)="onChange($event)"
     [validators]="alleleValidators"
@@ -21,7 +21,7 @@
     (onChange)="onChange($event)"
     [attr]="tg.comment" label="Comment">
   </app-patchable-attr-viewer>
-  <div fxLayout="row" fxLayoutAlign="end">
+  <div class="lo-row lo-align-end">
     <button *ngIf="mode === 'add'" [disabled]="!tg.valid" mat-button (click)="onSave()" color="primary">
       Save
     </button>

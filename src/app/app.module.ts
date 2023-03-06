@@ -11,7 +11,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
 import {MatListModule} from '@angular/material/list';
-import {FlexModule} from '@angular/flex-layout';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StockMigratorModule} from './stock-migrator/stock-migrator.module';
@@ -57,7 +56,6 @@ export function appStateProviderFactory(provider: AppStateService) {
     MatSelectModule,
     MatSidenavModule,
     MatListModule,
-    FlexModule,
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,

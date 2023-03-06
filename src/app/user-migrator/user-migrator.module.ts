@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserSelectorComponent } from './user-selector/user-selector.component';
-import {FlexLayoutModule, FlexModule} from '@angular/flex-layout';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatListModule} from '@angular/material/list';
 import {MatChipsModule} from '@angular/material/chips';
@@ -30,8 +29,6 @@ import {SharedModule} from '../shared/shared.module';
   imports: [
     UserMigratorRoutingModule,
     CommonModule,
-    FlexLayoutModule,
-    FlexModule,
     MatSidenavModule,
     MatListModule,
     MatChipsModule,

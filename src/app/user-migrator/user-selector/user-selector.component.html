@@ -1,4 +1,4 @@
-<div fxLayout="column" fxLayoutGap="10px">
+<div class="lo-column lo-gap20 zf-full-height">
   <button mat-button (click)="create()" color="primary">
     <mat-icon>add</mat-icon>
     Add a user
@@ -6,19 +6,19 @@
   <app-user-editor *ngIf="newItem" mode="add" [user]="newItem" (onUserCreated)="saveNewItem()"></app-user-editor>
   <app-user-editor *ngIf="!newItem && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
   <mat-divider></mat-divider>
-  <mat-selection-list #users dense [multiple]="false"
+  <mat-selection-list #users dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(users.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let user of filteredList">
+    <ng-container *ngFor="let user of service.filteredList | async">
       <mat-list-option
         [value]='user'
         [selected]="service.selected === user"
         class="zf-selection-item"
         [class.selected]="service.selected === user">
-        <div fxLayout="row" fxLayoutAlign="spacebetween center">
-          <div fxFlex="20px">
+        <div class="lo-row lo-gap5 lo-align-center">
+          <div class="lo-20px">
             <mat-icon (click)="delete(user)" color="primary">delete</mat-icon>
           </div>
-          <div fxFlex="15px">
+          <div class="lo-15px">
             <mat-icon *ngIf="!user.valid" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>{{user.name.current}}</div>

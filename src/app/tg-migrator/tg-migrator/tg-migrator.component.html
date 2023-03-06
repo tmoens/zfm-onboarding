@@ -1,12 +1,12 @@
-<div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center" class="tool-container">
-  <app-tg-selector fxFlex="20%" [filteredListInput]="tgService.filteredList"></app-tg-selector>
+<div class="lo-row lo-gap10 lo-align-center tool-container">
+  <app-tg-selector class="zf-full-height"></app-tg-selector>
 
   <!-- All the strings (and tokens) in the researcher genetics column of the raw stocks worksheet -->
-  <div fxFlex fxLayout="column" fxLayoutGap="10px" class="zf-full-height">
-    <div fxLayout="row" fxLayoutGap="10px" class="zf-full-height-scroll">
+  <div class="lo-column lo-gap20 zf-full-height">
+    <div class="lo-row zf-full-height-scroll">
       <app-string-set [uniqueStringsAndTokens]="stockService.geneticsStrings | async"></app-string-set>
       <app-string-set [uniqueStringsAndTokens]="stockService.residualGeneticsStrings | async"></app-string-set>
     </div>
   </div>
-  <app-pattern-mapper-group [service]="tgService"></app-pattern-mapper-group>
+  <app-pattern-mapper-group class="zf-full-height" [service]="tgService"></app-pattern-mapper-group>
 </div>

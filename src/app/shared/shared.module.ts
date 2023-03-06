@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { SharedRoutingModule } from './shared-routing.module';
 import {PatchableAttrViewerComponent} from './patching/patchable-attr-viewer/patchable-attr-viewer.component';
-import {FlexLayoutModule} from '@angular/flex-layout';
 import {MatIconModule} from '@angular/material/icon';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -21,7 +20,6 @@ import { RegExpInputComponent } from './reg-exp-input/reg-exp-input.component';
     SharedRoutingModule,
     MatIconModule,
     MatFormFieldModule,
-    FlexLayoutModule,
     MatInputModule,
     ReactiveFormsModule,
   ],

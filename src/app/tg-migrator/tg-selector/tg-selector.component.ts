@@ -1,7 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Tg} from '../tg';
 import {TgService} from '../tg.service';
-import {BehaviorSubject} from 'rxjs';
 import {
   MatchDetailsDialogComponent
 } from '../../string-mauling/pattern-mapper/match-details-dialog/match-details-dialog.component';
@@ -12,20 +11,14 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
   templateUrl: './tg-selector.component.html',
 })
 export class TgSelectorComponent implements OnInit {
-  filteredList: Tg[] = [];
   newItem: Tg | null = null;
   dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
-  @Input() filteredListInput: BehaviorSubject<Tg[]> = new BehaviorSubject<Tg[]>([]);
   constructor(
     public service: TgService,
     public matchDetailsDialog: MatDialog,
   ) { }
 
-
   ngOnInit(): void {
-    this.filteredListInput.subscribe((tgs: Tg[]) => {
-      this.filteredList = tgs;
-    })
   }
 
   select(tg: Tg) {

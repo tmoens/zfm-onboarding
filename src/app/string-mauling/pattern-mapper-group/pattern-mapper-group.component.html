@@ -1,13 +1,13 @@
-<div fxLayout="column" fxLayoutGap="10px" class="zf-full-height">
+<div class="lo-column lo-gap20 zf-full-height">
   <button mat-button (click)="create()" color="primary">
     <mat-icon>add</mat-icon>
     Add pattern mapper
   </button>
 
   <!-- All the patterns that map from strings to specific users -->
-  <div fxLayout="column" fxLayoutGap="10px" class="zf-full-height-scroll">
+  <div class="lo-column lo-gap20 zf-full-height-scroll">
     <ng-container *ngFor="let pm of patternMappers; let i = index;">
-      <div fxLayout="row" fxLayoutGap="10px">
+      <div class="lo-row">
         <button mat-icon-button [disabled]="disableUp(i)" (click)="move(pm, 'top')" color="primary">
           <mat-icon>keyboard_double_arrow_up</mat-icon>
         </button>

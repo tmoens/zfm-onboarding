@@ -1,7 +1,7 @@
-<div fxLayout="row" fxLayoutGap="10px">
+<div class="lo-row lo-gap20 zf-full-height-scroll">
 
-  <div fxLayout="column" fxLayoutGap="10px" *ngIf="_stock">
-    <div fxLayout="row" fxLayoutAlign="start center">
+  <div class="lo-column lo-gap20" *ngIf="_stock">
+    <div class="lo-row lo-justify-start lo-align-center">
       <button mat-icon-button (click)="goToPrev()" color="primary">
         <mat-icon>navigate_before</mat-icon>
       </button>
@@ -11,8 +11,8 @@
       </button>
     </div>
     <!----------------------------- Stock name ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="!_stock.stockName.isValid()" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.stockName.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -26,8 +26,8 @@
       </mat-form-field>
     </div>
     <!----------------------------- DOB ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="!_stock.dob.isValid()" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.dob.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -39,8 +39,8 @@
       </mat-form-field>
     </div>
     <!----------------------------- Mom ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="!_stock.mom.isValid()" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.mom.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -52,8 +52,8 @@
       </mat-form-field>
     </div>
     <!----------------------------- Dad ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="!_stock.dad.isValid()" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.dad.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -65,10 +65,10 @@
       </mat-form-field>
     </div>
     <!----------------------------- Researcher ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
       </div>
-      <div fxLayout="column">
+      <div class="lo-column">
         <mat-form-field  floatLabel="always">
           <mat-label>Researcher</mat-label>
           <input matInput type="text" [formControl]="researcherFC">
@@ -78,8 +78,8 @@
       </div>
     </div>
     <!----------------------------- Entering Nursery Count ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="!_stock.countEnteringNursery.isValid()" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.countEnteringNursery.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -91,8 +91,8 @@
       </mat-form-field>
     </div>
     <!----------------------------- Leaving Nursery Count ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
         <mat-icon *ngIf="countLeavingNurseryFC.invalid" class="zf-field-boo-boo">close</mat-icon>
         <mat-icon *ngIf="_stock.countLeavingNursery.isPatched()" class="zf-patched">check</mat-icon>
       </div>
@@ -106,10 +106,10 @@
       </mat-form-field>
     </div>
     <!----------------------------- Genetics ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
       </div>
-      <div fxLayout="column">
+      <div class="lo-column">
         <mat-form-field  floatLabel="always">
           <mat-label>Genetics</mat-label>
           <input matInput type="text" [formControl]="geneticsFC">
@@ -119,8 +119,8 @@
       </div>
     </div>
     <!----------------------------- Comments ----------------------------------------->
-    <div fxLayout="row">
-      <div fxFlex="30px">
+    <div class="lo-row">
+      <div class="lo-30px">
       </div>
       <mat-form-field  floatLabel="always">
         <mat-label>Comment</mat-label>
@@ -131,22 +131,22 @@
     </div>
   </div>
   <!----------------------------- Parents and kids ----------------------------------------->
-  <div fxLayout="column" fxLayoutGap="10px">
+  <div class="lo-column lo-gap20">
     <mat-card *ngIf="moms.length > 0">
       <h3>Mom</h3>
-      <mat-card-content fxLayoutGap="10px">
+      <mat-card-content>
         <app-stock-viewer *ngFor="let mom of moms" [stock]="mom"></app-stock-viewer>
       </mat-card-content>
     </mat-card>
     <mat-card *ngIf="dads.length > 0">
       <h3>Dad</h3>
-      <mat-card-content fxLayoutGap="10px">
+      <mat-card-content>
         <app-stock-viewer *ngFor="let dad of dads" [stock]="dad"></app-stock-viewer>
       </mat-card-content>
     </mat-card>
     <mat-card *ngIf="kids.length > 0">
       <h3>Kids</h3>
-      <mat-card-content fxLayoutGap="10px">
+      <mat-card-content>
         <app-stock-viewer *ngFor="let kid of kids" [stock]="kid" [mini]=true></app-stock-viewer>
       </mat-card-content>
     </mat-card>

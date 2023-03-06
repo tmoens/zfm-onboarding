@@ -1,6 +1,6 @@
-<div *ngIf="attr" fxLayout="column" fxLayoutAlign="start start">
-  <div fxLayout="row">
-    <div fxFlex="15px">
+<div *ngIf="attr" class="lo-column lo-justify-start">
+  <div class="lo-row">
+    <div class="lo-15px">
       <mat-icon *ngIf="!attr.isValid()" class="zf-field-boo-boo">close</mat-icon>
       <mat-icon *ngIf="attr.isPatched()" class="zf-patched">check</mat-icon>
     </div>

@@ -1,6 +1,6 @@
 <!----------------------------- Stock name ----------------------------------------->
-<div fxLayout="column" fxLayoutGap="5px" style="width: 200px">
-  <div fxLayout="row" fxLayoutAlign="start center">
+<div class="lo-column lo-gap5" style="width: 200px">
+  <div class="lo-row lo-justify-start lo-align-center">
   <button mat-button (click)="patchStock()" color="primary" style="padding: 0; line-height: inherit;">
     <app-patchable-attr-viewer [disabled]=true
       *ngIf="stock.stockName.current" [attr]="stock.stockName" label="Stock name">

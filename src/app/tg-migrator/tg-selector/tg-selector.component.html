@@ -1,4 +1,4 @@
-<div fxLayout="column" fxLayoutGap="10px" class="zf-full-height">
+<div class="lo-column lo-gap20 zf-full-height">
   <button mat-button (click)="create()" color="primary">
     <mat-icon>add</mat-icon>
     Add a Transgene
@@ -8,20 +8,21 @@
   <mat-divider></mat-divider>
   <app-reg-exp-input
     [regExpString]="service.regExpFilterString"
-    (onRegExpStringChange)="service.regExpFilterString = $event"></app-reg-exp-input>
+    (onRegExpStringChange)="service.regExpFilterString = $event">
+  </app-reg-exp-input>
   <mat-selection-list #items dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(items.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let tg of filteredList">
+    <ng-container *ngFor="let tg of service.filteredList | async">
       <mat-list-option
         [value]='tg'
         [selected]="service.selected === tg"
         class="zf-selection-item"
         [class.selected]="service.selected === tg">
-        <div fxLayout="row" fxLayoutAlign="spacebetween center">
-          <div fxFlex="20px">
+        <div class="lo-row lo-gap5 lo-align-center">
+          <div class="lo-20px">
             <mat-icon (click)="delete(tg)" color="primary">delete</mat-icon>
           </div>
-          <div fxFlex="15px">
+          <div class="lo-15px">
             <mat-icon *ngIf="!tg.valid" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>{{tg.descriptor.current}}^{{tg.allele.current}}</div>

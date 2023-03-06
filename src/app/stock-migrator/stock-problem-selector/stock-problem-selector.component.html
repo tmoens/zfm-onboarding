@@ -1,6 +1,6 @@
-<div fxLayout="column" class="zf-full-height">
+<div class="lo-column zf-full-height">
   <!-- filter area -->
-  <div fxLayout="row">
+  <div class="lo-row">
     <button mat-icon-button (click)="getFilteredStocks()" color="primary">
       <mat-icon>refresh</mat-icon>
     </button>
@@ -30,8 +30,8 @@
         [selected]="stockService.selected === s"
         class="zf-selection-item"
         [class.selected]="stockService.selected === s">
-        <div fxLayout="row">
-          <div fxFlex="15px">
+        <div class="lo-row">
+          <div class="lo-15px">
             <mat-icon *ngIf="!s.isValid()" class="zf-field-boo-boo">close</mat-icon>
           </div>
           <div>

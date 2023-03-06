@@ -1,5 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
 import {Mutation} from '../mutation';
 import {MutationService} from '../mutation.service';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -12,21 +11,14 @@ import {
   templateUrl: './mutation-selector.component.html',
 })
 export class MutationSelectorComponent implements OnInit {
-
-  filteredList: Mutation[] = [];
   newItem: Mutation | null = null;
   dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
-  @Input() filteredListInput: BehaviorSubject<Mutation[]> = new BehaviorSubject<Mutation[]>([]);
   constructor(
     public service: MutationService,
     public matchDetailsDialog: MatDialog,
   ) { }
 
-
   ngOnInit(): void {
-    this.filteredListInput.subscribe((mutations: Mutation[]) => {
-      this.filteredList = mutations;
-    })
   }
 
   select(mutation: Mutation) {

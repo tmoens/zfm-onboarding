@@ -1,4 +1,4 @@
-<div fxLayout="column" class="zf-full-height">
+<div class="lo-column zf-full-height">
   <h3>Stock List</h3>
   <mat-divider></mat-divider>
   <mat-list class="zf-full-height-scroll" dense>
@@ -7,11 +7,11 @@
       class="zf-selection-item"
       [class.selected]="service.selected === stock"
       (click)="select(stock)">
-      <div fxLayout="row">
-        <div fxFlex="15px">
+      <div class="lo-row">
+        <div class="lo-15px">
           <mat-icon *ngIf="!stock.isValid()" class="zf-field-boo-boo">close</mat-icon>
         </div>
-        <div fxLayout="column">
+        <div class="lo-column">
           <div matLine class="zf-list-item-title">{{stock.stockName.current}}: {{stock.comment.current}}</div>
           <p  matLine>{{stock.genetics.current}}</p>
         </div>
