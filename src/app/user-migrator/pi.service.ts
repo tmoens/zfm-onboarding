@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {User} from './user';
 import {GenericService} from '../generics/generic-service';
 import {JsonForExcel} from '../generics/json-for-excel';
+import * as XLSX from 'xlsx';
 
 /**
  * Load customer's user information from a spreadsheet. Augment or edit it.
@@ -10,8 +11,8 @@ import {JsonForExcel} from '../generics/json-for-excel';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends GenericService<User>{
-  serviceName = 'user';
+export class PiService extends GenericService<User>{
+  serviceName = 'pi';
   override get worksheetName(): string {
     return 'users';
   }
@@ -27,6 +28,20 @@ export class UserService extends GenericService<User>{
     }
     this.loadPatchesFromLocalStorage();
   }
+
+  override exportWorksheet(wb: XLSX.WorkBook) {
+    // for PIs we do not export the "users" worksheet, just the patterns.
+    // The Researchers service takes care of the "users" worksheet.
+    // It is a hack because I initially thought users=researchers, but Pis are also users.
+    // Anyway, this kludge works.
+
+    // Store pattern mappers if there are any.
+    if (this.patternMappers.value.length > 0) {
+      wb.SheetNames.push(this.localStoragePatternMapToken);
+      wb.Sheets[this.localStoragePatternMapToken] = XLSX.utils.json_to_sheet(this.getJsonPatterns());
+    }
+  }
+
 }
 
 

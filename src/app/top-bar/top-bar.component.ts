@@ -3,10 +3,11 @@ import {AppStateService, WellKnownStates} from '../app-state.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
-import {UserService} from '../user-migrator/user.service';
+import {ResearcherService} from '../user-migrator/researcher.service';
 import {interval} from 'rxjs';
 import {TgService} from '../tg-migrator/tg.service';
 import {MutationService} from '../mutation-migrator/mutation.service';
+import {PiService} from '../user-migrator/pi.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -22,7 +23,8 @@ export class TopBarComponent implements OnInit {
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
-    public userService: UserService,
+    public researcherService: ResearcherService,
+    public piService: PiService,
     public transgeneService: TgService,
     public mutationService: MutationService,
   ) {
@@ -41,14 +43,16 @@ export class TopBarComponent implements OnInit {
       const binaryString: string = e.target.result;
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
       this.stockService.loadFromWorkbook(inputWb);
-      this.userService.loadFromWorkbook(inputWb);
+      this.researcherService.loadFromWorkbook(inputWb);
+      this.piService.loadFromWorkbook(inputWb);
       this.transgeneService.loadFromWorkbook(inputWb);
       this.mutationService.loadFromWorkbook(inputWb);
 
       // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {
         this.stockService.savePatchesToLocalStorage();
-        this.userService.savePatchesToLocalStorage();
+        this.researcherService.savePatchesToLocalStorage();
+        this.piService.savePatchesToLocalStorage();
         this.transgeneService.savePatchesToLocalStorage();
         this.mutationService.savePatchesToLocalStorage();
       })
@@ -61,7 +65,8 @@ export class TopBarComponent implements OnInit {
   exportToExcel() {
     const wb = XLSX.utils.book_new();
     this.stockService.exportWorksheet(wb);
-    this.userService.exportWorksheet(wb);
+    this.researcherService.exportWorksheet(wb);
+    this.piService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
     this.mutationService.exportWorksheet(wb);
     XLSX.writeFile(wb, this.appState.getState(WellKnownStates.FILENAME));

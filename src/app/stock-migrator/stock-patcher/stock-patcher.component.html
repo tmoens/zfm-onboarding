@@ -129,6 +129,15 @@
         <mat-hint *ngIf="_stock.comment.hasChanged()">originally:{{_stock.comment.original}}</mat-hint>
       </mat-form-field>
     </div>
+    <!----------------------------- Notes ----------------------------------------->
+    <div class="lo-row">
+      <div class="lo-30px">
+      </div>
+      <mat-form-field  floatLabel="always" disabled>
+        <mat-label>Note</mat-label>
+        <input matInput type="text" [formControl]="notesFC">
+      </mat-form-field>
+    </div>
   </div>
   <!----------------------------- Parents and kids ----------------------------------------->
   <div class="lo-column lo-gap20">

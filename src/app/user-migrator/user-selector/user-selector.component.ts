@@ -1,18 +1,27 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {User} from '../user';
-import {UserService} from '../user.service';
+import {ResearcherService} from '../researcher.service';
 
 @Component({
   selector: 'app-user-selector',
   templateUrl: './user-selector.component.html',
 })
 export class UserSelectorComponent implements OnInit {
+  filteredUsers: User[] = [];
+  @Input() primaryInvestigatorsOnly: boolean = false;
   newItem: User | null = null;
   constructor(
-    public service: UserService,
+    public service: ResearcherService,
   ) { }
 
   ngOnInit(): void {
+    this.service.filteredList.subscribe((users: User[]) => {
+      if (this.primaryInvestigatorsOnly) {
+        this.filteredUsers = users.filter((user: User) => {
+          return (user.isPrimaryInvestigator.current === 'yes');
+        })
+      } else this.filteredUsers = users;
+    })
   }
 
   select(user: User) {

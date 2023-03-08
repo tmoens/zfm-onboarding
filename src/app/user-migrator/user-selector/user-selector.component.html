@@ -8,7 +8,7 @@
   <mat-divider></mat-divider>
   <mat-selection-list #users dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(users.selectedOptions.selected[0]?.value)">
-    <ng-container *ngFor="let user of service.filteredList | async">
+    <ng-container *ngFor="let user of filteredUsers">
       <mat-list-option
         [value]='user'
         [selected]="service.selected === user"

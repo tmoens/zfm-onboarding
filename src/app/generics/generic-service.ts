@@ -175,7 +175,7 @@ export abstract class GenericService<T extends GenericType> {
   }
 
   loadPatternMappersFromWorkbook(wb: XLSX.WorkBook) {
-    const ws = wb.Sheets[`${this.worksheetName}-patterns`];
+    const ws = wb.Sheets[this.localStoragePatternMapToken];
     if (ws) {
       const pmDtos: PatternMapperDto[] = XLSX.utils.sheet_to_json(ws);
       if (pmDtos) {
@@ -218,9 +218,8 @@ export abstract class GenericService<T extends GenericType> {
 
     // Store pattern mappers if there are any.
     if (this.patternMappers.value.length > 0) {
-      const patternWorksheetName = `${this.worksheetName}-patterns`
-      wb.SheetNames.push(patternWorksheetName);
-      wb.Sheets[patternWorksheetName] = XLSX.utils.json_to_sheet(this.getJsonPatterns());
+      wb.SheetNames.push(this.localStoragePatternMapToken);
+      wb.Sheets[this.localStoragePatternMapToken] = XLSX.utils.json_to_sheet(this.getJsonPatterns());
     }
   }
 

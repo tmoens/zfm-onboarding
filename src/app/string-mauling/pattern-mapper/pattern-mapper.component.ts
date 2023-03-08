@@ -27,7 +27,9 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
   ) { }
 
   ngOnInit(): void {
-    this.patternMapper.service.list.subscribe((targets: TargetType[]) => this.mappingTargets = targets);
+    this.patternMapper.service.list.subscribe((targets: TargetType[]) => {
+      this.mappingTargets = targets;
+    });
     this.commentFC.setValue(this.patternMapper.comment);
     this.targetFC.setValue(this.patternMapper.targetString);
     this.targetFC.addValidators([targetValidator(this.patternMapper)]);

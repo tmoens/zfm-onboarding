@@ -1,0 +1,13 @@
+<div class="lo-row lo-gap20 lo-align-center tool-container">
+  <app-user-selector class="zf-full-height lo-250px"  [primaryInvestigatorsOnly]="false"></app-user-selector>
+
+  <!-- All the strings (and tokens) in the researcher field of the raw stocks worksheet -->
+  <div class="lo-column lo-gap20 zf-full-height">
+    <app-reg-exp-input (onRegExpChange)="regExpChanged($event)"></app-reg-exp-input>
+    <div class="lo-row zf-full-height-scroll">
+      <app-string-set [uniqueStringsAndTokens]="originalStrings"></app-string-set>
+      <app-string-set [uniqueStringsAndTokens]="residualStrings"></app-string-set>
+    </div>
+  </div>
+  <app-pattern-mapper-group class="zf-full-height" [service]="userService"></app-pattern-mapper-group>
+</div>

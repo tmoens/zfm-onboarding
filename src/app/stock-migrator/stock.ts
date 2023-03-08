@@ -157,11 +157,25 @@ export class Stock extends GenericType {
     this.mom.setValidity(!ValidateParent(this.service, this, this.mom.current));
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
-  applyUserPatternMappers(patternMappers: PatternMapper<User>[] = []) {
+  applyResearcherPatternMappers(patternMappers: PatternMapper<User>[] = []) {
     for (const pm of patternMappers) {
       const target: User = pm.mapStringToTarget(this.researcher.current);
       if (target) {
-        this.researcherUsername.update(target.username.current);
+        if (target.username !== this.researcherUsername) {
+          this.researcherUsername.update(target.username.current);
+        }
+        // take the first match and run.
+        return;
+      }
+    }
+  }
+  applyPiPatternMappers(patternMappers: PatternMapper<User>[] = []) {
+    for (const pm of patternMappers) {
+      const target: User = pm.mapStringToTarget(this.researcher.current);
+      if (target) {
+        if (target.username !== this.piUsername) {
+          this.piUsername.update(target.username.current);
+        }
         // take the first match and run.
         return;
       }

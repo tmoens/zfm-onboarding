@@ -25,6 +25,7 @@ export class StockPatcherComponent implements OnInit {
   researcherFC: UntypedFormControl = new UntypedFormControl();
   geneticsFC: UntypedFormControl = new UntypedFormControl();
   commentFC: UntypedFormControl = new UntypedFormControl();
+  notesFC: UntypedFormControl= new UntypedFormControl()
 
   _stock: Stock | undefined;
   moms: Stock[] = [];
@@ -49,6 +50,7 @@ export class StockPatcherComponent implements OnInit {
     this.researcherFC = new UntypedFormControl();
     this.geneticsFC = new UntypedFormControl();
     this.commentFC = new UntypedFormControl();
+    this.notesFC = new UntypedFormControl();
 
     //------------------------- Stock Name --------------------------
     this.stockNameFC.valueChanges.subscribe((value: any) => {
