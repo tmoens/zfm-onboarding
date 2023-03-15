@@ -3,6 +3,8 @@ import {PatternMapperDto} from './pattern-mapper-dto';
 import {GenericService} from '../../generics/generic-service';
 
 export class PatternMapper<T extends GenericType> {
+  private mapCount = 0;
+  private removeCount = 0;
   // A string containing a regular expression used for the matching process.
   private _regExpString: string = '';
   // A note about what this regular expression match is supposed to find.

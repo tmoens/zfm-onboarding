@@ -1,6 +1,6 @@
 // You have a set of strings.  There is much replication between them and between parts of them.
 // This class keeps all the unique strings and a count of how often they occur (because the user
-// is often interested in the ones that occur the most often.
+// is often interested in the ones that occur the most often).
 // It also breaks each string into tokens separated by whitespace and tracks how often each appears.
 //
 
@@ -12,7 +12,8 @@ export class UniqueStringsAndTokens {
 
   constructor(
     public name: string = '',
-  ) {
+    public tokenizeSlashes = false,
+    ) {
   }
 
   addString(string: string, count = 1) {
@@ -35,7 +36,12 @@ export class UniqueStringsAndTokens {
     s = s.replace(/\([^)]*\)/g, '');
 
     // finally split the thing with whitespace or semicolon
-    this.addTokens(s.split(/[\s;]+/), count);
+
+    if (this.tokenizeSlashes) {
+      this.addTokens(s.split(/[\s;\/]+/), count);
+    } else {
+      this.addTokens(s.split(/[\s;]+/), count);
+    }
 
     // TODO we *could refresh the filtered list at this pont, but in practice it isn't needed
     // because all the strings are loaded before any filtering operations. Still.

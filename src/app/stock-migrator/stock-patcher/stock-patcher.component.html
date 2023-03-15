@@ -26,6 +26,9 @@
       </mat-form-field>
     </div>
     <!----------------------------- DOB ----------------------------------------->
+    <button mat-button *ngIf="prevStock" (click)="useDateFrom(prevStock)" color="primary">
+      Use {{prevStock.stockName.current}}: {{prevStock.dob.current}}
+    </button>
     <div class="lo-row">
       <div class="lo-30px">
         <mat-icon *ngIf="!_stock.dob.isValid()" class="zf-field-boo-boo">close</mat-icon>
@@ -38,6 +41,9 @@
         <mat-hint *ngIf="_stock.dob.hasChanged()">originally:{{_stock.dob.original}}</mat-hint>
       </mat-form-field>
     </div>
+    <button mat-button *ngIf="nextStock" (click)="useDateFrom(nextStock)" color="primary">
+      Use {{nextStock.stockName.current}}: {{nextStock.dob.current}}
+    </button>
     <!----------------------------- Mom ----------------------------------------->
     <div class="lo-row">
       <div class="lo-30px">
@@ -134,7 +140,7 @@
       <div class="lo-30px">
       </div>
       <mat-form-field  floatLabel="always" disabled>
-        <mat-label>Note</mat-label>
+        <mat-label>Notes</mat-label>
         <input matInput type="text" [formControl]="notesFC">
       </mat-form-field>
     </div>

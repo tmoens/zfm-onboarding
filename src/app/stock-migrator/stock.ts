@@ -157,28 +157,37 @@ export class Stock extends GenericType {
     this.mom.setValidity(!ValidateParent(this.service, this, this.mom.current));
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
-  applyResearcherPatternMappers(patternMappers: PatternMapper<User>[] = []) {
-    for (const pm of patternMappers) {
-      const target: User = pm.mapStringToTarget(this.researcher.current);
-      if (target) {
-        if (target.username !== this.researcherUsername) {
-          this.researcherUsername.update(target.username.current);
+  applyUserPatternMappers(
+    piPatternMappers: PatternMapper<User>[] = [],
+    researcherPatternMappers: PatternMapper<User>[] = [],
+  ) {
+    let pi: User | null = null;
+    let researcher: User | null = null;
+    // First try to identify a PI
+    for (const pm of piPatternMappers) {
+      pi = pm.mapStringToTarget(this.researcher.current);
+      if (pi) {
+        if (pi.username !== this.piUsername) {
+          this.piUsername.update(pi.username.current);
         }
         // take the first match and run.
-        return;
+        break;
       }
     }
-  }
-  applyPiPatternMappers(patternMappers: PatternMapper<User>[] = []) {
-    for (const pm of patternMappers) {
-      const target: User = pm.mapStringToTarget(this.researcher.current);
-      if (target) {
-        if (target.username !== this.piUsername) {
-          this.piUsername.update(target.username.current);
+    for (const pm of researcherPatternMappers) {
+      // Now try to identify a researcher
+      researcher = pm.mapStringToTarget(this.researcher.current);
+      if (researcher) {
+        if (researcher.username !== this.piUsername) {
+          this.researcherUsername.update(researcher.username.current);
         }
         // take the first match and run.
-        return;
+        break;
       }
+    }
+    // if we found a PI but no researcher, the PI is the researcher
+    if (pi && !researcher) {
+      this.researcherUsername = this.piUsername;
     }
   }
   applyGeneticsPatternMappers(

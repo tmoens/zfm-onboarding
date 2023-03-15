@@ -18,10 +18,10 @@ export abstract class GenericService<T extends GenericType> {
     return `${this.serviceName}`;
   }
   get localStoragePatchToken(): string {
-    return `${this.serviceName}Patches`;
+    return `${this.serviceName}-patches`;
   }
   get localStoragePatternMapToken(): string {
-    return `${this.serviceName}Patterns`;
+    return `${this.serviceName}-patterns`;
   }
   get localStorageRegExpFilterStringToken(): string {
     return `${this.serviceName}RegExp`;
