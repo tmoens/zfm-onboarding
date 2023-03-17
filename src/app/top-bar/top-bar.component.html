@@ -18,13 +18,9 @@
         fieldLabel="User Filter">
       </app-reg-exp-input>
       <span class="fill-remaining-space"></span>
-      <button mat-button [disabled]="appState.activeTool === zfTool.RESEARCHER_MIGRATOR"
-              [routerLink]="zfTool.RESEARCHER_MIGRATOR.route" color="primary">
-        {{zfTool.RESEARCHER_MIGRATOR.display_name}}
-      </button>
-      <button mat-button [disabled]="appState.activeTool === zfTool.PI_MIGRATOR"
-              [routerLink]="zfTool.PI_MIGRATOR.route" color="primary">
-        {{zfTool.PI_MIGRATOR.display_name}}
+      <button mat-button [disabled]="appState.activeTool === zfTool.USER_MIGRATOR"
+              [routerLink]="zfTool.USER_MIGRATOR.route" color="primary">
+        {{zfTool.USER_MIGRATOR.display_name}}
       </button>
       <button mat-button [disabled]="appState.activeTool === zfTool.STOCK_MIGRATOR"
               [routerLink]="zfTool.STOCK_MIGRATOR.route" color="primary">

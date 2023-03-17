@@ -10,6 +10,7 @@ import {GenericType} from '../../generics/generic-type';
 export class PatternMapperGroupComponent<TargetType extends GenericType> implements OnInit {
   patternMappers: PatternMapper<TargetType>[] = [];
   lastPMIndex = 0;
+  @Input() targetCount = 1;
 
   @Input() service!: GenericService<GenericType>;
 

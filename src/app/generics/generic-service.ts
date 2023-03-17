@@ -356,7 +356,7 @@ export abstract class GenericService<T extends GenericType> {
   const matches: {[index: string]: string[]} = {};
   if (!this.selected) return matches;
   for (const pm of this.patternMappers.value) {
-    if (pm.target === this.selected) {
+    if (pm.targets.includes(this.selected)) {
       for (const [string, matchList] of Object.entries(pm.matches)) {
         matches[string] = matchList;
       }

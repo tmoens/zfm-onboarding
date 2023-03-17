@@ -6,6 +6,10 @@ import {MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '
 import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-dialog.component';
 import {GenericType} from '../../generics/generic-type';
 
+// I beg your forgiveness.  Initially a pattern mapper aped for one pattern to a single target object.
+// After much kicking and scratching, it turned out that a single "owner" pattern could map to both a
+// researcher and a PI.  So this thing is full of item0 and item1 which I would not have done
+// had I thought that a single pattern could identify multiple targets.
 @Component({
   selector: 'app-pattern-mapper[patternMapper]',
   templateUrl: './pattern-mapper.component.html',
@@ -16,11 +20,21 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
   dialogRef: MatDialogRef<MatchDetailsDialogComponent> | null = null;
   mappingTargets: TargetType[] = [];
   @Input() patternMapper!: PatternMapper<TargetType>;
-  targetFC: UntypedFormControl = new UntypedFormControl('');
+  target0FC: UntypedFormControl = new UntypedFormControl('');
+  target1FC: UntypedFormControl = new UntypedFormControl('');
+  @Input() targetCount: number = 1;
 
   @Output() onRegExpChange: EventEmitter<string> = new EventEmitter<string>();
-  filteredMappingTargets: Observable<TargetType[]> | undefined;
-  private _targetHint: string = '';
+  filteredMappingTargets0: Observable<TargetType[]> | undefined;
+  filteredMappingTargets1: Observable<TargetType[]> | undefined;
+  private _targetHint0: string = '';
+  private _targetHint1: string = '';
+  get targetHint0(): string {
+    return this._targetHint0;
+  }
+  get targetHint1(): string {
+    return this._targetHint1;
+  }
 
   constructor(
     public matchDetailsDialog: MatDialog,
@@ -31,17 +45,28 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
       this.mappingTargets = targets;
     });
     this.commentFC.setValue(this.patternMapper.comment);
-    this.targetFC.setValue(this.patternMapper.targetString);
-    this.targetFC.addValidators([targetValidator(this.patternMapper)]);
-    this.filteredMappingTargets = this.targetFC.valueChanges.pipe(
+    this.target0FC.setValue(this.patternMapper.getTargetString(0));
+    this.target0FC.addValidators([targetValidator(this.patternMapper)]);
+    this.filteredMappingTargets0 = this.target0FC.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value)),
     );
-    this.targetFC.valueChanges.subscribe((targetString: string) => {
-      this.patternMapper.setTargetFromIdString(targetString);
-      this.setTargetHint();
+    this.target0FC.valueChanges.subscribe((targetString: string) => {
+      this.patternMapper.setTargetFromIdString(targetString, 0);
+      this.setTargetHint0();
     })
-    this.setTargetHint();
+    this.target1FC.setValue(this.patternMapper.getTargetString(1));
+    this.target1FC.addValidators([targetValidator(this.patternMapper)]);
+    this.filteredMappingTargets1 = this.target1FC.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value)),
+    );
+    this.target1FC.valueChanges.subscribe((targetString: string) => {
+      this.patternMapper.setTargetFromIdString(targetString,1);
+      this.setTargetHint1();
+    })
+    this.setTargetHint0();
+    this.setTargetHint1();
   }
 
   onRegExpStringChange(regExpString: string) {
@@ -62,18 +87,21 @@ export class PatternMapperComponent<TargetType extends GenericType> implements O
     }
   }
 
-  setTargetHint() {
-    if (!this.patternMapper.targetString) {
-      this._targetHint = 'Select a target...'
-    } else if (this.patternMapper.target) {
-      this._targetHint = this.patternMapper.target.informalName;
+  setTargetHint0() {
+    const target: GenericType = this.patternMapper.getTarget(0);
+    if (target) {
+      this._targetHint0 = target.informalName
     } else {
-      this._targetHint = 'hmmmmm';
+      this._targetHint0 = `Select a target`;
     }
   }
-
-  get targetHint(): string {
-    return this._targetHint;
+  setTargetHint1() {
+    const target: GenericType = this.patternMapper.getTarget(1);
+    if (target) {
+      this._targetHint1 = target.informalName
+    } else {
+      this._targetHint1 = `Select a target`;
+    }
   }
 
   private _filter(value: string): TargetType[] {

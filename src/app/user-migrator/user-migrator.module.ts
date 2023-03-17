@@ -15,7 +15,6 @@ import {MatLegacyCheckboxModule as MatCheckboxModule} from '@angular/material/le
 import {StockMigratorModule} from '../stock-migrator/stock-migrator.module';
 import {UserMigratorRoutingModule} from './user-migrator-routing.module';
 import {SharedModule} from '../shared/shared.module';
-import { PiMigratorComponent } from './pi-migrator/pi-migrator.component';
 import {StringMaulingModule} from '../string-mauling/string-mauling.module';
 
 
@@ -24,7 +23,6 @@ import {StringMaulingModule} from '../string-mauling/string-mauling.module';
   declarations: [
     UserSelectorComponent,
     UserEditorComponent,
-    PiMigratorComponent,
   ],
   exports: [
     UserSelectorComponent,

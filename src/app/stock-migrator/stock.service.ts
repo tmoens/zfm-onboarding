@@ -14,7 +14,6 @@ import {Tg} from '../tg-migrator/tg';
 import {Mutation} from '../mutation-migrator/mutation';
 import {User} from '../user-migrator/user';
 import {MutationService} from '../mutation-migrator/mutation.service';
-import {PiService} from '../user-migrator/pi.service';
 
 /**
  * Import a customer's raw stock data from an Excel worksheet.
@@ -110,7 +109,6 @@ export class StockService extends GenericService<Stock> {
   constructor(
     private appService: AppStateService,
     private researcherService: ResearcherService,
-    private piService: PiService,
     private tgService: TgService,
     private mutationService: MutationService,
   ) {
@@ -118,10 +116,6 @@ export class StockService extends GenericService<Stock> {
     researcherService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
       this._researcherPatternMappers = patternMappers;
       this.applyResearcherPatternMappers();
-    })
-    piService.patternMappers.subscribe((patternMappers: PatternMapper<User>[]) => {
-      this._piPatternMappers = patternMappers;
-      this.applyPiPatternMappers();
     })
     tgService.patternMappers.subscribe((patternMappers: PatternMapper<Tg>[]) => {
       this._tgPatternMappers = patternMappers;

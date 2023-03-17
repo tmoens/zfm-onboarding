@@ -8,9 +8,15 @@
       </mat-form-field>
       <mat-form-field floatLabel="always">
         <mat-label>Maps to</mat-label>
-        <input matInput type="text" [formControl]="targetFC" [matAutocomplete]="transgenes">
-        <mat-hint>{{targetHint}}</mat-hint>
-        <mat-error *ngIf="targetFC.errors?.['unknownTarget']">{{targetFC.errors?.['unknownTarget']}}</mat-error>
+        <input matInput type="text" [formControl]="target0FC" [matAutocomplete]="targets0">
+        <mat-hint>{{targetHint0}}</mat-hint>
+        <mat-error *ngIf="target1FC.errors?.['unknownTarget']">{{target0FC.errors?.['unknownTarget']}}</mat-error>
+      </mat-form-field>
+      <mat-form-field *ngIf="targetCount > 1" floatLabel="always">
+        <mat-label>Maps to</mat-label>
+        <input matInput type="text" [formControl]="target1FC" [matAutocomplete]="targets1">
+        <mat-hint>{{targetHint1}}</mat-hint>
+        <mat-error *ngIf="target1FC.errors?.['unknownTarget']">{{target1FC.errors?.['unknownTarget']}}</mat-error>
       </mat-form-field>
       <button [disabled]="patternMapper.matchCount < 1" mat-button (click)="openMatchDetailsDialog()" color="primary">
         matches: {{patternMapper.matchCount}}
@@ -18,8 +24,13 @@
     </div>
   </form>
 </div>
-<mat-autocomplete #transgenes="matAutocomplete">
-  <mat-option *ngFor="let option of filteredMappingTargets | async" [value]="option.id">
+<mat-autocomplete #targets0="matAutocomplete">
+  <mat-option *ngFor="let option of filteredMappingTargets0 | async" [value]="option.id">
+    {{option.id}}^{{option.informalName}}
+  </mat-option>
+</mat-autocomplete>
+<mat-autocomplete #targets1="matAutocomplete">
+  <mat-option *ngFor="let option of filteredMappingTargets1 | async" [value]="option.id">
     {{option.id}}^{{option.informalName}}
   </mat-option>
 </mat-autocomplete>

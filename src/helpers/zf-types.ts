@@ -1,8 +1,7 @@
 export enum ZFTypes {
   SPLASH = 'splash',
   STOCK_MIGRATOR = 'stock',
-  RESEARCHER_MIGRATOR = 'researcher',
-  PI_MIGRATOR = 'pi',
+  USER_MIGRATOR = 'user',
   TRANSGENE_MIGRATOR = 'transgene',
   MUTATION_MIGRATOR = 'mutation',
 }

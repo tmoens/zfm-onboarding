@@ -19,9 +19,9 @@ export class PatternMapper<T extends GenericType> {
 
   // The thing we are trying to map to (e.g. a transgene or mutation). If the
   // regular expression matches, it in a string, then bingo.
-  public target: T | undefined;
-  // A string identifying th thing we are trying to map to.
-  public targetString: string = '';
+  public targets: T[] = [];
+  // A string identifying the thing we are trying to map to.
+  public targetStrings: string[] = [];
   set regExpString(regExpString: string) {
     this._regExpString = regExpString;
     this.makeRegExpFromString();
@@ -64,10 +64,7 @@ export class PatternMapper<T extends GenericType> {
   }
 
   // given a string, if there is a match to our regular expression, then we return our target.
-  mapStringToTarget(s: string): T | null {
-    if (!this.target || !this.regExp) {
-      return null;
-    }
+  mapStringToTarget(s: string): T[] {
     // A GIANT  wtf?  I used 'this.regExp.test(s)' originally as it is more efficient
     // than s.match(this.regExp).
     // But it produced a totally bizarre result.  On any two consecutive tests of the same
@@ -79,10 +76,10 @@ export class PatternMapper<T extends GenericType> {
     // Followed by further wtfness. I cannot leave out the 'g' flag for further
     // operations because sometimes a pattern will match more than once in a given string.
     // So I have now got two versions of the regExp.
-    if (this.regExp.test(s)) {
-      return this.target;
+    if (this.regExp?.test(s)) {
+      return this.targets;
     }
-    return null;
+    return [];
   }
 
   // So we can store and retrieve the pattern mapper using a spreadsheet and browser memory.
@@ -93,11 +90,9 @@ export class PatternMapper<T extends GenericType> {
       comment: this.comment,
       targetIdString: '',
     }
-    if (this.target?.id) {
-      pmDto.targetIdString = this.target.id;
-    } else if (this.targetString) {
-      pmDto.targetIdString = this.targetString
-    }
+    pmDto.targetIdString = this.targets.map((t: T) => {
+      return (t.id);
+    }).join(";");
     return pmDto;
   }
 
@@ -106,24 +101,40 @@ export class PatternMapper<T extends GenericType> {
     if (dto.comment) {
       this.comment = dto.comment;
     }
-    this.setTargetFromIdString(dto.targetIdString);
-    if (dto.targetIdString && !this.target) {
-      console.log(`Problem loading pattern mapper for ${dto.regExpString} - target ${dto.targetIdString} not found}`);
+    if (dto.targetIdString) {
+      this.targetStrings = dto.targetIdString.split(";");
+      for (let index = 0; index < this.targetStrings.length; index++) {
+        this.setTargetFromIdString(this.targetStrings[index], index)
+      }
     }
   }
 
-  setTargetFromIdString(targetIdString: string) {
+  setTargetFromIdString(targetIdString: string, index = 0) {
     if (targetIdString) {
-      this.targetString = targetIdString;
-      this.target = this.service.findById(targetIdString) as T | undefined;
-    } else {
-      this.targetString = '';
-      this.target = undefined;
+      this.targetStrings[index] = targetIdString;
+      const target: T | undefined = this.service.findById(targetIdString) as T | undefined;
+      if (target) {
+        this.targets[index] = target;
+      }
     }
   }
 
   clearResults() {
     this.matches = {};
     this.matchCount = 0;
+  }
+  getTargetString(index): string {
+    if (this.targetStrings[index]) {
+      return this.targetStrings[index];
+    } else {
+      return '';
+    }
+  }
+  getTarget(index = 0): T | undefined {
+    if (this.targets[index]) {
+      return this.targets[index];
+    } else {
+      return undefined;
+    }
   }
 }

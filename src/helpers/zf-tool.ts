@@ -11,14 +11,10 @@ export class ZFTool {
     'stock-migrator',
     ZFTypes.STOCK_MIGRATOR,
     'Stock Migrator');
-  static readonly RESEARCHER_MIGRATOR  = new ZFTool(
+  static readonly USER_MIGRATOR  = new ZFTool(
     'user-migrator',
-    ZFTypes.RESEARCHER_MIGRATOR,
-    'Researchers');
-  static readonly PI_MIGRATOR  = new ZFTool(
-    'pi-migrator',
-    ZFTypes.PI_MIGRATOR,
-    'PIs');
+    ZFTypes.USER_MIGRATOR,
+    'Users');
   static readonly TRANSGENE_MIGRATOR  = new ZFTool(
     'transgene-migrator',
     ZFTypes.TRANSGENE_MIGRATOR,

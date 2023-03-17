@@ -7,7 +7,6 @@ import {ResearcherService} from '../user-migrator/researcher.service';
 import {interval} from 'rxjs';
 import {TgService} from '../tg-migrator/tg.service';
 import {MutationService} from '../mutation-migrator/mutation.service';
-import {PiService} from '../user-migrator/pi.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -24,7 +23,6 @@ export class TopBarComponent implements OnInit {
     public appState: AppStateService,
     public stockService: StockService,
     public researcherService: ResearcherService,
-    public piService: PiService,
     public transgeneService: TgService,
     public mutationService: MutationService,
   ) {
@@ -44,7 +42,6 @@ export class TopBarComponent implements OnInit {
       const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
       this.stockService.loadFromWorkbook(inputWb);
       this.researcherService.loadFromWorkbook(inputWb);
-      this.piService.loadFromWorkbook(inputWb);
       this.transgeneService.loadFromWorkbook(inputWb);
       this.mutationService.loadFromWorkbook(inputWb);
 
@@ -52,7 +49,6 @@ export class TopBarComponent implements OnInit {
       interval(60000).subscribe(_ => {
         this.stockService.savePatchesToLocalStorage();
         this.researcherService.savePatchesToLocalStorage();
-        this.piService.savePatchesToLocalStorage();
         this.transgeneService.savePatchesToLocalStorage();
         this.mutationService.savePatchesToLocalStorage();
       })
@@ -66,7 +62,6 @@ export class TopBarComponent implements OnInit {
     const wb = XLSX.utils.book_new();
     this.stockService.exportWorksheet(wb);
     this.researcherService.exportWorksheet(wb);
-    this.piService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
     this.mutationService.exportWorksheet(wb);
     XLSX.writeFile(wb, this.appState.getState(WellKnownStates.FILENAME));

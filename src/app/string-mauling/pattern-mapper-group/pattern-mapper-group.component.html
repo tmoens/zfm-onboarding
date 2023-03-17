@@ -16,6 +16,7 @@
         </button>
         <mat-icon (click)="delete(pm)" color="primary">delete</mat-icon>
         <app-pattern-mapper
+          [targetCount]="targetCount"
           [patternMapper]="pm"
           (onRegExpChange)="onChange(pm)">
         </app-pattern-mapper>

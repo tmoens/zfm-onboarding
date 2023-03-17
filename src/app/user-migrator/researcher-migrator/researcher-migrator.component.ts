@@ -15,7 +15,7 @@ export class ResearcherMigratorComponent implements OnInit {
     public stockService: StockService,
     public researcherService: ResearcherService,
   ) {
-    this.appState.setActiveTool(ZFTool.RESEARCHER_MIGRATOR);
+    this.appState.setActiveTool(ZFTool.USER_MIGRATOR);
   }
 
 

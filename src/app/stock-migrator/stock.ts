@@ -164,30 +164,27 @@ export class Stock extends GenericType {
     let pi: User | null = null;
     let researcher: User | null = null;
     // First try to identify a PI
-    for (const pm of piPatternMappers) {
-      pi = pm.mapStringToTarget(this.researcher.current);
-      if (pi) {
-        if (pi.username !== this.piUsername) {
-          this.piUsername.update(pi.username.current);
-        }
-        // take the first match and run.
-        break;
-      }
-    }
     for (const pm of researcherPatternMappers) {
-      // Now try to identify a researcher
-      researcher = pm.mapStringToTarget(this.researcher.current);
-      if (researcher) {
-        if (researcher.username !== this.piUsername) {
-          this.researcherUsername.update(researcher.username.current);
-        }
-        // take the first match and run.
-        break;
+      let done = false;
+      const users: User[] = pm.mapStringToTarget(this.researcher.current);
+      // There should be two users (researcher and a PI) or none
+      switch (users.length) {
+        case 2:
+          if (users[0].username.current !== this.researcherUsername.current) {
+            this.researcherUsername.update(users[0].username.current);
+          }
+          if (users[1].username.current !== this.piUsername.current) {
+            this.piUsername.update(users[1].username.current);
+          }
+          done = true;
+          break;
+        case 0:
+          break;
+        default:
+          console.log(`Problem user pattern matcher should match 0 or two users. ${pm.regExpString} matches ${users.length}`);
       }
-    }
-    // if we found a PI but no researcher, the PI is the researcher
-    if (pi && !researcher) {
-      this.researcherUsername = this.piUsername;
+        // take the first match and run.
+       if (done)  break;
     }
   }
   applyGeneticsPatternMappers(
@@ -197,22 +194,22 @@ export class Stock extends GenericType {
     let geneticsString = this.genetics.current;
 
     for (const pm of tgPatternMappers) {
-      const target: Tg = pm.mapStringToTarget(geneticsString);
-      if (target) {
+      const targets: Tg[] = pm.mapStringToTarget(geneticsString);
+      targets.map((t: Tg) => {
         geneticsString = pm.removedMatchedBitsFromString(geneticsString);
-        if (!alleles.includes(target.allele.current)) {
-          alleles.push(target.allele.current);
+        if (!alleles.includes(t.allele.current)) {
+          alleles.push(t.allele.current);
         }
-      }
+      })
     }
     for (const pm of mutationPatternMappers) {
-      const target: Mutation = pm.mapStringToTarget(geneticsString);
-      if (target) {
+      const targets: Mutation[] = pm.mapStringToTarget(geneticsString);
+      targets.map((t: Mutation) => {
         geneticsString = pm.removedMatchedBitsFromString(geneticsString);
-        if (!alleles.includes(target.allele.current)) {
-          alleles.push(target.allele.current);
+        if (!alleles.includes(t.allele.current)) {
+          alleles.push(t.allele.current);
         }
-      }
+      })
     }
     return alleles.join(';');
   }
