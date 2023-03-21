@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {User} from '../user';
-import {ResearcherService} from '../researcher.service';
+import {UserService} from '../user.service';
 
 @Component({
   selector: 'app-user-selector',
@@ -11,7 +11,7 @@ export class UserSelectorComponent implements OnInit {
   @Input() primaryInvestigatorsOnly: boolean = false;
   newItem: User | null = null;
   constructor(
-    public service: ResearcherService,
+    public service: UserService,
   ) { }
 
   ngOnInit(): void {

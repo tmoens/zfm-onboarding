@@ -18,7 +18,7 @@ export class User extends GenericType{
   isActive: PatchableAttr = new PatchableAttr();
 
   override get id(): string {
-    return this.username.original;
+    return this.username.current;
   }
 
   override get informalName(): string {

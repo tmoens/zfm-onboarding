@@ -6,7 +6,7 @@ import {MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '
 import {MatchDetailsDialogComponent} from './match-details-dialog/match-details-dialog.component';
 import {GenericType} from '../../generics/generic-type';
 
-// I beg your forgiveness.  Initially a pattern mapper aped for one pattern to a single target object.
+// I beg your forgiveness.  Initially a pattern mapper mapped one pattern to a single target object.
 // After much kicking and scratching, it turned out that a single "owner" pattern could map to both a
 // researcher and a PI.  So this thing is full of item0 and item1 which I would not have done
 // had I thought that a single pattern could identify multiple targets.

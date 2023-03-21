@@ -1,6 +1,10 @@
 <div class="lo-column zf-full-height">
   <h3>Stock List</h3>
   <mat-divider></mat-divider>
+  <app-reg-exp-input
+    [regExpString]="service.regExpFilterString"
+    (onRegExpStringChange)="service.regExpFilterString = $event">
+  </app-reg-exp-input>
   <mat-list class="zf-full-height-scroll" dense>
     <mat-list-item
       *ngFor="let stock of service.filteredList | async"

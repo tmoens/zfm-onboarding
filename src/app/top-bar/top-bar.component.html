@@ -6,12 +6,14 @@
       <span>Zebrafish Stock Migrator</span>
       <span class="mat-body"> (migrating: {{appState.getState('filename')}})</span>
       <app-reg-exp-input
+        *ngIf="showGeneticsFilter()"
         [regExpString]="stockService.regExpFilterString"
         (onRegExpStringChange)="stockService.geneticsFilterString = $event"
         style="font-size: 10pt"
         fieldLabel="Genetics Filter">
       </app-reg-exp-input>
       <app-reg-exp-input
+        *ngIf="showUserFilter()"
         [regExpString]="stockService.userFilterString"
         (onRegExpStringChange)="stockService.userFilterString = $event"
         style="font-size: 10pt"

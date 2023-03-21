@@ -6,6 +6,10 @@
   <app-user-editor *ngIf="newItem" mode="add" [user]="newItem" (onUserCreated)="saveNewItem()"></app-user-editor>
   <app-user-editor *ngIf="!newItem && service.selected" mode="edit" [user]="service.selected"></app-user-editor>
   <mat-divider></mat-divider>
+  <app-reg-exp-input
+    [regExpString]="service.regExpFilterString"
+    (onRegExpStringChange)="service.regExpFilterString = $event">
+  </app-reg-exp-input>
   <mat-selection-list #users dense [multiple]="false" class="zf-full-height-scroll"
                       (selectionChange)="select(users.selectedOptions.selected[0]?.value)">
     <ng-container *ngFor="let user of filteredUsers">

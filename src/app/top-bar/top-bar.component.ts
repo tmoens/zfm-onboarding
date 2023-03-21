@@ -3,7 +3,7 @@ import {AppStateService, WellKnownStates} from '../app-state.service';
 import {ZFTool} from '../../helpers/zf-tool';
 import {StockService} from '../stock-migrator/stock.service';
 import * as XLSX from 'xlsx';
-import {ResearcherService} from '../user-migrator/researcher.service';
+import {UserService} from '../user-migrator/user.service';
 import {interval} from 'rxjs';
 import {TgService} from '../tg-migrator/tg.service';
 import {MutationService} from '../mutation-migrator/mutation.service';
@@ -23,7 +23,7 @@ export class TopBarComponent implements OnInit {
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
-    public researcherService: ResearcherService,
+    public researcherService: UserService,
     public transgeneService: TgService,
     public mutationService: MutationService,
   ) {
@@ -70,5 +70,12 @@ export class TopBarComponent implements OnInit {
       XLSX.utils.book_append_sheet(wb,this.inputWb.Sheets['notes'],'notes');
     }
     XLSX.writeFile(wb, this.appState.getState(WellKnownStates.FILENAME));
+  }
+  showGeneticsFilter(): boolean {
+    return (this.appState.activeTool === ZFTool.TRANSGENE_MIGRATOR ||
+        this.appState.activeTool === ZFTool.MUTATION_MIGRATOR);
+  }
+  showUserFilter(): boolean {
+    return (this.appState.activeTool === ZFTool.USER_MIGRATOR);
   }
 }

@@ -5,7 +5,7 @@ import {GenericService} from '../generics/generic-service';
 import {UniqueStringsAndTokens} from '../string-mauling/string-set/unique-strings'
 import {JsonForExcel} from '../generics/json-for-excel';
 import {PatternMapper} from '../string-mauling/pattern-mapper/pattern-mapper';
-import {ResearcherService} from '../user-migrator/researcher.service';
+import {UserService} from '../user-migrator/user.service';
 import {AppStateService} from '../app-state.service';
 import {WorkBook} from 'xlsx';
 import * as XLSX from 'xlsx';
@@ -108,7 +108,7 @@ export class StockService extends GenericService<Stock> {
 
   constructor(
     private appService: AppStateService,
-    private researcherService: ResearcherService,
+    private researcherService: UserService,
     private tgService: TgService,
     private mutationService: MutationService,
   ) {

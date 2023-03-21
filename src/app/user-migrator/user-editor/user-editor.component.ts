@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {User, ValidateUserRoleFC} from '../user';
-import {ResearcherService} from '../researcher.service';
+import {UserService} from '../user.service';
 import {ValidatorFn, Validators} from '@angular/forms';
 import {ValidateYesNoFC} from '../../generics/validators/yes-no.validator';
 import {uniquenessValidatorFC} from '../../generics/validators/uniqueness.validator';
@@ -42,7 +42,7 @@ export class UserEditorComponent implements OnInit {
 
 
   constructor(
-    private service: ResearcherService,
+    private service: UserService,
   ) {
   }
 
