@@ -16,6 +16,7 @@ import {MutationService} from '../mutation-migrator/mutation.service';
 
 export class TopBarComponent implements OnInit {
   zfTool = ZFTool;
+  inputWb: XLSX.WorkBook | null = null;
 
   regExpString: string = '.*'
 
@@ -39,11 +40,12 @@ export class TopBarComponent implements OnInit {
     const reader: FileReader = new FileReader();
     reader.onload = (e: any) => {
       const binaryString: string = e.target.result;
-      const inputWb: XLSX.WorkBook = XLSX.read(binaryString, { type: 'binary' });
-      this.stockService.loadFromWorkbook(inputWb);
-      this.researcherService.loadFromWorkbook(inputWb);
-      this.transgeneService.loadFromWorkbook(inputWb);
-      this.mutationService.loadFromWorkbook(inputWb);
+      this.inputWb = XLSX.read(binaryString, { type: 'binary' });
+      this.stockService.loadFromWorkbook(this.inputWb);
+      this.researcherService.loadFromWorkbook(this.inputWb);
+      this.transgeneService.loadFromWorkbook(this.inputWb);
+      this.mutationService.loadFromWorkbook(this.inputWb);
+
 
       // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {
@@ -64,6 +66,9 @@ export class TopBarComponent implements OnInit {
     this.researcherService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
     this.mutationService.exportWorksheet(wb);
+    if (this.inputWb.SheetNames.includes('notes')) {
+      XLSX.utils.book_append_sheet(wb,this.inputWb.Sheets['notes'],'notes');
+    }
     XLSX.writeFile(wb, this.appState.getState(WellKnownStates.FILENAME));
   }
 }
