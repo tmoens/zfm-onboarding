@@ -360,11 +360,11 @@ export class StockService extends GenericService<Stock> {
       }
       stockMarkerDtos.push(stockMarkerDto);
     })
-    wb.SheetNames.push('stocks');
+    wb.SheetNames.push('stock');
     wb.Sheets['stocks'] = XLSX.utils.json_to_sheet(stockImportDtos);
     wb.SheetNames.push('lineage');
     wb.Sheets['lineage'] = XLSX.utils.json_to_sheet(stockLineageDtos);
-    wb.SheetNames.push('markers');
+    wb.SheetNames.push('stick-markers');
     wb.Sheets['markers'] = XLSX.utils.json_to_sheet(stockMarkerDtos);
   }
 }

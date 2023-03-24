@@ -12,10 +12,6 @@ import {Mutation} from './mutation';
 })
 export class MutationService extends GenericService<Mutation>{
   serviceName = 'mutation';
-  override get worksheetName(): string {
-    return 'mutations';
-  }
-
 
   override loadJsonItems(itemsFromWorksheet: JsonForExcel[]) {
     for (const jsonTg of itemsFromWorksheet) {

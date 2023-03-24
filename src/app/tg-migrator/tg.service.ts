@@ -12,10 +12,6 @@ import {Tg} from './tg';
 })
 export class TgService extends GenericService<Tg>{
   serviceName = 'transgene';
-  override get worksheetName(): string {
-    return 'transgenes';
-  }
-
 
   override loadJsonItems(itemsFromWorksheet: JsonForExcel[]) {
     for (const jsonTg of itemsFromWorksheet) {

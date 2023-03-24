@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {User} from './user';
 import {GenericService} from '../generics/generic-service';
 import {JsonForExcel} from '../generics/json-for-excel';
-import {Tg} from '../tg-migrator/tg';
 
 /**
  * Load customer's user information from a spreadsheet. Augment or edit it.
@@ -12,12 +11,7 @@ import {Tg} from '../tg-migrator/tg';
   providedIn: 'root'
 })
 export class UserService extends GenericService<User>{
-  serviceName = 'researcher';
-  override get worksheetName(): string {
-    return 'users';
-  }
-
-
+  serviceName = 'user';
 
   override loadJsonItems(usersFromWorksheet: JsonForExcel[]) {
     for (const rawUser of usersFromWorksheet) {
