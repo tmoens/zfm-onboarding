@@ -3,7 +3,7 @@ import {PatchableAttr} from '../shared/patching/patchable-attr';
 
 
 export class Mutation extends GenericType{
-  allele: PatchableAttr = new PatchableAttr();
+  name: PatchableAttr = new PatchableAttr();
   gene: PatchableAttr = new PatchableAttr();
   source: PatchableAttr = new PatchableAttr();
   nickname: PatchableAttr = new PatchableAttr();
@@ -12,7 +12,7 @@ export class Mutation extends GenericType{
   mutationType: PatchableAttr = new PatchableAttr();
 
   override get id(): string {
-    return this.allele.current;
+    return this.name.current;
   }
   override get informalName(): string {
     return this.gene.current;

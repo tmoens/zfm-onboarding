@@ -161,8 +161,6 @@ export class Stock extends GenericType {
     piPatternMappers: PatternMapper<User>[] = [],
     researcherPatternMappers: PatternMapper<User>[] = [],
   ) {
-    let pi: User | null = null;
-    let researcher: User | null = null;
     // First try to identify a PI
     for (const pm of researcherPatternMappers) {
       let done = false;
@@ -206,8 +204,8 @@ export class Stock extends GenericType {
       const targets: Mutation[] = pm.mapStringToTarget(geneticsString);
       targets.map((t: Mutation) => {
         geneticsString = pm.removedMatchedBitsFromString(geneticsString);
-        if (!alleles.includes(t.allele.current)) {
-          alleles.push(t.allele.current);
+        if (!alleles.includes(t.name.current)) {
+          alleles.push(t.name.current);
         }
       })
     }

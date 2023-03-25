@@ -37,7 +37,7 @@ export class MutationService extends GenericService<Mutation>{
   override filterList() {
     if (this._regExpFilter) {
       this._filteredList = this._list.filter((mutation: Mutation) => {
-        return (this._regExpFilter?.test(mutation.allele.current) ||
+        return (this._regExpFilter?.test(mutation.name.current) ||
           this._regExpFilter?.test(mutation.gene.current) ||
           this._regExpFilter?.test(mutation.nickname.current));
       })

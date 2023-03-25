@@ -1,8 +1,8 @@
 <div *ngIf="mutation" class="lo-column lo-gap5" style="width: 200px">
   <app-patchable-attr-viewer
-    (onChange)="onChange($event)"
-    [validators]="alleleValidators"
-    [attr]="mutation.allele" label="Allele">
+          (onChange)="onChange($event)"
+          [validators]="alleleValidators"
+          [attr]="mutation.name" label="Allele">
   </app-patchable-attr-viewer>
   <app-patchable-attr-viewer
     (onChange)="onChange($event)"

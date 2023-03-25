@@ -25,7 +25,7 @@
           <div class="lo-15px">
             <mat-icon *ngIf="!mutation.valid" class="zf-field-boo-boo">close</mat-icon>
           </div>
-          <div>{{mutation.gene.current}}^{{mutation.allele.current}}</div>
+          <div>{{mutation.gene.current}}^{{mutation.name.current}}</div>
           <button mat-icon-button (click)="openMatchDetailsDialog(mutation)" color="primary">
             <mat-icon>more_horiz</mat-icon>
           </button>
