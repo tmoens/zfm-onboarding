@@ -13,6 +13,13 @@
         fieldLabel="Genetics Filter">
       </app-reg-exp-input>
       <app-reg-exp-input
+        *ngIf="showGeneticsFilter()"
+        [regExpString]="stockService.regExpFilterString"
+        (onRegExpStringChange)="stockService.piFilterForGenetics = $event"
+        style="font-size: 10pt"
+        fieldLabel="PI Filter for Genetics">
+      </app-reg-exp-input>
+      <app-reg-exp-input
         *ngIf="showUserFilter()"
         [regExpString]="stockService.userFilterString"
         (onRegExpStringChange)="stockService.userFilterString = $event"

@@ -97,13 +97,14 @@ export class StockService extends GenericService<Stock> {
     this.residualGeneticsStrings.value.setFilter(this._geneticsFilter);
     this.applyGeneticsPatternMappers();
   }
-  get geneticsFilterString(): string {
-    const regExpString = this.appState.getState('geneticsRegExpFilterString');
-    if (regExpString) {
-      return regExpString;
-    } else {
-      return '.*';
+  _piFilterForGenetics: RegExp = /.*/;
+  set piFilterForGenetics(regExpString: string) {
+    try {
+      this._piFilterForGenetics = new RegExp(regExpString, 'i');
+    } catch {
+      console.log('Oopsy, this should not happen.');
     }
+    this.refreshStringsAndTokens();
   }
 
   constructor(
@@ -182,7 +183,7 @@ export class StockService extends GenericService<Stock> {
       this._filteredList = this._list.filter((stock: Stock) => {
         return (this._regExpFilter?.test(stock.stockName.current) ||
           this._regExpFilter?.test(stock.genetics.current) ||
-          this._regExpFilter?.test(stock.notes.current) ||
+          this._regExpFilter?.test(stock.migrationNotes.current) ||
           this._regExpFilter?.test(stock.comment.current));
       })
     }
@@ -247,7 +248,7 @@ export class StockService extends GenericService<Stock> {
 
   /**
    * Itemize and tokenize the input strings that represent the genetics for each stock
-   * and the researchers (users) associated with each stock.
+   * and the users associated with each stock.
    */
   refreshStringsAndTokens() {
     const researcherSandT = new UniqueStringsAndTokens('Original', true);
@@ -259,7 +260,13 @@ export class StockService extends GenericService<Stock> {
     this._list.map((s: Stock) => {
       researcherSandT.addString(s.researcher.current);
       piSandT.addString(s.researcher.current);
-      geneticsSandT.addString(s.genetics.current);
+      // For a big lab there are too many genetics strings and tokens to
+      // deal with, so we can filter down to only the genetics strings and
+      // tokens for the stocks belonging to a single PI.  Note, this only
+      // makes sense if the PIs of all the stocks are known.
+      if (this._piFilterForGenetics.test(s.piUsername.current)) {
+        geneticsSandT.addString(s.genetics.current);
+      }
     });
     this.researcherStrings.next(researcherSandT);
     this.piStrings.next(piSandT);
@@ -333,38 +340,56 @@ export class StockService extends GenericService<Stock> {
 
     this._list.map((stock: Stock) => {
       stock.applyUserPatternMappers(this._piPatternMappers, this._researcherPatternMappers);
+      const migrationNotes: string[] = [];
+      if (stock.researcher.original) {
+        migrationNotes.push(`original owner: ${stock.researcher.original}`);
+      }
+      if (stock.migrationNotes.current) {
+        migrationNotes.push(stock.migrationNotes.current);
+      }
+
       const stockImportDto: JsonForExcel = {
         name: stock.stockName.current,
         description: stock.genetics.current,
-        comment: stock.comment.current,
+        comment: (migrationNotes.length > 0) ? `${stock.comment.current} Migration notes: ${migrationNotes.join("; ")}` : stock.comment.current,
         fertilizationDate: stock.dob.current,
         countEnteringNursery: stock.countEnteringNursery.current,
         countLeavingNursery: stock.countLeavingNursery.current,
         researcherUsername: stock.researcherUsername.current,
         piUsername: stock.piUsername.current,
+        userCrosscheck: stock.researcher.current,
       }
       stockImportDtos.push(stockImportDto);
-      const stockLineageDto: JsonForExcel = {
-        stockNumber: stock.stockName.current,
-        internalMom: stock.mom?.current,
-        internalDad: stock.dad?.current,
-        externalMomName: '',
-        externalMomDescription: '',
-        externalDadName: '',
-        externalDadDescription: '',
+
+      // export lineage only if the stock has a parent
+      if (stock.mom?.current || stock.dad?.current) {
+        const stockLineageDto: JsonForExcel = {
+          stockNumber: stock.stockName.current,
+          internalMom: stock.mom?.current,
+          internalDad: stock.dad?.current,
+          externalMomName: '',
+          externalMomDescription: '',
+          externalDadName: '',
+          externalDadDescription: '',
+        }
+        stockLineageDtos.push(stockLineageDto);
       }
-      stockLineageDtos.push(stockLineageDto);
-      const stockMarkerDto: JsonForExcel = {
-        stockNumber: stock.stockName.current,
-        alleles: stock.applyGeneticsPatternMappers(this._tgPatternMappers, this._mutationPatternMappers),
+      // likewise, only export markers if there are markers to export.
+      const alleles: string = stock.applyGeneticsPatternMappers(this._tgPatternMappers, this._mutationPatternMappers);
+      if (alleles) {
+        const stockMarkerDto: JsonForExcel = {
+          stockName: stock.stockName.current,
+          alleles: alleles,
+          alleleCrosscheck: stock.genetics.current,
+        }
+        stockMarkerDtos.push(stockMarkerDto);
       }
-      stockMarkerDtos.push(stockMarkerDto);
     })
     wb.SheetNames.push('stock');
-    wb.Sheets['stocks'] = XLSX.utils.json_to_sheet(stockImportDtos);
+    wb.Sheets['stock'] = XLSX.utils.json_to_sheet(stockImportDtos);
     wb.SheetNames.push('lineage');
     wb.Sheets['lineage'] = XLSX.utils.json_to_sheet(stockLineageDtos);
-    wb.SheetNames.push('stick-markers');
-    wb.Sheets['markers'] = XLSX.utils.json_to_sheet(stockMarkerDtos);
+    wb.SheetNames.push('stock-markers');
+    wb.Sheets['stock-markers'] = XLSX.utils.json_to_sheet(stockMarkerDtos);
   }
 }

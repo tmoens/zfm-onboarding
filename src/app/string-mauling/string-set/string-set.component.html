@@ -1,12 +1,12 @@
 <h3>{{stringsAndTokens.name}}</h3>
 <div class="lo-row">
-  <div class="lo-column lo-gap20">
+  <div class="lo-column lo-gap20" style="max-width: 250px;">
     <h3>Tokens ({{stringsAndTokens.filteredTokens.length}} of {{stringsAndTokens.tokenCount}})</h3>
     <div *ngFor="let s of stringsAndTokens.filteredTokensOrderedByFrequency" >
       {{s.string}} ({{s.frequency}})
     </div>
   </div>
-  <div class="lo-column lo-gap20">
+  <div class="lo-column lo-gap20" style="max-width: 250px;">
     <h3>Strings ({{stringsAndTokens.filteredStrings.length}} of {{stringsAndTokens.stringCount}})</h3>
     <div *ngFor="let s of stringsAndTokens.filteredStingsOrderedByFrequency" >
       {{s.string}} ({{s.frequency}})

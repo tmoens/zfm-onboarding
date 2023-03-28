@@ -1,4 +1,4 @@
-<mat-form-field floatLabel="always">
+<mat-form-field floatLabel="always" style="min-width:240px">
   <mat-label>{{fieldLabel}}</mat-label>
   <input [formControl]="regExpStringFC" type="text" matInput>
   <mat-error *ngIf="regExpStringFC.invalid">Invalid RegExp</mat-error>

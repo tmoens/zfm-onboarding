@@ -140,7 +140,7 @@ export class StockPatcherComponent implements OnInit {
     this.countLeavingNurseryFC.setValue(stock.countLeavingNursery.current);
     this.geneticsFC.setValue(stock.genetics.current);
     this.commentFC.setValue(stock.comment.current);
-    this.notesFC.setValue(stock.notes.current);
+    this.notesFC.setValue(stock.migrationNotes.current);
     this.researcherFC.setValue(stock.researcher.current);
 
     if (this._stock) {

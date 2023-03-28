@@ -8,7 +8,7 @@ export abstract class GenericType{
   abstract get id(): string;
   abstract get informalName(): string;
 
-  notes: PatchableAttr = new PatchableAttr();
+  migrationNotes: PatchableAttr = new PatchableAttr();
   abstract getPatchableAttrValue(attrName: string): string | null;
 
 
@@ -62,8 +62,8 @@ export abstract class GenericType{
   }
   extractJsonForExcel(item: JsonForExcel): JsonForExcel | null {
     const notes: string[] = [];
-    if (this.notes.current) {
-      notes.push(this.notes.current);
+    if (this.migrationNotes.current) {
+      notes.push(this.migrationNotes.current);
     }
     Object.entries(this).map(([key, value]) => {
       if (value instanceof PatchableAttr  && key !== 'notes') {
