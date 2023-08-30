@@ -27,6 +27,7 @@ export class Stock extends GenericType {
   countEnteringNursery: PatchableAttr = new PatchableAttr();
   countLeavingNursery: PatchableAttr = new PatchableAttr();
   researcher: PatchableAttr = new PatchableAttr();
+  pi: PatchableAttr = new PatchableAttr();
   genetics: PatchableAttr = new PatchableAttr();
   comment: PatchableAttr = new PatchableAttr();
   researcherUsername: PatchableAttr = new PatchableAttr();
@@ -158,32 +159,33 @@ export class Stock extends GenericType {
     this.dad.setValidity(!ValidateParent(this.service, this, this.dad.current));
   }
   applyUserPatternMappers(
-    piPatternMappers: PatternMapper<User>[] = [],
-    researcherPatternMappers: PatternMapper<User>[] = [],
+    userPatternMappers: PatternMapper<User>[] = [],
   ) {
-    // First try to identify a PI
-    for (const pm of researcherPatternMappers) {
-      let done = false;
-      const users: User[] = pm.mapStringToTarget(this.researcher.current);
-      // There should be two users (researcher and a PI) or none
-      switch (users.length) {
-        case 2:
-          if (users[0].username.current !== this.researcherUsername.current) {
-            this.researcherUsername.update(users[0].username.current);
-          }
-          if (users[1].username.current !== this.piUsername.current) {
-            this.piUsername.update(users[1].username.current);
-          }
-          done = true;
-          break;
-        case 0:
-          break;
-        default:
-          console.log(`Problem user pattern matcher should match 0 or two users. ${pm.regExpString} matches ${users.length}`);
+    // Map researchers to users
+    for (const pm of userPatternMappers) {
+      const researchers: User[] = pm.mapStringToTarget(this.researcher.current);
+      if (researchers.length === 1) {
+        const researcher: User = researchers[0];
+        if (researcher && researcher.username.current !== this.researcherUsername.current) {
+          this.researcherUsername.update(researcher.username.current);
+        }
+        break;
       }
-        // take the first match and run.
-       if (done)  break;
     }
+
+    // Map PIs to users.  Note, this does not check if the user is in fact a PI
+    // so be a bit careful here.
+    for (const pm of userPatternMappers) {
+      const pis: User[] = pm.mapStringToTarget(this.pi.current);
+      if (pis.length === 1) {
+        const pi: User = pis[0];
+        if (pi && pi.username.current !== this.piUsername.current) {
+          this.piUsername.update(pi.username.current)
+        }
+        break;
+      }
+    }
+
   }
   applyGeneticsPatternMappers(
     tgPatternMappers: PatternMapper<Tg>[] = [],

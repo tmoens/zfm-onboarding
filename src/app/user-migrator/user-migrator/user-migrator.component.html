@@ -4,9 +4,9 @@
   <!-- All the strings (and tokens) in the researcher field of the raw stocks worksheet -->
   <div class="lo-column lo-gap20 zf-full-height">
     <div class="lo-row zf-full-height-scroll">
-      <app-string-set [uniqueStringsAndTokens]="stockService.researcherStrings | async"></app-string-set>
-      <app-string-set [uniqueStringsAndTokens]="stockService.residualResearcherStrings | async"></app-string-set>
+      <app-string-set [uniqueStringsAndTokens]="stockService.userStrings | async"></app-string-set>
+      <app-string-set [uniqueStringsAndTokens]="stockService.residualUserStrings | async"></app-string-set>
     </div>
   </div>
-  <app-pattern-mapper-group class="zf-full-height" [service]="researcherService" [targetCount]="2"></app-pattern-mapper-group>
+  <app-pattern-mapper-group class="zf-full-height" [service]="userService"></app-pattern-mapper-group>
 </div>

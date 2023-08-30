@@ -21,7 +21,7 @@ import {SplashComponent } from './splash/splash.component';
 import {AppRoutingModule} from './app-routing.module';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {AppStateService} from './app-state.service';
-import {ResearcherMigratorComponent} from './user-migrator/researcher-migrator/researcher-migrator.component';
+import {UserMigratorComponent} from './user-migrator/user-migrator/user-migrator.component';
 import {UserMigratorModule} from './user-migrator/user-migrator.module';
 import {StringMaulingModule} from './string-mauling/string-mauling.module';
 import {MatIconModule} from '@angular/material/icon';
@@ -39,7 +39,7 @@ export function appStateProviderFactory(provider: AppStateService) {
   declarations: [
     AppComponent,
     StockMigratorComponent,
-    ResearcherMigratorComponent,
+    UserMigratorComponent,
     TgMigratorComponent,
     MutationMigratorComponent,
     TopBarComponent,

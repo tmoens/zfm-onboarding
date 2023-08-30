@@ -61,7 +61,7 @@ export class PatternMapper<T extends GenericType> {
     }
   }
 
-  // given a string, if there is a match to our regular expression, then we return our target.
+  // given a string, if there is a match to our regular expression, then we return our targets.
   mapStringToTarget(s: string): T[] {
     // A GIANT  wtf?  I used 'this.regExp.test(s)' originally as it is more efficient
     // than s.match(this.regExp).

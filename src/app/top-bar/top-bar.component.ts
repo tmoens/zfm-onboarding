@@ -23,7 +23,7 @@ export class TopBarComponent implements OnInit {
   constructor(
     public appState: AppStateService,
     public stockService: StockService,
-    public researcherService: UserService,
+    public userService: UserService,
     public transgeneService: TgService,
     public mutationService: MutationService,
   ) {
@@ -42,7 +42,7 @@ export class TopBarComponent implements OnInit {
       const binaryString: string = e.target.result;
       this.inputWb = XLSX.read(binaryString, { type: 'binary' });
       this.stockService.loadFromWorkbook(this.inputWb);
-      this.researcherService.loadFromWorkbook(this.inputWb);
+      this.userService.loadFromWorkbook(this.inputWb);
       this.transgeneService.loadFromWorkbook(this.inputWb);
       this.mutationService.loadFromWorkbook(this.inputWb);
 
@@ -50,7 +50,7 @@ export class TopBarComponent implements OnInit {
       // Now start a loop to save any patches to memory every minute
       interval(60000).subscribe(_ => {
         this.stockService.savePatchesToLocalStorage();
-        this.researcherService.savePatchesToLocalStorage();
+        this.userService.savePatchesToLocalStorage();
         this.transgeneService.savePatchesToLocalStorage();
         this.mutationService.savePatchesToLocalStorage();
       })
@@ -63,7 +63,7 @@ export class TopBarComponent implements OnInit {
   exportToExcel() {
     const wb = XLSX.utils.book_new();
     this.stockService.exportWorksheet(wb);
-    this.researcherService.exportWorksheet(wb);
+    this.userService.exportWorksheet(wb);
     this.transgeneService.exportWorksheet(wb);
     this.mutationService.exportWorksheet(wb);
     if (this.inputWb.SheetNames.includes('notes')) {
