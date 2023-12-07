@@ -29,9 +29,11 @@ export class Stock extends GenericType {
   researcher: PatchableAttr = new PatchableAttr();
   pi: PatchableAttr = new PatchableAttr();
   genetics: PatchableAttr = new PatchableAttr();
+  description: PatchableAttr = new PatchableAttr();
   comment: PatchableAttr = new PatchableAttr();
   researcherUsername: PatchableAttr = new PatchableAttr();
   piUsername: PatchableAttr = new PatchableAttr();
+  tank: PatchableAttr  = new PatchableAttr();
   private _row: number | null = null;
   set row(value: number | null) {
     this._row = value;

@@ -23,8 +23,10 @@ export class StockPatcherComponent implements OnInit {
   countEnteringNurseryFC: UntypedFormControl;
   countLeavingNurseryFC: UntypedFormControl;
   researcherFC: UntypedFormControl;
+  descriptionFC: UntypedFormControl;
   geneticsFC: UntypedFormControl;
   commentFC: UntypedFormControl;
+  tankFC: UntypedFormControl;
   notesFC: UntypedFormControl;
 
   _stock: Stock | undefined;
@@ -101,6 +103,13 @@ export class StockPatcherComponent implements OnInit {
       this._stock?.countLeavingNursery.update(String(value));
       this._stock?.countLeavingNursery.setValidity(this.countLeavingNurseryFC.valid);
     })
+    //------------------------- Description --------------------------
+    this.descriptionFC = new UntypedFormControl();
+    this.descriptionFC.valueChanges.subscribe((value: any) => {
+      if (value === this._stock.description.current) return;
+      this._stock?.description.update(String(value));
+      this.service.refreshStringsAndTokens();
+    })
     //------------------------- Genetics & Comment --------------------------
     this.geneticsFC = new UntypedFormControl();
     this.geneticsFC.valueChanges.subscribe((value: any) => {
@@ -118,6 +127,13 @@ export class StockPatcherComponent implements OnInit {
     this.researcherFC.valueChanges.subscribe((value: any) => {
       if (value === this._stock.researcher.current) return;
       this._stock?.researcher.update(String(value));
+      this.service.refreshStringsAndTokens();
+    })
+    //------------------------- Tanks --------------------------
+    this.tankFC = new UntypedFormControl();
+    this.tankFC.valueChanges.subscribe((value: any) => {
+      if (value === this._stock.tank.current) return;
+      this._stock?.tank.update(String(value));
       this.service.refreshStringsAndTokens();
     })
     this.notesFC = new UntypedFormControl();
@@ -138,6 +154,8 @@ export class StockPatcherComponent implements OnInit {
     this.dobFC.setValue(stock.dob.current);
     this.countEnteringNurseryFC.setValue(stock.countEnteringNursery.current);
     this.countLeavingNurseryFC.setValue(stock.countLeavingNursery.current);
+    this.descriptionFC.setValue(stock.description.current);
+    this.tankFC.setValue(stock.tank.current);
     this.geneticsFC.setValue(stock.genetics.current);
     this.commentFC.setValue(stock.comment.current);
     this.notesFC.setValue(stock.migrationNotes.current);

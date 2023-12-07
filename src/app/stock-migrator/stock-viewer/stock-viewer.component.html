@@ -17,6 +17,9 @@
     *ngIf="stock.dad.current && !mini" [attr]="stock.dad" label="Dad">
   </app-patchable-attr-viewer>
   <app-patchable-attr-viewer [disabled]=true
+    *ngIf="stock.genetics.current" [attr]="stock.description" label="Genetics">
+  </app-patchable-attr-viewer>
+  <app-patchable-attr-viewer [disabled]=true
     *ngIf="stock.genetics.current" [attr]="stock.genetics" label="Genetics">
   </app-patchable-attr-viewer>
   <app-patchable-attr-viewer [disabled]=true

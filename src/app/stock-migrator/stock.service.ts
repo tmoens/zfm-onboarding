@@ -305,10 +305,12 @@ export class StockService extends GenericService<Stock> {
     // - "stocks" bare bones of each stock plus the researcher and pi usernames
     // - "lineage" parents of each stock
     // - "markers" mutations and transgenes for each stock
+    // - "swimmers" Which stocks are in which tanks
     super.exportWorksheet(wb);
     const stockImportDtos: JsonForExcel[] = [];
     const stockLineageDtos: JsonForExcel[] = [];
     const stockMarkerDtos: JsonForExcel[] = [];
+    const swimmerDtos: JsonForExcel[] = [];
 
     this._list.map((stock: Stock) => {
       stock.applyUserPatternMappers(this._userPatternMappers);
@@ -320,9 +322,15 @@ export class StockService extends GenericService<Stock> {
         migrationNotes.push(stock.migrationNotes.current);
       }
 
+      let description: string = '';
+      if (stock.description.current || stock.description.original) {
+        description = stock.description.current;
+      } else {
+        description = stock.genetics.current;
+      }
       const stockImportDto: JsonForExcel = {
         name: stock.stockName.current,
-        description: stock.genetics.current,
+        description: description,
         comment: (migrationNotes.length > 0) ? `${stock.comment.current} Migration notes: ${migrationNotes.join("; ")}` : stock.comment.current,
         fertilizationDate: stock.dob.current,
         countEnteringNursery: stock.countEnteringNursery.current,
@@ -356,6 +364,15 @@ export class StockService extends GenericService<Stock> {
         }
         stockMarkerDtos.push(stockMarkerDto);
       }
+      // export swimmers if they are there
+      if (stock.tank?.current) {
+        const stockLineageDto: JsonForExcel = {
+          stockNumber: stock.stockName.current,
+          internalMom: stock.tank.current,
+        }
+        swimmerDtos.push(stockLineageDto);
+      }
+
     })
     wb.SheetNames.push('stock');
     wb.Sheets['stock'] = XLSX.utils.json_to_sheet(stockImportDtos);
@@ -363,5 +380,9 @@ export class StockService extends GenericService<Stock> {
     wb.Sheets['lineage'] = XLSX.utils.json_to_sheet(stockLineageDtos);
     wb.SheetNames.push('stock-markers');
     wb.Sheets['stock-markers'] = XLSX.utils.json_to_sheet(stockMarkerDtos);
+    if (swimmerDtos.length > 0) {
+      wb.SheetNames.push('swimmers');
+      wb.Sheets['swimmers'] = XLSX.utils.json_to_sheet(swimmerDtos);
+    }
   }
 }

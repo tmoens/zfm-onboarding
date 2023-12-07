@@ -111,6 +111,19 @@
         </mat-hint>
       </mat-form-field>
     </div>
+    <!----------------------------- Description ----------------------------------------->
+    <div class="lo-row">
+      <div class="lo-30px">
+      </div>
+      <div class="lo-column">
+        <mat-form-field  floatLabel="always">
+          <mat-label>Description</mat-label>
+          <input matInput type="text" [formControl]="descriptionFC">
+          <mat-error *ngIf="descriptionFC.invalid">{{descriptionFC.errors?.['invalid']}}</mat-error>
+          <mat-hint *ngIf="_stock.description.hasChanged()">originally:{{_stock.description.original}}</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
     <!----------------------------- Genetics ----------------------------------------->
     <div class="lo-row">
       <div class="lo-30px">
@@ -123,6 +136,17 @@
           <mat-hint *ngIf="_stock.genetics.hasChanged()">originally:{{_stock.genetics.original}}</mat-hint>
         </mat-form-field>
       </div>
+    </div>
+    <!----------------------------- Tank ----------------------------------------->
+    <div class="lo-row">
+      <div class="lo-30px">
+      </div>
+      <mat-form-field  floatLabel="always">
+        <mat-label>Swimmer</mat-label>
+        <input matInput type="text" [formControl]="tankFC">
+        <mat-error *ngIf="tankFC.invalid">{{tankFC.errors?.['invalid']}}</mat-error>
+        <mat-hint *ngIf="_stock.tank.hasChanged()">originally:{{_stock.tank.original}}</mat-hint>
+      </mat-form-field>
     </div>
     <!----------------------------- Comments ----------------------------------------->
     <div class="lo-row">
